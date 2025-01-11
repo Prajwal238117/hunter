@@ -15,7 +15,7 @@
         <div class="container">
             <h1><img src="logo.jpg" width=50> Hunter Top-Up Centre</h1>
             <a href="index.html" >Home</a>
-            <a href="products.html" >Products</a>
+            <a href="product.html" >Products</a>
             <a href="contactus.html" class="active">Contact Us </a>
            </div>
       </nav>
@@ -29,27 +29,39 @@
     </header>
    
 
-    <!-- Contact Us Section -->
-    <section id="contact-us">
-        <h2>Contact Us</h2>
-        <div class="container">
-            <form id="contact-form">
-                <div class="form-group">
-                    <label for="name">Name</label>
-                    <input type="text" id="name" name="name" placeholder="Enter your name" required>
-                </div>
-                <div class="form-group">
-                    <label for="email">Email</label>
-                    <input type="email" id="email" name="email" placeholder="Enter your email" required>
-                </div>
-                <div class="form-group">
-                    <label for="message">Message</label>
-                    <textarea id="message" name="message" placeholder="Enter your message" required></textarea>
-                </div>
-                <button type="submit" class="buynow">Send Message</button>
-            </form>
+   
+            <!-- Contact Details -->
+            <div class="contact-details">
+                <h3>Contact Information</h3>
+                <p><strong>Phone Number:</strong> 9800745053</p>
+                <p><strong>Email:</strong> <a href="mailto:abc@gmail.com">abc@gmail.com</a></p>
+            </div>
+    
+            <!-- Contact Form -->
+            <div class="contact-form">
+                <h3>Get in Touch</h3>
+                <form id="contact-form">
+                    <div class="form-group">
+                        <label for="name">Name</label>
+                        <input type="text" id="name" name="name" placeholder="Enter your name">
+                    </div>
+                    <div class="form-group">
+                        <label for="email">Email</label>
+                        <input type="email" id="email" name="email" placeholder="Enter your email">
+                    </div>
+                    <div class="form-group">
+                        <label for="message">Message</label>
+                        <textarea id="message" name="message" placeholder="Enter your message"></textarea>
+                    </div>
+                    <input type="submit" value="Send Message">
+                </form>
+            </div>
         </div>
+    
+     <!-- Toast Notification -->
+     <div id="toast" class="toast">Form submitted successfully!</div>
     </section>
+    
 
     <!-- Footer -->
     <footer>
