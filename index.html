@@ -7,17 +7,26 @@
     <link rel="stylesheet" href="styles.css">
 
       <!-- Font Awesome CDN -->
-      <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
-  
+    
+      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+   
+     
+
 </head>
 <body>
     <!-- Navbar -->
 <nav>
   <div class="container">
-      <h1><a href="index.html" > </a><img src="logo.jpg" width=50> Hunter Top-Up Centre </a> </h1>
-      <a href="index.html" class="active">Home</a>
-      <a href="product.html">Products</a>
-      <a href="contactus.html">Contact Us </a>
+      <h1>07 Hunter Top-Up Centre </h1>
+      <div class="hamburger-menu">&#9776;</div>
+        <div class="nav-links">
+            <a href="index.html" class="active">Home</a>
+            <a href="#features-list">Features</a>
+            <a href="product.html">Products</a>
+            <a href="#categories">Categories</a>
+            <a href="contactus.html">Contact Us</a>
+        </div>
+      
      </div>
 </nav>
 
@@ -48,7 +57,7 @@
         <img src="Subscriptions.png" alt="RPG">
         <h3>Subscriptions</h3>
         <p>Buy Your Favorite Subscription. At Low Cost</p>
-        <a herf="subscription.html"> <button class="buynow">See More Products</button> </a>
+        <a href="subscription.html"> <button class="buynow">See More Products</button> </a>
     </div>
     
     <div class="category-item">
@@ -74,6 +83,68 @@
             </ul>
         </div>
     </section>
+
+    <!-- Trigger Buttons -->
+<div class="auth-buttons">
+    <button id="open-signup" class="btn">Sign Up</button>
+    <button id="open-login" class="btn">Login</button>
+    <button class="btn" onclick="logout()">Sign Out</button>
+
+</div>
+    
+    
+<!-- Sign Up Modal -->
+<div id="signup-modal" class="modal" onsubmit="signup(event)">
+    <div class="modal-content">
+        <span class="close" id="closesignup">&times;</span>
+        <h2>Sign Up</h2>
+        <form id="signup-form">
+
+            
+            <div class="form-group">
+                <label for="signup-email">Email</label>
+                <input type="email" id="signupemail" name="email" placeholder="Enter your email" required>
+            </div>
+            <div class="form-group">
+                <label for="signuppassword">Password</label>
+                <input type="password" id="signuppassword" name="password" placeholder="Enter your password" required>
+            </div>
+            
+            <button type="submit" class="btn">Sign Up</button>
+        </form>
+    </div>
+</div>
+
+<!-- Login Modal -->
+<div id="login-modal" class="modal" onsubmit="login(event)">
+    <div class="modal-content">
+        <span class="close" id="closelogin">&times;</span>
+        <h2>Login</h2>
+        <form id="loginform">
+            <div class="form-group">
+                <label for="loginemail">Email</label>
+                <input type="email" id="loginemail" name="email" placeholder="Enter your email" required>
+            </div>
+            <div class="form-group">
+                <label for="loginpassword">Password</label>
+                <input type="password" id="loginpassword" name="password" placeholder="Enter your password" required>
+            </div>
+            <button type="submit" class="btn">Login</button>
+        </form>
+    </div>
+</div>
+
+</div>
+
+
+
+
+<!--- Toast ---->
+<div class="Gtoast-container"></div>
+<!--- Toast ---->
+<div class="Rtoast-container"></div>
+
+
     
       
 
@@ -84,6 +155,28 @@
             <p>&copy; 2025 07 Hunter Top-Up Centre. All Rights Reserved.</p>
         </div>
     </footer>
+      
     <script src="script.js"></script>
+    <script src="hamburger.js"></script>
+    
+      <script src="https://www.gstatic.com/firebasejs/8.2.9/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.2.9/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.2.9/firebase-firestore.js"></script>
+    <script>
+                // Your web app's Firebase configuration
+                const firebaseConfig = {
+          apiKey: "AIzaSyAZB88zfBXMqFcGAmmhlC-7n31WX7VCq1A",
+          authDomain: "huntertopup-df7f2.firebaseapp.com",
+          projectId: "huntertopup-df7f2",
+          storageBucket: "huntertopup-df7f2.firebasestorage.app",
+          messagingSenderId: "256726120870",
+          appId: "1:256726120870:web:da91344bcf7427a0453767"
+        };
+      
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+
+        
+    </script>
 </body>
 </html>
