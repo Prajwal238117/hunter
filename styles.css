@@ -18,7 +18,7 @@ body {
 
 /* Hero Header */
 #hero {
-    background: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), url('bg.jpg') no-repeat center center/cover;
+    background: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), url('image/bg.jpg') no-repeat center center/cover;
     color: #fff;
     height: 70vh;
     display: flex;
@@ -207,6 +207,80 @@ nav a:hover {
 nav a:hover::after {
     transform: scaleX(1);
     transform-origin: left;
+}
+
+/* Slide-in Navigation Menu */
+.nav-links {
+    position: fixed;
+    top: 0;
+    right: -100%; /* Initially off-screen on the right */
+    height: 100%;
+    width: 250px;
+    background-color: #34495e;
+    display: flex;
+    flex-direction: column;
+    padding-top: 3rem;
+    transition: all 0.3s ease-in-out;
+    z-index: 1000;
+}
+
+.nav-links.active {
+    right: 0; /* Slide into view from the right */
+}
+
+.nav-links a {
+    color: #fff;
+    text-decoration: none;
+    padding: 1rem;
+    font-size: 1.2rem;
+    border-bottom: 1px solid #2c3e50;
+}
+
+.nav-links a:hover {
+    background-color: #1abc9c;
+}
+
+.hamburger-menu {
+    font-size: 2rem;
+    cursor: pointer;
+    display: block;
+    z-index: 1001; /* Ensures it's above other elements */
+}
+
+.hamburger-menu.hidden {
+    display: none; /* Hides the hamburger menu */
+}
+
+/* Mobile Styles */
+@media (max-width: 768px) {
+    nav .nav-links {
+        position: fixed;
+        top: 0;
+        right: -100%; /* Initially off-screen */
+        width: 80%; /* Occupy 80% of screen */
+        height: 100%;
+        background-color: #34495e;
+        flex-direction: column;
+        padding-top: 3rem;
+        transition: right 0.3s ease;
+    }
+
+    .hamburger-menu {
+        display: block;
+    }
+
+    nav a {
+        padding: 1.5rem;
+        font-size: 1.4rem;
+    }
+
+    .nav-links.active {
+        right: 0;
+    }
+
+    .nav-links li {
+        text-align: center;
+    }
 }
 
 
@@ -450,31 +524,88 @@ input[type="submit"]:hover {
         gap: 1rem;
     }
 }
-/* Toast Notification */
-.toast {
-    visibility: hidden;
-    min-width: 250px;
-    margin: 0 auto;
-    background-color: #4caf50; /* Green background */
-    color: white;
-    text-align: center;
-    padding: 1rem;
-    border-radius: 5px;
+/* Toast Container */
+.Gtoast-container {
     position: fixed;
-    z-index: 9999;
-    left: 50%;
-    bottom: 2rem;
-    transform: translateX(-50%);
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    font-size: 1rem;
-    opacity: 0;
-    transition: opacity 0.5s ease, visibility 0.5s ease;
+    bottom: 20px;
+    right: 20px;
+    z-index: 1000;
 }
 
-.toast.show {
-    visibility: visible;
-    opacity: 1;
+/* Toast */
+.Gtoast {
+    background-color: rgb(34, 221, 34);
+    color: #fff;
+    padding: 15px 20px;
+    border-radius: 8px;
+    margin-bottom: 10px;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    box-shadow: 0 4px 6px rgba(72, 236, 39, 0.795);
+    opacity: 0;
+    transform: translateX(100%);
+    transition: opacity 0.3s ease, transform 0.3s ease;
 }
+
+/* Toast shown state */
+.Gtoast.show {
+    opacity: 1;
+    transform: translateX(0);
+}
+
+/* Close Button */
+.Gtoast .Gclose-toast {
+    background: none;
+    border: none;
+    color: #fff;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+
+
+
+/* Toast Container */
+.Rtoast-container {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    z-index: 1000;
+}
+/* Toast */
+.Rtoast {
+    background-color: rgb(221, 34, 34);
+    color: #fff;
+    padding: 15px 20px;
+    border-radius: 8px;
+    margin-bottom: 10px;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    box-shadow: 0 4px 6px rgba(236, 39, 39, 0.795);
+    opacity: 0;
+    transform: translateX(100%);
+    transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+/* Toast shown state */
+.Rtoast.show {
+    opacity: 1;
+    transform: translateX(0);
+}
+
+/* Close Button */
+.Rtoast .Rclose-toast {
+    background: none;
+    border: none;
+    color: #fff;
+    font-size: 16px;
+    cursor: pointer;
+}
+
 
 /* Responsive Adjustments */
 @media (max-width: 576px) {
@@ -548,4 +679,184 @@ img, video {
 button, .buynow, input[type="submit"] {
     min-height: 48px; /* Comfortable tap target */
     padding: 0.8rem;
+}
+/* Auth Buttons */
+.auth-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    margin: 2rem 0;
+}
+
+.btn {
+    background-color: #3540a3;
+    color: #fff;
+    padding: 10px 20px;
+    font-size: 1rem;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: transform 0.3s ease, background-color 0.3s ease;
+}
+
+.btn:hover {
+    background-color: rgb(5, 54, 94);
+    transform: scale(1.05);
+}
+
+/* Modal Styling */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 999;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0, 0, 0, 0.6);
+}
+
+.modal-content {
+    background-color: #fff;
+    margin: 10% auto;
+    padding: 2rem;
+    border-radius: 8px;
+    width: 90%;
+    max-width: 400px;
+    overflow-y: auto;
+    
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    position: relative;
+}
+
+.modal-content h2 {
+    text-align: center;
+    margin-bottom: 1rem;
+}
+
+.modal-content .form-group {
+    margin-bottom: 1rem;
+}
+
+.modal-content .form-group label {
+    display: block;
+    margin-bottom: 0.5rem;
+}
+
+.modal-content .form-group input {
+    width: 100%;
+    padding: 0.8rem;
+    font-size: 1rem;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+.modal-content .btn {
+    display: block;
+    width: 100%;
+    margin-top: 1rem;
+}
+
+.modal-header {
+    font-size: 1.5rem;
+    margin-bottom: 1rem;
+    color: #333;
+}
+
+.modal-body {
+    margin-bottom: 1.5rem;
+    font-size: 1.1rem;
+    color: #555;
+}
+
+.modal-footer button {
+    padding: 0.8rem 1.5rem;
+    border: none;
+    border-radius: 8px;
+    font-size: 1rem;
+    cursor: pointer;
+    margin: 0 0.5rem;
+}
+
+.btn-proceed {
+    background: #27ae60;
+    color: #fff;
+}
+
+.btn-cancel {
+    background: #e74c3c;
+    color: #fff;
+}
+
+
+.close {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    font-size: 1.5rem;
+    cursor: pointer;
+    color: #333;
+    transition: color 0.3s ease;
+}
+
+.close:hover {
+    color: #e67e22;
+}
+
+.product-container {
+    max-width: 800px;
+    margin: 2rem auto;
+    padding: 2rem;
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    text-align: center;
+}
+
+.product-image {
+    max-width: 100%;
+    height: auto;
+    margin-bottom: 1rem;
+    border-radius: 8px;
+}
+
+.product-title {
+    font-size: 1.8rem;
+    margin-bottom: 1rem;
+    color: #333;
+}
+
+.product-price {
+    font-size: 1.5rem;
+    margin: 1rem 0;
+    color: #e67e22;
+}
+
+.product-options {
+    margin: 1rem 0;
+}
+
+.product-options select {
+    padding: 0.8rem;
+    font-size: 1rem;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+}
+
+.buy-now-btn {
+    padding: 1rem 2rem;
+    background: #e67e22;
+    color: #fff;
+    font-size: 1rem;
+    font-weight: bold;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: transform 0.3s ease, background-color 0.3s ease;
+}
+
+.buy-now-btn:hover {
+    background: #d35400;
+    transform: scale(1.05);
 }
