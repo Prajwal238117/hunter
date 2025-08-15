@@ -3,180 +3,121 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>07 Hunter Top-Up Centre</title>
+    <title>CGAPH - Game Top-ups & Gift Cards</title>
     <link rel="stylesheet" href="styles.css">
-
-      <!-- Font Awesome CDN -->
-    
-      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
-   
-     
-
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
 </head>
 <body>
-    <!-- Navbar -->
-<nav>
-  <div class="container">
-      <h1>07 Hunter Top-Up Centre </h1>
-      <div class="hamburger-menu">&#9776;</div>
-        <div class="nav-links">
-            <a href="index.html" class="active">Home</a>
-            <a href="#features-list">Features</a>
-            <a href="product.html">Products</a>
-            <a href="#categories">Categories</a>
-            <a href="contactus.html">Contact Us</a>
-        </div>
-      
-     </div>
-</nav>
-
-
-<!-- Hero Header Section -->
-<header id="hero">
-  <div class="hero-content">
-      <h2>Welcome to the Ultimate Gaming Top-Up Experience</h2>
-      <p>Secure, fast, and reliable digital top-ups for gamers worldwide.</p>
-  </div>
-</header>
-
-<!-- Categories Section -->
-<section id="categories">
-    <div class="container">
-<h2>Categories</h2>
-<div class="categories-grid">
-   
-   
-    <div class="category-item">
-        <img src="shootinggame.png" alt="Shooters">
-        <h3>Shooters Games</h3>
-        <p>Buy Your Favorite Game Top-Up. At Cheap Price</p>
-        <a href="shootinggame.html"> <button class="buynow">See More Products</button> </a>
-    </div>
-    
-    <div class="category-item">
-        <img src="Subscriptions.png" alt="RPG">
-        <h3>Subscriptions</h3>
-        <p>Buy Your Favorite Subscription. At Low Cost</p>
-        <a href="subscription.html"> <button class="buynow">See More Products</button> </a>
-    </div>
-    
-    <div class="category-item">
-        <img src="giftcard.png" alt="Mobile Games">
-        <h3>Gift Cards</h3>
-        <p>Top up your favorite Gift Cards. At Cheap Price</p>
-        <a href="giftcards.html"> <button class="buynow">See More Products</button> </a>
-    </div>
-</div>
-</div>
-</section>
-
-    
-
-    <!-- Features List Section -->
-    <section id="features-list">
-        <div class="container">
-            <h3>Why Should You Choose Us?</h3>
-            <ul>
-              <li> <img src="secure.jpeg" width="250"> </li>
-                <li><img src="instant.jpeg" width="250"></li>
-                <li><img src="customersupport.jpeg" width="250"></li>
+    <!-- Header -->
+    <header class="header">
+        <nav class="navbar">
+            <div class="nav-brand">
+                <i class="fas fa-gamepad"></i>
+                <span>CGAPH</span>
+            </div>
+            <ul class="nav-menu">
+                <li><a href="#home" class="nav-link">Home</a></li>
+                <li><a href="#games" class="nav-link">Games</a></li>
+                <li><a href="#gift-cards" class="nav-link">Gift Cards</a></li>
+                <li><a href="product-details.html" class="nav-link">Products</a></li>
+        
+                <li><a href="about.html" class="nav-link">About</a></li>
+                <li><a href="contact.html" class="nav-link">Contact</a></li>
             </ul>
+            <div class="nav-cart">
+                <a href="cart.html">
+                <i class="fas fa-shopping-cart"></i>
+                <span class="cart-count">0</span>
+                </a>
+            </div>
+            <div class="nav-auth">
+                <a href="login.html" class="nav-link">Login</a>
+                <a href="register.html" class="nav-link">Register</a>
+            </div>
+            <div class="hamburger">
+                <span class="bar"></span>
+                <span class="bar"></span>
+                <span class="bar"></span>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Hero Section -->
+    <section id="home" class="hero">
+        <div class="hero-content">
+            <h1>Digital Gaming & Entertainment</h1>
+            <p>Get instant top-ups, gift cards, and digital content for your favorite games and platforms</p>
+            <button class="cta-button">Shop Now</button>
+        </div>
+        <div class="hero-image">
+            <i class="fas fa-rocket"></i>
         </div>
     </section>
 
-    <!-- Trigger Buttons -->
-<div class="auth-buttons">
-    <button id="open-signup" class="btn">Sign Up</button>
-    <button id="open-login" class="btn">Login</button>
-    <button class="btn" onclick="logout()">Sign Out</button>
+    <!-- Categories Section -->
+    <section class="categories">
+        <h2>Shop by Category</h2>
+        <div class="category-grid">
+            <a class="category-card" href="categories.html?category=game-topups">
+                <i class="fas fa-gamepad"></i>
+                <h3>Game Top-ups</h3>
+                <p>V-Bucks, Robux, and more</p>
+            </a>
+            <a class="category-card" href="categories.html?category=gift-cards">
+                <i class="fas fa-gift"></i>
+                <h3>Gift Cards</h3>
+                <p>Steam, PlayStation, Xbox</p>
+            </a>
+            <a class="category-card" href="categories.html?category=mobile-games">
+                <i class="fas fa-mobile-alt"></i>
+                <h3>Mobile Games</h3>
+                <p>Clash Royale, PUBG Mobile</p>
+            </a>
+            <a class="category-card" href="categories.html?category=streaming">
+                <i class="fas fa-tv"></i>
+                <h3>Streaming</h3>
+                <p>Netflix, Spotify, Disney+</p>
+            </a>
+        </div>
+    </section>
 
-</div>
-    
-    
-<!-- Sign Up Modal -->
-<div id="signup-modal" class="modal" onsubmit="signup(event)">
-    <div class="modal-content">
-        <span class="close" id="closesignup">&times;</span>
-        <h2>Sign Up</h2>
-        <form id="signup-form">
+    <!-- Dynamic products coming soon -->
+    <section id="games" class="products" style="display:none"></section>
+    <section id="gift-cards" class="gift-cards" style="display:none"></section>
 
-            
-            <div class="form-group">
-                <label for="signup-email">Email</label>
-                <input type="email" id="signupemail" name="email" placeholder="Enter your email" required>
+    <!-- Features Section -->
+    <section class="features">
+        <h2>Why Choose CGAPH?</h2>
+        <div class="features-grid">
+            <div class="feature">
+                <i class="fas fa-bolt"></i>
+                <h3>Instant Delivery</h3>
+                <p>Get your codes instantly via email</p>
             </div>
-            <div class="form-group">
-                <label for="signuppassword">Password</label>
-                <input type="password" id="signuppassword" name="password" placeholder="Enter your password" required>
+            <div class="feature">
+                <i class="fas fa-shield-alt"></i>
+                <h3>Secure Payment</h3>
+                <p>100% secure payment processing</p>
             </div>
-            
-            <button type="submit" class="btn">Sign Up</button>
-        </form>
-    </div>
-</div>
-
-<!-- Login Modal -->
-<div id="login-modal" class="modal" onsubmit="login(event)">
-    <div class="modal-content">
-        <span class="close" id="closelogin">&times;</span>
-        <h2>Login</h2>
-        <form id="loginform">
-            <div class="form-group">
-                <label for="loginemail">Email</label>
-                <input type="email" id="loginemail" name="email" placeholder="Enter your email" required>
+            <div class="feature">
+                <i class="fas fa-headset"></i>
+                <h3>24/7 Support</h3>
+                <p>Round the clock customer support</p>
             </div>
-            <div class="form-group">
-                <label for="loginpassword">Password</label>
-                <input type="password" id="loginpassword" name="password" placeholder="Enter your password" required>
+            <div class="feature">
+                <i class="fas fa-globe"></i>
+                <h3>Global Service</h3>
+                <p>Available worldwide</p>
             </div>
-            <button type="submit" class="btn">Login</button>
-        </form>
-    </div>
-</div>
-
-</div>
-
-
-
-
-<!--- Toast ---->
-<div class="Gtoast-container"></div>
-<!--- Toast ---->
-<div class="Rtoast-container"></div>
-
-
-    
-      
-
+        </div>
+    </section>
 
     <!-- Footer -->
-    <footer>
-        <div class="container">
-            <p>&copy; 2025 07 Hunter Top-Up Centre. All Rights Reserved.</p>
-        </div>
+    <footer id="contact" class="footer">
+        <!-- Footer content will be populated by cart.js -->
     </footer>
-      
-    <script src="script.js"></script>
-    <script src="hamburger.js"></script>
-    
-      <script src="https://www.gstatic.com/firebasejs/8.2.9/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.2.9/firebase-auth.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.2.9/firebase-firestore.js"></script>
-    <script>
-                // Your web app's Firebase configuration
-                const firebaseConfig = {
-          apiKey: "AIzaSyAZB88zfBXMqFcGAmmhlC-7n31WX7VCq1A",
-          authDomain: "huntertopup-df7f2.firebaseapp.com",
-          projectId: "huntertopup-df7f2",
-          storageBucket: "huntertopup-df7f2.firebasestorage.app",
-          messagingSenderId: "256726120870",
-          appId: "1:256726120870:web:da91344bcf7427a0453767"
-        };
-      
-        // Initialize Firebase
-        firebase.initializeApp(firebaseConfig);
 
-        
-    </script>
+    <script type="module" src="./toast.js"></script>
+    <script type="module" src="./cart.js"></script>
 </body>
 </html>
