@@ -431,12 +431,17 @@
         <li><a href="index.html" class="nav-link">Home</a></li>
         <li><a href="#" class="nav-link">Categories</a></li>
       </ul>
-      <div class="nav-cart">
-        <a href="cart.html">
-          <i class="fas fa-shopping-cart"></i>
-          <span class="cart-count">0</span>
-        </a>
-      </div>
+                  <div class="nav-search">
+                <button id="searchToggle" class="search-toggle">
+                    <i class="fas fa-search"></i>
+                </button>
+            </div>
+            <div class="nav-cart">
+                <a href="cart.html">
+                <i class="fas fa-shopping-cart"></i>
+                <span class="cart-count">0</span>
+                </a>
+            </div>
       <div class="hamburger">
         <span class="bar"></span>
         <span class="bar"></span>
@@ -444,6 +449,26 @@
       </div>
     </nav>
   </header>
+
+  <!-- Search Overlay -->
+  <div id="searchOverlay" class="search-overlay">
+      <div class="search-overlay-content">
+          <div class="search-overlay-header">
+              <h2>Search Products</h2>
+              <button id="closeSearch" class="close-search">
+                  <i class="fas fa-times"></i>
+              </button>
+          </div>
+          <div class="search-overlay-input">
+              <i class="fas fa-search search-icon"></i>
+              <input type="text" id="overlaySearchInput" placeholder="Search for products..." class="overlay-search-input">
+              <button id="overlaySearchBtn" class="overlay-search-btn">
+                  <i class="fas fa-search"></i>
+              </button>
+          </div>
+          <div id="overlaySearchResults" class="overlay-search-results"></div>
+      </div>
+  </div>
 
   <section class="categories-hero">
     <div class="hero-content">
@@ -480,6 +505,7 @@
 
   <script type="module" src="./toast.js"></script>
   <script type="module" src="./cart.js"></script>
+  <script type="module" src="./search.js"></script>
   <script type="module">
     import { db } from './firebase-config.js';
     import { collection, getDocs, query, where, orderBy } from 'https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js';
@@ -521,10 +547,143 @@
       heroSubtitle: 'Discover our complete collection'
     };
 
-    // Update page content
-    document.getElementById('catLabel').textContent = currentCategory.title;
-    document.getElementById('heroTitle').textContent = currentCategory.heroTitle;
-    document.getElementById('heroSubtitle').textContent = currentCategory.heroSubtitle;
+    // Check if this is a search request
+    const urlParams = new URLSearchParams(window.location.search);
+    const searchQuery = urlParams.get('search');
+    
+    // Clear previous search results if no search query
+    if (!searchQuery) {
+        localStorage.removeItem('searchQuery');
+        localStorage.removeItem('searchResults');
+    }
+    
+    if (searchQuery) {
+        // Handle search results
+        document.getElementById('catLabel').textContent = 'Search Results';
+        document.getElementById('heroTitle').textContent = `Search Results for "${searchQuery}"`;
+        document.getElementById('heroSubtitle').textContent = 'Find what you\'re looking for';
+        
+        // Load search results from localStorage and filter by current category if applicable
+        const searchResults = JSON.parse(localStorage.getItem('searchResults') || '[]');
+        if (searchResults.length > 0) {
+            // If we're on a specific category page, filter results to that category
+            if (category && category !== 'all') {
+                const filteredResults = searchResults.filter(product => 
+                    product.category && product.category.toLowerCase() === category.toLowerCase()
+                );
+                if (filteredResults.length > 0) {
+                    displayProducts(filteredResults);
+                    // Add clear search button
+                    addClearSearchButton();
+                } else {
+                    displayNoResults();
+                }
+            } else {
+                // Show all search results if no specific category
+                displayProducts(searchResults);
+                // Add clear search button
+                addClearSearchButton();
+            }
+        } else {
+            displayNoResults();
+        }
+    } else {
+        // Update page content for category
+        document.getElementById('catLabel').textContent = currentCategory.title;
+        document.getElementById('heroTitle').textContent = currentCategory.heroTitle;
+        document.getElementById('heroSubtitle').textContent = currentCategory.heroSubtitle;
+        
+            // Load category products only when not searching
+    loadCategory();
+    
+    // Clear any existing search state
+    const searchInput = document.querySelector('.search-input');
+    if (searchInput) {
+        searchInput.value = '';
+    }
+    }
+
+    function displayProducts(products) {
+      const container = document.getElementById('products-container');
+      
+      // Update product count
+      document.getElementById('productCount').textContent = products.length;
+      
+      if (!products.length) {
+        container.innerHTML = `
+          <div class="empty-state">
+            <i class="fas fa-box-open"></i>
+            <h3>No products found</h3>
+            <p>We couldn't find any products in this category at the moment.</p>
+          </div>
+        `;
+        return;
+      }
+      
+      container.innerHTML = products.map((p, index) => `
+        <div class="product-card" data-product-id="${p.id}" style="animation-delay: ${index * 0.1}s">
+          <div class="product-image">
+            ${(p.imageUrl || p.imagePath) ?
+              `<img src="${p.imageUrl || p.imagePath}" alt="${p.name}" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">` :
+              ''
+            }
+            <div class="placeholder" style="display: ${(p.imageUrl || p.imagePath) ? 'none' : 'flex'}">
+              <i class="fas fa-image"></i>
+            </div>
+          </div>
+          <div class="product-info">
+            <h3 class="product-name">${p.name}</h3>
+            <p class="product-description">${(p.description || '').substring(0, 120)}${(p.description || '').length > 120 ? '...' : ''}</p>
+            <div class="product-meta">
+              <span class="product-price">Rs ${p.variants?.[0]?.price || 'N/A'}</span>
+              <span class="product-category">${p.category || 'General'}</span>
+            </div>
+            <button class="view-product-btn" onclick="window.location.href='product-details.html?id=${p.id}'">
+              <i class="fas fa-eye"></i> View Details
+            </button>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function displayNoResults() {
+      const container = document.getElementById('products-container');
+      container.innerHTML = `
+        <div class="empty-state">
+          <i class="fas fa-search"></i>
+          <h3>No Results Found</h3>
+          <p>Try searching with different keywords or browse our categories.</p>
+          <button class="clear-search-btn" onclick="clearSearch()">
+            <i class="fas fa-times"></i> Clear Search
+          </button>
+        </div>
+      `;
+    }
+    
+    function addClearSearchButton() {
+      const container = document.getElementById('products-container');
+      const clearButton = document.createElement('div');
+      clearButton.className = 'clear-search-section';
+      clearButton.innerHTML = `
+        <button class="clear-search-btn" onclick="clearSearch()">
+          <i class="fas fa-times"></i> Clear Search & Show All ${currentCategory.title}
+        </button>
+      `;
+      container.appendChild(clearButton);
+    }
+    
+    function clearSearch() {
+      // Clear search from localStorage
+      localStorage.removeItem('searchQuery');
+      localStorage.removeItem('searchResults');
+      
+      // Reload the page without search parameters
+      if (category) {
+        window.location.href = `categories.html?category=${category}`;
+      } else {
+        window.location.href = 'categories.html';
+      }
+    }
 
     async function loadCategory() {
       const container = document.getElementById('products-container');
@@ -538,44 +697,7 @@
         const snap = await getDocs(qy);
         const products = snap.docs.map(d => ({ id: d.id, ...d.data() }));
         
-        // Update product count
-        document.getElementById('productCount').textContent = products.length;
-        
-        if (!products.length) {
-          container.innerHTML = `
-            <div class="empty-state">
-              <i class="fas fa-box-open"></i>
-              <h3>No products found</h3>
-              <p>We couldn't find any products in this category at the moment.</p>
-            </div>
-          `;
-          return;
-        }
-        
-        container.innerHTML = products.map((p, index) => `
-          <div class="product-card" data-product-id="${p.id}" style="animation-delay: ${index * 0.1}s">
-            <div class="product-image">
-              ${(p.imageUrl || p.imagePath) ?
-                `<img src="${p.imageUrl || p.imagePath}" alt="${p.name}" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">` :
-                ''
-              }
-              <div class="placeholder" style="display: ${(p.imageUrl || p.imagePath) ? 'none' : 'flex'}">
-                <i class="fas fa-image"></i>
-              </div>
-            </div>
-            <div class="product-info">
-              <h3 class="product-name">${p.name}</h3>
-              <p class="product-description">${(p.description || '').substring(0, 120)}${(p.description || '').length > 120 ? '...' : ''}</p>
-              <div class="product-meta">
-                <span class="product-price">Rs ${p.variants?.[0]?.price || 'N/A'}</span>
-                <span class="product-category">${p.category || 'General'}</span>
-              </div>
-              <button class="view-product-btn" onclick="window.location.href='product-details.html?id=${p.id}'">
-                <i class="fas fa-eye"></i> View Details
-              </button>
-            </div>
-          </div>
-        `).join('');
+        displayProducts(products);
         
       } catch (e) {
         console.error('Error loading products:', e);

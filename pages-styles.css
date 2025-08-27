@@ -117,9 +117,21 @@
   text-align: center;
   padding: 1.5rem;
 }
-.team-card img {
-  width: 120px; height: 120px; object-fit: cover; border-radius: 50%;
-  display: block; margin: 0 auto 1rem;
+.team-avatar {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 1rem;
+  border: 3px solid #667eea;
+}
+
+.team-avatar i {
+  font-size: 3rem;
+  color: white;
 }
 .team-card h4 { margin-bottom: 0.25rem; color: #333; }
 .team-card span { display: block; color: #667eea; font-weight: 600; margin-bottom: 0.25rem; }

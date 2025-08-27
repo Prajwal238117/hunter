@@ -17,18 +17,22 @@
             </div>
             <ul class="nav-menu">
                 <li><a href="#home" class="nav-link">Home</a></li>
-                <li><a href="#games" class="nav-link">Games</a></li>
-                <li><a href="#gift-cards" class="nav-link">Gift Cards</a></li>
-                <li><a href="product-details.html" class="nav-link">Products</a></li>
-        
-                <li><a href="about.html" class="nav-link">About</a></li>
-                <li><a href="contact.html" class="nav-link">Contact</a></li>
+                
+               
+                <li><a href="#" class="nav-link" id="categoriesBtn">Categories</a></li>
+                       
+                
             </ul>
             <div class="nav-cart">
                 <a href="cart.html">
                 <i class="fas fa-shopping-cart"></i>
                 <span class="cart-count">0</span>
                 </a>
+            </div>
+            <div class="nav-search">
+                <button id="searchToggle" class="search-toggle">
+                    <i class="fas fa-search"></i>
+                </button>
             </div>
             <div class="nav-auth">
                 <a href="login.html" class="nav-link">Login</a>
@@ -42,38 +46,100 @@
         </nav>
     </header>
 
+    <!-- Search Overlay -->
+    <div id="searchOverlay" class="search-overlay">
+        <div class="search-overlay-content">
+            <div class="search-overlay-header">
+                <h2>Search Products</h2>
+                <button id="closeSearch" class="close-search">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="search-overlay-input">
+                <i class="fas fa-search search-icon"></i>
+                <input type="text" id="overlaySearchInput" placeholder="Search for products..." class="overlay-search-input">
+                <button id="overlaySearchBtn" class="overlay-search-btn">
+                    <i class="fas fa-search"></i>
+                </button>
+            </div>
+            <div id="overlaySearchResults" class="overlay-search-results"></div>
+        </div>
+    </div>
+
+    <!-- Category Modal -->
+    <div id="categoryModal" class="category-modal">
+        <div class="category-modal-content">
+            <div class="category-modal-header">
+                <h2>Choose Category</h2>
+                <button id="closeCategoryModal" class="close-category-modal">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="category-modal-grid">
+                <div class="modal-category-card" data-category="game-topups">
+                    <i class="fas fa-gamepad"></i>
+                    <h3>Game Top-ups</h3>
+                    <p>V-Bucks, Robux, and more</p>
+                </div>
+                <div class="modal-category-card" data-category="gift-cards">
+                    <i class="fas fa-gift"></i>
+                    <h3>Gift Cards</h3>
+                    <p>Steam, PlayStation, Xbox</p>
+                </div>
+                <div class="modal-category-card" data-category="mobile-games">
+                    <i class="fas fa-mobile-alt"></i>
+                    <h3>Mobile Games</h3>
+                    <p>Clash Royale, PUBG Mobile</p>
+                </div>
+                <div class="modal-category-card" data-category="streaming">
+                    <i class="fas fa-tv"></i>
+                    <h3>Streaming</h3>
+                    <p>Netflix, Spotify, Disney+</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Hero Section -->
     <section id="home" class="hero">
         <div class="hero-content">
-            <h1>Digital Gaming & Entertainment</h1>
-            <p>Get instant top-ups, gift cards, and digital content for your favorite games and platforms</p>
-            <button class="cta-button">Shop Now</button>
+            <h1 class="hero-title animate-slide-up">Digital Gaming & Entertainment</h1>
+            <p class="hero-subtitle animate-slide-up animate-delay-1">Get instant top-ups, gift cards, and digital content for your favorite games and platforms</p>
+            <button class="cta-button animate-slide-up animate-delay-2" onclick="window.location.href='categories.html'">Shop Now</button>
         </div>
-        <div class="hero-image">
+        <div class="hero-image animate-float">
             <i class="fas fa-rocket"></i>
+        </div>
+        
+        <!-- Animated background elements -->
+        <div class="hero-bg-elements">
+            <div class="floating-icon icon-1"><i class="fas fa-gamepad"></i></div>
+            <div class="floating-icon icon-2"><i class="fas fa-gift"></i></div>
+            <div class="floating-icon icon-3"><i class="fas fa-mobile-alt"></i></div>
+            <div class="floating-icon icon-4"><i class="fas fa-tv"></i></div>
         </div>
     </section>
 
     <!-- Categories Section -->
     <section class="categories">
-        <h2>Shop by Category</h2>
+        <h2 class="section-title animate-on-scroll">Shop by Category</h2>
         <div class="category-grid">
-            <a class="category-card" href="categories.html?category=game-topups">
+            <a class="category-card animate-on-scroll animate-delay-1" href="categories.html?category=game-topups">
                 <i class="fas fa-gamepad"></i>
                 <h3>Game Top-ups</h3>
                 <p>V-Bucks, Robux, and more</p>
             </a>
-            <a class="category-card" href="categories.html?category=gift-cards">
+            <a class="category-card animate-on-scroll animate-delay-2" href="categories.html?category=gift-cards">
                 <i class="fas fa-gift"></i>
                 <h3>Gift Cards</h3>
                 <p>Steam, PlayStation, Xbox</p>
             </a>
-            <a class="category-card" href="categories.html?category=mobile-games">
+            <a class="category-card animate-on-scroll animate-delay-3" href="categories.html?category=mobile-games">
                 <i class="fas fa-mobile-alt"></i>
                 <h3>Mobile Games</h3>
                 <p>Clash Royale, PUBG Mobile</p>
             </a>
-            <a class="category-card" href="categories.html?category=streaming">
+            <a class="category-card animate-on-scroll animate-delay-4" href="categories.html?category=streaming">
                 <i class="fas fa-tv"></i>
                 <h3>Streaming</h3>
                 <p>Netflix, Spotify, Disney+</p>
@@ -117,7 +183,10 @@
         <!-- Footer content will be populated by cart.js -->
     </footer>
 
-    <script type="module" src="toast.js"></script>
-    <script type="module" src="cart.js"></script>
+    <script type="module" src="./toast.js"></script>
+    <script type="module" src="./cart.js"></script>
+    <script type="module" src="./search.js"></script>
+    <script type="module" src="./category-modal.js"></script>
+    <script type="module" src="./scroll-animations.js"></script>
 </body>
 </html>

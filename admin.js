@@ -555,6 +555,60 @@ async function viewUserDetails(userId) {
   }
 }
 
+async function loadContacts() {
+  const tbody = document.querySelector('#contactsTable tbody');
+  if (!tbody) return;
+  
+  tbody.innerHTML = '<tr><td colspan="6">Loading...</td></tr>';
+  try {
+    // Get contacts from localStorage (in real app, this would come from a database)
+    const contacts = JSON.parse(localStorage.getItem('contactMessages') || '[]');
+    
+    if (contacts.length === 0) {
+      tbody.innerHTML = '<tr><td colspan="6">No contact messages yet.</td></tr>';
+      return;
+    }
+    
+    const rows = contacts.map(contact => {
+      const date = new Date(contact.timestamp);
+      const dateStr = date.toLocaleString();
+      
+      return `
+        <tr>
+          <td>${dateStr}</td>
+          <td>${contact.name}</td>
+          <td>${contact.email}</td>
+          <td>${contact.subject}</td>
+          <td>
+            <div class="message-preview">
+              ${contact.message.length > 50 ? contact.message.substring(0, 50) + '...' : contact.message}
+            </div>
+          </td>
+          <td>
+            <button class="btn" onclick="viewContactMessage('${contact.name}', '${contact.email}', '${contact.subject}', '${contact.message.replace(/'/g, "\\'")}', '${dateStr}')">View</button>
+          </td>
+        </tr>
+      `;
+    });
+    
+    tbody.innerHTML = rows.join('');
+  } catch (err) {
+    console.error(err);
+    tbody.innerHTML = '<tr><td colspan="6">Failed to load contacts.</td></tr>';
+  }
+}
+
+function viewContactMessage(name, email, subject, message, date) {
+  const lines = [
+    `Date: ${date}`,
+    `Name: ${name}`,
+    `Email: ${email}`,
+    `Subject: ${subject}`,
+    `Message: ${message}`
+  ];
+  showToast(lines.join('\n'), 'info', { timeout: 8000 });
+}
+
 // Global functions for onclick handlers
 window.addVariant = addVariant;
 window.addExtraField = addExtraField;
@@ -563,6 +617,7 @@ window.cancelAddProduct = cancelAddProduct;
 window.deleteProduct = deleteProduct;
 window.updateUserRole = updateUserRole;
 window.viewUserDetails = viewUserDetails;
+window.viewContactMessage = viewContactMessage;
 window.editProduct = function(productId) {
   showToast('Edit product - coming soon', 'info');
 };
@@ -641,6 +696,10 @@ document.addEventListener('DOMContentLoaded', async () => {
       tbody.innerHTML = filtered.length ? filtered.join('') : '<tr><td colspan="5">No matches.</td></tr>';
     });
   }
+  
+  // Setup contact management
+  await loadContacts();
+  document.getElementById('refreshContactsBtn')?.addEventListener('click', loadContacts);
 });
 
 

@@ -374,9 +374,9 @@ class Cart {
                 </div>
                 <div class="footer-section">
                     <h4>Contact Us</h4>
-                    <p><i class="fas fa-map-marker-alt"></i> Butwal-4 Hatbazar</p>
-                    <p><i class="fas fa-phone"></i> 9768281599</p>
-                    <p><i class="fas fa-envelope"></i> support@cgaph.com</p>
+                    <p><i class="fas fa-map-marker-alt"></i> Butwal-4, Hatbazar, Nepal</p>
+                    <p><i class="fas fa-phone"></i> +977 9768281599</p>
+                    <p><i class="fas fa-envelope"></i> cgaph.np@gmail.com</p>
                 </div>
             </div>
             <div class="footer-bottom">

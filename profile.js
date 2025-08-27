@@ -1,5 +1,5 @@
 import { auth, db } from './firebase-config.js';
-import { onAuthStateChanged, updateProfile } from 'https://www.gstatic.com/firebasejs/12.1.0/firebase-auth.js';
+import { onAuthStateChanged, updateProfile, signOut } from 'https://www.gstatic.com/firebasejs/12.1.0/firebase-auth.js';
 import { doc, getDoc, setDoc, collection, query, where, orderBy, limit, getDocs } from 'https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js';
 import { showToast } from './toast.js';
 
@@ -149,5 +149,19 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 });
+
+// Global logout function
+async function logout() {
+    try {
+        await signOut(auth);
+        showToast('Logged out successfully', 'success');
+        setTimeout(() => {
+            window.location.href = 'index.html';
+        }, 1000);
+    } catch (error) {
+        console.error('Error logging out:', error);
+        showToast('Error logging out', 'error');
+    }
+}
 
 

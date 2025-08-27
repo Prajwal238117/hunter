@@ -608,6 +608,7 @@
         <div class="admin-tab active" data-tab="payments">Payment Management</div>
         <div class="admin-tab" data-tab="products">Product Management</div>
         <div class="admin-tab" data-tab="users">User Management</div>
+        <div class="admin-tab" data-tab="contacts">Contact Messages</div>
       </div>
 
       <!-- Payments Tab -->
@@ -739,6 +740,32 @@
                 <th>Email</th>
                 <th>Role</th>
                 <th>Created</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <!-- rows injected by JS -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Contacts Tab -->
+      <div id="contacts" class="tab-content">
+        <div class="controls">
+          <button id="refreshContactsBtn" class="btn">Refresh</button>
+          <span class="muted">Showing contact messages from users</span>
+        </div>
+        
+        <div class="table-wrapper">
+          <table id="contactsTable">
+            <thead>
+              <tr>
+                <th>Date</th>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Subject</th>
+                <th>Message</th>
                 <th>Actions</th>
               </tr>
             </thead>

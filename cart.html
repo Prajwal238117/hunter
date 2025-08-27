@@ -25,6 +25,11 @@
                 <li><a href="about.html" class="nav-link">About</a></li>
                 <li><a href="contact.html" class="nav-link">Contact</a></li>
             </ul>
+            <div class="nav-search">
+                <button id="searchToggle" class="search-toggle">
+                    <i class="fas fa-search"></i>
+                </button>
+            </div>
             <div class="hamburger">
                 <span class="bar"></span>
                 <span class="bar"></span>
@@ -32,6 +37,26 @@
             </div>
         </nav>
     </header>
+
+    <!-- Search Overlay -->
+    <div id="searchOverlay" class="search-overlay">
+        <div class="search-overlay-content">
+            <div class="search-overlay-header">
+                <h2>Search Products</h2>
+                <button id="closeSearch" class="close-search">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="search-overlay-input">
+                <i class="fas fa-search search-icon"></i>
+                <input type="text" id="overlaySearchInput" placeholder="Search for products..." class="overlay-search-input">
+                <button id="overlaySearchBtn" class="overlay-search-btn">
+                    <i class="fas fa-search"></i>
+                </button>
+            </div>
+            <div id="overlaySearchResults" class="overlay-search-results"></div>
+        </div>
+    </div>
 
     <!-- Cart Section -->
     <section class="cart-section">
@@ -100,5 +125,6 @@
 
     <script type="module" src="./toast.js"></script>
     <script type="module" src="./cart.js"></script>
+    <script type="module" src="./search.js"></script>
 </body>
 </html>

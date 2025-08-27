@@ -53,7 +53,7 @@
     <div class="contact-grid">
       <div class="content-card contact-form">
         <h2 class="section-title">Send a Message</h2>
-        <form>
+        <form id="contactForm">
           <div class="form-group">
             <label for="name">Full Name</label>
             <input id="name" type="text" placeholder="Your name" required />
@@ -70,7 +70,7 @@
             <label for="message">Message</label>
             <textarea id="message" placeholder="Write your message..." required></textarea>
           </div>
-          <button type="submit"><i class="fas fa-paper-plane"></i> Send</button>
+          <button type="submit"><i class="fas fa-paper-plane"></i> Send Message</button>
         </form>
       </div>
 
@@ -80,21 +80,21 @@
           <i class="fas fa-envelope"></i>
           <div>
             <strong>Email</strong>
-            <div>support@cgaph.com</div>
+            <div>cgaph.np@gmail.com</div>
           </div>
         </div>
         <div class="info-item">
           <i class="fas fa-phone"></i>
           <div>
             <strong>Phone</strong>
-            <div>+1 (555) 123-4567</div>
+            <div>+977 9768281599</div>
           </div>
         </div>
         <div class="info-item">
           <i class="fas fa-map-marker-alt"></i>
           <div>
             <strong>Address</strong>
-            <div>123 Digital Street, Tech City</div>
+            <div>Butwal-4, Hatbazar, Nepal</div>
           </div>
         </div>
       </aside>
@@ -106,5 +106,42 @@
   </footer>
 
   <script type="module" src="./cart.js"></script>
+  <script>
+    // Contact form functionality
+    document.addEventListener('DOMContentLoaded', function() {
+      const contactForm = document.getElementById('contactForm');
+      
+      if (contactForm) {
+        contactForm.addEventListener('submit', async function(e) {
+          e.preventDefault();
+          
+          const formData = {
+            name: document.getElementById('name').value,
+            email: document.getElementById('email').value,
+            subject: document.getElementById('subject').value,
+            message: document.getElementById('message').value,
+            timestamp: new Date()
+          };
+          
+          try {
+            // Store in localStorage for admin to see (in real app, this would go to a database)
+            const existingContacts = JSON.parse(localStorage.getItem('contactMessages') || '[]');
+            existingContacts.push(formData);
+            localStorage.setItem('contactMessages', JSON.stringify(existingContacts));
+            
+            // Show success message
+            alert('Thank you! Your message has been sent successfully. We\'ll get back to you soon.');
+            
+            // Reset form
+            contactForm.reset();
+            
+          } catch (error) {
+            console.error('Error sending message:', error);
+            alert('Sorry, there was an error sending your message. Please try again.');
+          }
+        });
+      }
+    });
+  </script>
 </body>
 </html>
