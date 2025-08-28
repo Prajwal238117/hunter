@@ -18,121 +18,32 @@ class LatestPurchases {
 
     async loadLatestPurchases() {
         try {
-            // Try to load from a public collection first, then fallback to payments
+            // Try to load from payments collection
             let purchases = [];
             
             try {
-                // First try to get from a public 'public-purchases' collection
-                const publicRef = collection(db, 'public-purchases');
-                const publicQuery = query(publicRef, orderBy('createdAt', 'desc'), limit(5));
-                const publicSnapshot = await getDocs(publicQuery);
+                const paymentsRef = collection(db, 'payments');
+                const q = query(paymentsRef, orderBy('createdAt', 'desc'), limit(5));
+                const querySnapshot = await getDocs(q);
                 
-                if (!publicSnapshot.empty) {
-                    publicSnapshot.forEach((doc) => {
-                        purchases.push({
-                            id: doc.id,
-                            ...doc.data()
-                        });
+                querySnapshot.forEach((doc) => {
+                    purchases.push({
+                        id: doc.id,
+                        ...doc.data()
                     });
-                }
-            } catch (publicError) {
-                console.log('Public purchases collection not available, trying payments...');
-            }
-            
-            // If no public purchases, try to get from payments (might fail due to permissions)
-            if (purchases.length === 0) {
-                try {
-                    const paymentsRef = collection(db, 'payments');
-                    const q = query(paymentsRef, orderBy('createdAt', 'desc'), limit(5));
-                    const querySnapshot = await getDocs(q);
-                    
-                    querySnapshot.forEach((doc) => {
-                        purchases.push({
-                            id: doc.id,
-                            ...doc.data()
-                        });
-                    });
-                } catch (paymentsError) {
-                    console.log('Payments collection access denied, showing demo data');
-                    // Show demo data if both fail
-                    purchases = this.getDemoPurchases();
-                }
+                });
+            } catch (paymentsError) {
+                console.log('Payments collection access denied');
+                // Don't show any data if access is denied
+                purchases = [];
             }
             
             this.displayPurchases(purchases);
         } catch (error) {
             console.error('Error loading latest purchases:', error);
-            // Show demo data as fallback
-            const demoPurchases = this.getDemoPurchases();
-            this.displayPurchases(demoPurchases);
+            // Don't show any data on error
+            this.displayPurchases([]);
         }
-    }
-
-    getDemoPurchases() {
-        return [
-            {
-                id: 'demo1',
-                fullName: 'John Doe',
-                email: 'john@example.com',
-                orderTotal: 'Rs 1,500',
-                paymentMethod: 'eSewa',
-                orderItems: [
-                    { name: 'Free Fire Diamond', productName: 'Free Fire Diamond' },
-                    { name: 'V-Bucks 1000', productName: 'V-Bucks 1000' }
-                ],
-                status: 'approved',
-                createdAt: new Date(Date.now() - 2 * 60 * 60 * 1000) // 2 hours ago
-            },
-            {
-                id: 'demo2',
-                fullName: 'Sarah Smith',
-                email: 'sarah@example.com',
-                orderTotal: 'Rs 2,200',
-                paymentMethod: 'Khalti',
-                orderItems: [
-                    { name: 'Netflix Gift Card', productName: 'Netflix Gift Card' }
-                ],
-                status: 'approved',
-                createdAt: new Date(Date.now() - 4 * 60 * 60 * 1000) // 4 hours ago
-            },
-            {
-                id: 'demo3',
-                fullName: 'Mike Johnson',
-                email: 'mike@example.com',
-                orderTotal: 'Rs 800',
-                paymentMethod: 'IME Pay',
-                orderItems: [
-                    { name: 'PUBG UC', productName: 'PUBG UC' }
-                ],
-                status: 'pending',
-                createdAt: new Date(Date.now() - 6 * 60 * 60 * 1000) // 6 hours ago
-            },
-            {
-                id: 'demo4',
-                fullName: 'Lisa Brown',
-                email: 'lisa@example.com',
-                orderTotal: 'Rs 3,000',
-                paymentMethod: 'eSewa',
-                orderItems: [
-                    { name: 'Steam Gift Card', productName: 'Steam Gift Card' },
-                    { name: 'Spotify Premium', productName: 'Spotify Premium' }
-                ],
-                status: 'approved',
-                createdAt: new Date(Date.now() - 8 * 60 * 60 * 1000) // 8 hours ago
-            },
-            {
-                id: 'demo5',
-                fullName: 'David Wilson',
-                email: 'david@example.com',
-                orderTotal: 'Rs 1,200',
-                paymentMethod: 'Khalti',
-                orderItems: [
-                    { name: 'Call of Duty Points', productName: 'Call of Duty Points' }
-                ],
-                status: 'approved',
-                createdAt: new Date(Date.now() - 12 * 60 * 60 * 1000) // 12 hours ago
-            }
-        ];
     }
 
     displayPurchases(purchases) {
@@ -143,7 +54,6 @@ class LatestPurchases {
                 <div class="no-purchases">
                     <i class="fas fa-shopping-bag"></i>
                     <p>No recent purchases yet.</p>
-                    <button onclick="createTestData()" class="test-data-btn">Create Test Data</button>
                 </div>
             `;
             return;
@@ -219,10 +129,7 @@ class LatestPurchases {
                 </td>
                 <td class="payment-cell">
                     <div class="payment-info">
-                        ${paymentMethod.image ? 
-                            `<img src="${paymentMethod.image}" alt="${paymentMethod.name}" class="payment-method-img" onerror="this.style.display='none'; this.nextElementSibling.style.display='inline-block';"><i class="${paymentMethod.icon}" style="display: none;"></i>` : 
-                            `<i class="${paymentMethod.icon}"></i>`
-                        }
+                        <i class="${paymentMethod.icon}"></i>
                         <span>${paymentMethod.name}</span>
                     </div>
                 </td>
@@ -240,13 +147,13 @@ class LatestPurchases {
         const methodLower = (method || '').toLowerCase();
         
         if (methodLower.includes('esewa')) {
-            return { icon: 'fas fa-mobile-alt', name: 'eSewa', image: null };
+            return { icon: 'fas fa-mobile-alt', name: 'eSewa' };
         } else if (methodLower.includes('khalti')) {
-            return { icon: 'fas fa-wallet', name: 'Khalti', image: 'khalti.jpg' };
+            return { icon: 'fas fa-wallet', name: 'Khalti' };
         } else if (methodLower.includes('ime')) {
-            return { icon: 'fas fa-mobile-alt', name: 'IME Pay', image: 'khalti.jpg' };
+            return { icon: 'fas fa-mobile-alt', name: 'IME Pay' };
         } else {
-            return { icon: 'fas fa-credit-card', name: method || 'Unknown', image: null };
+            return { icon: 'fas fa-credit-card', name: method || 'Unknown' };
         }
     }
 
@@ -263,17 +170,7 @@ class LatestPurchases {
     }
 }
 
-// Create test data function (for debugging)
-function createTestData() {
-    console.log('Creating test data...');
-    // This function can be used to create test data if needed
-    alert('Test data creation would be implemented here. Check console for details.');
-}
-
 // Initialize when DOM is loaded
 document.addEventListener('DOMContentLoaded', () => {
     new LatestPurchases();
 });
-
-// Export for global access
-window.createTestData = createTestData;

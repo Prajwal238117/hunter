@@ -1,6 +1,6 @@
 import { auth, db, storage } from './firebase-config.js';
 import { onAuthStateChanged, signInWithPopup, GoogleAuthProvider } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-auth.js";
-import { collection, doc, getDoc, getDocs, limit, orderBy, query, updateDoc, addDoc, deleteDoc, where, serverTimestamp } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
+import { collection, doc, getDoc, getDocs, limit, orderBy, query, updateDoc, addDoc, deleteDoc, where, serverTimestamp, setDoc } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
 import { ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-storage.js";
 import { showToast } from './toast.js';
 
@@ -613,6 +613,26 @@ async function deleteProduct(productId) {
 }
 
 // User Management Functions
+async function ensureUserDocument(userId, userData) {
+  try {
+    const userRef = doc(db, 'users', userId);
+    const userDoc = await getDoc(userRef);
+    
+    if (!userDoc.exists()) {
+      // Create user document if it doesn't exist
+      await setDoc(userRef, {
+        ...userData,
+        role: 'user',
+        createdAt: serverTimestamp(),
+        updatedAt: serverTimestamp()
+      });
+      console.log('Created user document for:', userId);
+    }
+  } catch (error) {
+    console.error('Error ensuring user document:', error);
+  }
+}
+
 async function loadUsers() {
   const tbody = document.querySelector('#usersTable tbody');
   if (!tbody) return;
@@ -659,14 +679,37 @@ async function loadUsers() {
 
 async function updateUserRole(userId, newRole) {
   try {
-    await updateDoc(doc(db, 'users', userId), {
+    // Validate the role
+    if (!['user', 'admin'].includes(newRole)) {
+      showToast('Invalid role selected', 'error');
+      return;
+    }
+
+    // Update the user document
+    const userRef = doc(db, 'users', userId);
+    await updateDoc(userRef, {
       role: newRole,
       updatedAt: serverTimestamp()
     });
+    
     showToast(`User role updated to ${newRole}`, 'success');
+    
+    // Reload the users table to reflect the change
+    setTimeout(() => {
+      loadUsers();
+    }, 1000);
+    
   } catch (error) {
     console.error('Error updating user role:', error);
-    showToast('Error updating user role', 'error');
+    
+    // Provide more specific error messages
+    if (error.code === 'permission-denied') {
+      showToast('Permission denied. You may not have admin rights.', 'error');
+    } else if (error.code === 'not-found') {
+      showToast('User document not found', 'error');
+    } else {
+      showToast(`Error updating user role: ${error.message}`, 'error');
+    }
   }
 }
 
