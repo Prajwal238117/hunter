@@ -7,50 +7,50 @@ import { showToast } from './toast.js';
 // Turnstile removed in UI; keep stub safe
 window.onTurnstileSuccess = function() {};
 
-// Cloudflare Images configuration - Update these with your actual values
+// Cloudflare Images configuration
 const CLOUDFLARE_CONFIG = {
-  accountId: 'YOUR_CLOUDFLARE_ACCOUNT_ID', // Replace with your Cloudflare Account ID
-  apiToken: 'YOUR_CLOUDFLARE_API_TOKEN',   // Replace with your Cloudflare API Token
-  imageDeliveryUrl: 'https://imagedelivery.net/YOUR_ACCOUNT_HASH' // Replace with your delivery URL
+  accountId: '299aafd8a8b053d38c5e7fe12efeb619', // Your Cloudflare Account ID
+  accountHash: 'sa5wvaEF1ck0fjfLwJyGTg', // Your Cloudflare Account Hash
+  apiToken: 'zXz2F5-YJ1NooUktiTS1bSKKBsdyInh-F50WpFqy',   // Your Cloudflare API Token
+  imageDeliveryUrl: 'https://imagedelivery.net/sa5wvaEF1ck0fjfLwJyGTg/<image_id>/<variant_name>' // Your delivery URL
 };
 
 async function uploadToCloudflareImages(file, progressCallback) {
-  const formData = new FormData();
-  formData.append('file', file);
-  formData.append('metadata', JSON.stringify({
-    uploadedBy: 'payment-form',
-    timestamp: Date.now()
-  }));
-
   try {
-    const response = await fetch(`https://api.cloudflare.com/client/v4/accounts/${CLOUDFLARE_CONFIG.accountId}/images/v1`, {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${CLOUDFLARE_CONFIG.apiToken}`,
-      },
-      body: formData
-    });
-
-    if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(`Upload failed: ${errorData.errors?.[0]?.message || response.statusText}`);
-    }
-
-    const result = await response.json();
-    
-    if (result.success) {
-      return {
-        id: result.result.id,
-        url: result.result.variants[0], // Use first variant URL
-        filename: result.result.filename
-      };
-    } else {
-      throw new Error(`Upload failed: ${result.errors?.[0]?.message || 'Unknown error'}`);
-    }
+    // Since Cloudflare Images API has CORS restrictions for browser uploads,
+    // we'll use base64 storage as the primary method
+    console.log('Using base64 storage for reliable image upload...');
+    return await uploadAsBase64(file);
   } catch (error) {
-    console.error('Cloudflare Images upload error:', error);
+    console.error('Image upload error:', error);
     throw error;
   }
+}
+
+async function uploadAsBase64(file) {
+  return new Promise((resolve, reject) => {
+    // Check file size (limit to 5MB for reasonable performance)
+    const maxSize = 5 * 1024 * 1024; // 5MB limit
+    
+    if (file.size > maxSize) {
+      reject(new Error('File too large. Please use a smaller image (max 5MB).'));
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = () => {
+      const base64 = reader.result;
+      resolve({
+        id: `base64_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+        url: base64,
+        filename: file.name,
+        isBase64: true,
+        size: file.size
+      });
+    };
+    reader.onerror = () => reject(new Error('Failed to read file'));
+    reader.readAsDataURL(file);
+  });
 }
 
 function attachScreenshotPreview() {
@@ -103,8 +103,7 @@ function setQrByMethod(method) {
   const map = {
     esewa: 'esewa.jpg',
     khalti: 'khalti.jpg',
-    imepay: 'imepay.jpg',
-    binance: 'binance.jpg'
+    imepay: 'imepay.jpg'
   };
   img.src = map[method] || map.esewa;
 }
@@ -114,7 +113,6 @@ let currentCart = [];
 function handleSubmit() {
   const form = document.getElementById('paymentForm');
   const submitBtn = document.querySelector('.btn-complete-order');
-  const progressEl = document.getElementById('uploadProgress');
   const fileInput = document.getElementById('paymentScreenshot');
   const cfTokenInput = document.getElementById('cfTurnstileToken');
   const extraWrap = document.getElementById('extraFieldsSection');
@@ -122,14 +120,6 @@ function handleSubmit() {
 
   form.addEventListener('submit', async (e) => {
     e.preventDefault();
-    
-    // Check terms checkbox manually since it might be styled
-    const termsCheckbox = document.querySelector('input[name="terms"]');
-    if (termsCheckbox && !termsCheckbox.checked) {
-      showToast('Please agree to the Terms of Service and Privacy Policy', 'error');
-      termsCheckbox.focus();
-      return;
-    }
     
     if (!form.reportValidity()) return;
 
@@ -149,15 +139,7 @@ function handleSubmit() {
       await ensureAnonymousAuth();
 
       // Upload to Cloudflare Images
-      if (progressEl) progressEl.value = 0;
-      
-      const uploadResult = await uploadToCloudflareImages(file, (progress) => {
-        if (progressEl) {
-          progressEl.value = progress;
-        }
-      });
-      
-      if (progressEl) progressEl.value = 100;
+      const uploadResult = await uploadToCloudflareImages(file);
 
       // Get extra fields data from checkout data or cart
       const checkoutData = JSON.parse(localStorage.getItem('checkoutData') || '{}');
@@ -182,7 +164,6 @@ function handleSubmit() {
 
       showToast("Thank you! Your order has been submitted. We'll review your payment shortly.", 'success');
       form.reset();
-      if (progressEl) progressEl.value = 0;
       const preview = document.getElementById('screenshotPreview');
       if (preview) preview.style.display = 'none';
     } catch (err) {

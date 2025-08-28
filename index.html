@@ -66,39 +66,7 @@
         </div>
     </div>
 
-    <!-- Category Modal -->
-    <div id="categoryModal" class="category-modal">
-        <div class="category-modal-content">
-            <div class="category-modal-header">
-                <h2>Choose Category</h2>
-                <button id="closeCategoryModal" class="close-category-modal">
-                    <i class="fas fa-times"></i>
-                </button>
-            </div>
-            <div class="category-modal-grid">
-                <div class="modal-category-card" data-category="game-topups">
-                    <i class="fas fa-gamepad"></i>
-                    <h3>Game Top-ups</h3>
-                    <p>V-Bucks, Robux, and more</p>
-                </div>
-                <div class="modal-category-card" data-category="gift-cards">
-                    <i class="fas fa-gift"></i>
-                    <h3>Gift Cards</h3>
-                    <p>Steam, PlayStation, Xbox</p>
-                </div>
-                <div class="modal-category-card" data-category="mobile-games">
-                    <i class="fas fa-mobile-alt"></i>
-                    <h3>Mobile Games</h3>
-                    <p>Clash Royale, PUBG Mobile</p>
-                </div>
-                <div class="modal-category-card" data-category="streaming">
-                    <i class="fas fa-tv"></i>
-                    <h3>Streaming</h3>
-                    <p>Netflix, Spotify, Disney+</p>
-                </div>
-            </div>
-        </div>
-    </div>
+
 
     <!-- Hero Section -->
     <section id="home" class="hero">
@@ -151,6 +119,19 @@
     <section id="games" class="products" style="display:none"></section>
     <section id="gift-cards" class="gift-cards" style="display:none"></section>
 
+    <!-- Latest Purchases Section -->
+    <section class="latest-purchases">
+        <h2 class="section-title animate-on-scroll">Latest Purchases</h2>
+        <div class="purchases-container">
+            <div id="latestPurchasesList" class="purchases-list">
+                <div class="loading-spinner">
+                    <i class="fas fa-spinner fa-spin"></i>
+                    <p>Loading recent purchases...</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
     <!-- Features Section -->
     <section class="features">
         <h2>Why Choose CGAPH?</h2>
@@ -183,11 +164,10 @@
         <!-- Footer content will be populated by cart.js -->
     </footer>
 
-    <script type="module" src="toast.js"></script>
-    <script type="module" src="cart.js"></script>
-    <script type="module" src="search.js"></script>
-    <script type="module" src="category-modal.js"></script>
-    <script type="module" src="scroll-animations.js"></script>
+    <script type="module" src="./toast.js"></script>
+    <script type="module" src="./cart.js"></script>
+    <script type="module" src="./search.js"></script>
+    <script type="module" src="./scroll-animations.js"></script>
+    <script type="module" src="./latest-purchases.js"></script>
 </body>
 </html>
-

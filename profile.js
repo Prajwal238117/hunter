@@ -164,4 +164,7 @@ async function logout() {
     }
 }
 
+// Make logout function globally accessible
+window.logout = logout;
+
 

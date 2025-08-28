@@ -114,10 +114,6 @@
                                     <input type="radio" name="paymentMethod" value="imepay">
                                     <div class="method-content"><span>IME Pay</span></div>
                                 </label>
-                                <label class="payment-method">
-                                    <input type="radio" name="paymentMethod" value="binance">
-                                    <div class="method-content"><span>Binance</span></div>
-                                </label>
                             </div>
                             <div class="form-group">
                                 <label>Scan to Pay</label>
@@ -135,26 +131,13 @@
                                 <div class="form-group">
                                 <img id="screenshotPreview" alt="Screenshot Preview" style="display:none; max-width:100%; border-radius:8px; border:1px solid #eee;" />
                             </div>
-                            <div class="form-group">
-                                <label for="uploadProgress">Upload Progress</label>
-                                <progress id="uploadProgress" value="0" max="100" style="width:100%"></progress>
-                            </div>
                         </div>
 
                         
 
                         <!-- Terms and Conditions -->
                         <div class="form-section">
-                            <label class="checkbox-label">
-                                <input type="checkbox" name="terms" id="termsCheckbox">
-                                <span class="checkmark"></span>
-                                I agree to the <a href="terms.html">Terms of Service</a> and <a href="privacy.html">Privacy Policy</a>
-                            </label>
-                            <label class="checkbox-label">
-                                <input type="checkbox" name="newsletter">
-                                <span class="checkmark"></span>
-                                Subscribe to our newsletter for updates and special offers
-                            </label>
+                            <!-- Terms checkbox removed -->
                         </div>
                     </form>
                 </div>
@@ -211,10 +194,9 @@
                 <!-- Footer content will be populated by cart.js -->
     </footer>
 
-    <script type="module" src="toast.js"></script>
-    <script type="module" src="cart.js"></script>
+    <script type="module" src="./toast.js"></script>
+    <script type="module" src="./cart.js"></script>
     <!-- Page logic (ES modules) -->
-    <script type="module" src="payment.js"></script>
+    <script type="module" src="./payment.js"></script>
 </body>
 </html>
-

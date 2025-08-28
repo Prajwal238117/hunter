@@ -55,6 +55,34 @@ function setupTabs() {
   });
 }
 
+// Show specific tab (for programmatic access)
+function showTab(tabName) {
+  // Hide all tab contents
+  document.querySelectorAll('.tab-content').forEach(content => {
+    content.classList.remove('active');
+  });
+  
+  // Remove active class from all tabs
+  document.querySelectorAll('.admin-tab').forEach(tab => {
+    tab.classList.remove('active');
+  });
+  
+  // Show selected tab content
+  const selectedContent = document.getElementById(tabName);
+  if (selectedContent) {
+    selectedContent.classList.add('active');
+  }
+  
+  // Add active class to selected tab
+  const selectedTab = document.querySelector(`[data-tab="${tabName}"]`);
+  if (selectedTab) {
+    selectedTab.classList.add('active');
+  }
+}
+
+// Make showTab globally available
+window.showTab = showTab;
+
 // Payment Management Functions
 function statusBadge(status) {
   const cls = status === 'approved' ? 'status-approved'
@@ -68,9 +96,21 @@ function rowTemplate(id, data) {
   const created = data.createdAt?.toDate?.() || new Date(0);
   const dateStr = created.toLocaleString();
   const contact = `${data.email || ''}<br/><span class="muted">${data.phone || ''}</span>`;
-  const billing = `${data.firstName || ''} ${data.lastName || ''}<br/><span class="muted">${data.address || ''}, ${data.city || ''}, ${data.state || ''} ${data.zipCode || ''}, ${data.country || ''}</span>`;
+  const billing = `${data.fullName || ''}<br/><span class="muted">${data.address || ''}, ${data.city || ''}, ${data.state || ''} ${data.zipCode || ''}, ${data.country || ''}</span>`;
   const pay = `${data.paymentMethod || ''}<br/><strong>${data.orderTotal || ''}</strong>`;
-  const ss = data.screenshotUrl ? `<a class="screenshot-link" href="${data.screenshotUrl}" target="_blank">View</a>` : '-';
+  
+  // Handle screenshot display - support both Cloudflare URLs and base64
+  let ss = '-';
+  if (data.screenshotUrl) {
+    if (data.screenshotUrl.startsWith('data:image')) {
+      // Base64 image - show in modal
+      ss = `<button class="screenshot-link" onclick="viewBase64Image('${data.screenshotUrl}', '${data.screenshotFilename || 'Screenshot'}')">View Base64</button>`;
+    } else {
+      // Cloudflare URL - direct link
+      ss = `<a class="screenshot-link" href="${data.screenshotUrl}" target="_blank">View Cloudflare</a>`;
+    }
+  }
+  
   const status = data.status || 'pending';
   return `
     <tr data-id="${id}">
@@ -92,17 +132,17 @@ async function loadPayments() {
   const tbody = document.querySelector('#paymentsTable tbody');
   if (!tbody) return;
   
-  tbody.innerHTML = '<tr><td colspan="7">Loading...</td></tr>';
+  tbody.innerHTML = '<tr><td colspan="8">Loading...</td></tr>';
   try {
     const q = query(paymentsCol, orderBy('createdAt', 'desc'), limit(200));
     const snap = await getDocs(q);
     const rows = [];
     snap.forEach(docSnap => rows.push(rowTemplate(docSnap.id, docSnap.data())));
     tbody.dataset.allRows = JSON.stringify(rows);
-    tbody.innerHTML = rows.length ? rows.join('') : '<tr><td colspan="7">No payments yet.</td></tr>';
+    tbody.innerHTML = rows.length ? rows.join('') : '<tr><td colspan="8">No payments yet.</td></tr>';
   } catch (err) {
     console.error(err);
-    tbody.innerHTML = '<tr><td colspan="7">Failed to load.</td></tr>';
+    tbody.innerHTML = '<tr><td colspan="8">Failed to load.</td></tr>';
   }
 }
 
@@ -137,15 +177,15 @@ function wirePaymentActions() {
 
 // Product Management Functions
 async function loadProducts() {
-  const productsList = document.getElementById('productsList');
-  if (!productsList) return;
+  const productsGrid = document.getElementById('productsGrid');
+  if (!productsGrid) return;
   
   try {
     const q = query(productsCol, orderBy('name'));
     const snap = await getDocs(q);
     
     if (snap.empty) {
-      productsList.innerHTML = '<p class="muted">No products available.</p>';
+      productsGrid.innerHTML = '<p class="muted">No products available.</p>';
       return;
     }
     
@@ -176,24 +216,15 @@ async function loadProducts() {
       `;
     }).join('');
     
-    productsList.innerHTML = `<div class="products-grid">${productsHTML}</div>`;
+    productsGrid.innerHTML = productsHTML;
   } catch (error) {
     console.error('Error loading products:', error);
-    productsList.innerHTML = '<p class="muted">Error loading products.</p>';
+    productsGrid.innerHTML = '<p class="muted">Error loading products.</p>';
   }
 }
 
 function setupProductForm() {
-  const addProductBtn = document.getElementById('addProductBtn');
-  const addProductForm = document.getElementById('addProductForm');
   const productForm = document.getElementById('productForm');
-  
-  if (addProductBtn) {
-    addProductBtn.addEventListener('click', () => {
-      addProductForm.style.display = 'block';
-      addProductBtn.style.display = 'none';
-    });
-  }
   
   if (productForm) {
     productForm.addEventListener('submit', handleProductSubmit);
@@ -216,7 +247,7 @@ function addVariant() {
           <input type="number" class="variant-price" step="0.01" placeholder="7.99" required>
         </div>
       </div>
-      <button type="button" class="remove-variant" onclick="this.parentElement.remove()">×</button>
+      <button type="button" class="remove-variant" onclick="removeVariant(this)">×</button>
     </div>
   `;
   
@@ -246,9 +277,17 @@ function addExtraField() {
           </select>
         </div>
       </div>
-      <button type="button" class="remove-variant" onclick="this.parentElement.remove()">×</button>
+      <button type="button" class="remove-variant" onclick="removeExtraField(this)">×</button>
     </div>`;
   container.insertAdjacentHTML('beforeend', html);
+}
+
+function removeVariant(element) {
+  element.parentElement.remove();
+}
+
+function removeExtraField(element) {
+  element.parentElement.remove();
 }
 function cancelAddProduct() {
   const addProductForm = document.getElementById('addProductForm');
@@ -274,7 +313,7 @@ function cancelAddProduct() {
             <input type="number" class="variant-price" step="0.01" placeholder="7.99" required>
           </div>
         </div>
-        <button type="button" class="remove-variant" onclick="this.parentElement.remove()">×</button>
+        <button type="button" class="remove-variant" onclick="removeVariant(this)">×</button>
       </div>
     `;
   }
@@ -330,7 +369,7 @@ async function editProduct(productId) {
               <input type="number" class="variant-price" step="0.01" value="${variant.price || ''}" required>
             </div>
           </div>
-          <button type="button" class="remove-variant" onclick="this.parentElement.remove()">×</button>
+          <button type="button" class="remove-variant" onclick="removeVariant(this)">×</button>
         `;
         variantsContainer.appendChild(variantDiv);
       });
@@ -365,7 +404,7 @@ async function editProduct(productId) {
               </select>
             </div>
           </div>
-          <button type="button" class="remove-variant" onclick="this.parentElement.remove()">×</button>
+          <button type="button" class="remove-variant" onclick="removeExtraField(this)">×</button>
         `;
         extraFieldsContainer.appendChild(fieldDiv);
       });
@@ -393,8 +432,25 @@ async function handleProductSubmit(e) {
     const productName = document.getElementById('productName').value;
     const productCategory = document.getElementById('productCategory').value;
     const productDescription = document.getElementById('productDescription').value;
-    const productImage = document.getElementById('productImage').value;
+    const productImageInput = document.getElementById('productImage');
+    const productImageUrl = document.getElementById('productImageUrl');
     const productFeatures = document.getElementById('productFeatures').value;
+    
+    // Handle image upload - support both file upload and URL input
+    let imageData = null;
+    if (productImageInput.files && productImageInput.files[0]) {
+      // File upload - convert to base64
+      const file = productImageInput.files[0];
+      if (file.size > 5 * 1024 * 1024) { // 5MB limit
+        showToast('Image file size must be less than 5MB', 'error');
+        return;
+      }
+      
+      imageData = await convertFileToBase64(file);
+    } else if (productImageUrl && productImageUrl.value.trim()) {
+      // URL input
+      imageData = productImageUrl.value.trim();
+    }
     
     // Collect variants (only within variants container)
     const variantElements = document.querySelectorAll('#variantsContainer .variant-item');
@@ -433,7 +489,7 @@ async function handleProductSubmit(e) {
       name: productName,
       category: productCategory,
       description: productDescription,
-      imagePath: productImage || null,
+      imagePath: imageData,
       features: features,
       variants: variants,
       extraFields: extras,
@@ -460,6 +516,84 @@ async function handleProductSubmit(e) {
   } catch (error) {
     console.error('Error adding product:', error);
     showToast('Error adding product', 'error');
+  }
+}
+
+// Convert file to base64
+function convertFileToBase64(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(reader.result);
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
+}
+
+// Setup image upload functionality
+function setupImageUpload() {
+  const fileInput = document.getElementById('productImage');
+  const urlInput = document.getElementById('productImageUrl');
+  const preview = document.getElementById('imagePreview');
+  const previewImg = document.getElementById('previewImg');
+  const uploadArea = document.querySelector('.image-upload-area');
+  
+  if (fileInput) {
+    fileInput.addEventListener('change', (e) => {
+      const file = e.target.files[0];
+      if (file) {
+        if (file.size > 5 * 1024 * 1024) {
+          showToast('Image file size must be less than 5MB', 'error');
+          return;
+        }
+        
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          if (previewImg) previewImg.src = e.target.result;
+          if (preview) preview.style.display = 'block';
+          if (uploadArea) uploadArea.style.display = 'none';
+          if (urlInput) urlInput.value = '';
+        };
+        reader.readAsDataURL(file);
+      }
+    });
+  }
+  
+  if (urlInput) {
+    urlInput.addEventListener('input', (e) => {
+      const url = e.target.value.trim();
+      if (url && isValidUrl(url)) {
+        if (previewImg) previewImg.src = url;
+        if (preview) preview.style.display = 'block';
+        if (uploadArea) uploadArea.style.display = 'none';
+        if (fileInput) fileInput.value = '';
+      } else if (!url) {
+        if (preview) preview.style.display = 'none';
+        if (uploadArea) uploadArea.style.display = 'block';
+      }
+    });
+  }
+}
+
+// Remove image preview
+function removeImagePreview() {
+  const preview = document.getElementById('imagePreview');
+  const uploadArea = document.querySelector('.image-upload-area');
+  const fileInput = document.getElementById('productImage');
+  const urlInput = document.getElementById('productImageUrl');
+  
+  if (preview) preview.style.display = 'none';
+  if (uploadArea) uploadArea.style.display = 'block';
+  if (fileInput) fileInput.value = '';
+  if (urlInput) urlInput.value = '';
+}
+
+// Validate URL
+function isValidUrl(string) {
+  try {
+    new URL(string);
+    return true;
+  } catch (_) {
+    return false;
   }
 }
 
@@ -618,9 +752,49 @@ window.deleteProduct = deleteProduct;
 window.updateUserRole = updateUserRole;
 window.viewUserDetails = viewUserDetails;
 window.viewContactMessage = viewContactMessage;
+window.viewBase64Image = viewBase64Image;
 window.editProduct = function(productId) {
   showToast('Edit product - coming soon', 'info');
 };
+
+function viewBase64Image(base64Data, filename) {
+  // Create a modal to display the base64 image
+  const modal = document.createElement('div');
+  modal.style.cssText = `
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.8);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10000;
+  `;
+  
+  modal.innerHTML = `
+    <div style="background: white; padding: 20px; border-radius: 10px; max-width: 90%; max-height: 90%; overflow: auto;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+        <h3>${filename}</h3>
+        <button onclick="this.closest('div[style*=\'position: fixed\']').remove()" style="background: none; border: none; font-size: 24px; cursor: pointer;">×</button>
+      </div>
+      <img src="${base64Data}" style="max-width: 100%; height: auto;" alt="${filename}">
+    </div>
+  `;
+  
+  document.body.appendChild(modal);
+  
+  // Close modal when clicking outside
+  modal.addEventListener('click', (e) => {
+    if (e.target === modal) {
+      modal.remove();
+    }
+  });
+}
+
+// Make viewBase64Image globally available
+window.viewBase64Image = viewBase64Image;
 
 function setAdminStatus(text) {
   const el = document.getElementById('adminStatus');
@@ -654,15 +828,16 @@ async function requireAdmin() {
   });
 }
 
-document.addEventListener('DOMContentLoaded', async () => {
-  const ok = await requireAdmin();
-  if (!ok) return;
-  
+// Initialize admin panel functionality
+function initializeAdminPanel() {
   // Setup tabs
   setupTabs();
   
+  // Setup image upload functionality
+  setupImageUpload();
+  
   // Setup payment management
-  await loadPayments();
+  loadPayments();
   wirePaymentActions();
   document.getElementById('refreshBtn')?.addEventListener('click', loadPayments);
   const paymentsSearch = document.getElementById('searchPaymentsInput');
@@ -678,12 +853,12 @@ document.addEventListener('DOMContentLoaded', async () => {
   }
   
   // Setup product management
-  await loadProducts();
+  loadProducts();
   setupProductForm();
   document.getElementById('refreshProductsBtn')?.addEventListener('click', loadProducts);
   
   // Setup user management
-  await loadUsers();
+  loadUsers();
   document.getElementById('refreshUsersBtn')?.addEventListener('click', loadUsers);
   const usersSearch = document.getElementById('searchUsersInput');
   if (usersSearch) {
@@ -698,8 +873,58 @@ document.addEventListener('DOMContentLoaded', async () => {
   }
   
   // Setup contact management
-  await loadContacts();
+  loadContacts();
   document.getElementById('refreshContactsBtn')?.addEventListener('click', loadContacts);
+}
+
+// Show access denied message
+function showAccessDenied() {
+  const container = document.querySelector('.admin-container');
+  if (container) {
+    container.innerHTML = `
+      <div style="text-align: center; padding: 50px;">
+        <h2>Access Denied</h2>
+        <p>You don't have admin privileges to access this page.</p>
+        <button onclick="window.location.href='index.html'" class="btn">Go Home</button>
+      </div>
+    `;
+  }
+}
+
+// Show login prompt
+function showLoginPrompt() {
+  const container = document.querySelector('.admin-container');
+  if (container) {
+    container.innerHTML = `
+      <div style="text-align: center; padding: 50px;">
+        <h2>Authentication Required</h2>
+        <p>Please log in to access the admin panel.</p>
+        <button onclick="window.location.href='login.html'" class="btn">Login</button>
+      </div>
+    `;
+  }
+}
+
+document.addEventListener('DOMContentLoaded', async () => {
+  console.log('Admin panel initializing...');
+  
+  // Check authentication
+  onAuthStateChanged(auth, async (user) => {
+    if (user) {
+      console.log('User authenticated:', user.email);
+      const adminStatus = await isAdmin(user.uid);
+      if (adminStatus) {
+        console.log('Admin access granted');
+        initializeAdminPanel();
+      } else {
+        console.log('Admin access denied');
+        showAccessDenied();
+      }
+    } else {
+      console.log('No user authenticated');
+      showLoginPrompt();
+    }
+  });
 });
 
 

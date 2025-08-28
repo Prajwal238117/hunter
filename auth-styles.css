@@ -421,3 +421,163 @@
         transform: translateY(0);
     }
 }
+
+/* Mobile Responsive */
+@media (max-width: 768px) {
+    .auth-container {
+        padding: 1rem;
+        margin-top: 80px;
+    }
+    
+    .auth-card {
+        padding: 2rem 1.5rem;
+        margin: 1rem;
+    }
+    
+    .auth-header h1 {
+        font-size: 1.8rem;
+    }
+    
+    .auth-header p {
+        font-size: 1rem;
+    }
+    
+    .form-group {
+        margin-bottom: 1.5rem;
+    }
+    
+    .form-group label {
+        font-size: 0.9rem;
+    }
+    
+    .form-group input {
+        padding: 0.8rem;
+        font-size: 0.9rem;
+    }
+    
+    .auth-btn {
+        padding: 1rem;
+        font-size: 1rem;
+    }
+    
+    .social-btn {
+        padding: 0.8rem;
+        font-size: 0.9rem;
+    }
+    
+    .social-btn i {
+        font-size: 1.2rem;
+    }
+    
+    .auth-footer {
+        font-size: 0.9rem;
+    }
+    
+    .auth-footer a {
+        font-size: 0.9rem;
+    }
+    
+    /* Hide icons on mobile for better space usage */
+    .social-btn i {
+        font-size: 1.2rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .auth-container {
+        padding: 0.5rem;
+    }
+    
+    .auth-card {
+        padding: 1.5rem 1rem;
+        margin: 0.5rem;
+    }
+    
+    .auth-header h1 {
+        font-size: 1.6rem;
+    }
+    
+    .auth-header p {
+        font-size: 0.9rem;
+    }
+    
+    .form-group {
+        margin-bottom: 1rem;
+    }
+    
+    .form-group label {
+        font-size: 0.8rem;
+    }
+    
+    .form-group input {
+        padding: 0.7rem;
+        font-size: 0.8rem;
+    }
+    
+    .auth-btn {
+        padding: 0.8rem;
+        font-size: 0.9rem;
+    }
+    
+    .social-btn {
+        padding: 0.7rem;
+        font-size: 0.8rem;
+    }
+    
+    .social-btn i {
+        font-size: 1.1rem;
+    }
+    
+    .auth-footer {
+        font-size: 0.8rem;
+    }
+    
+    .auth-footer a {
+        font-size: 0.8rem;
+    }
+}
+
+@media (max-width: 360px) {
+    .auth-header h1 {
+        font-size: 1.4rem;
+    }
+    
+    .auth-header p {
+        font-size: 0.85rem;
+    }
+    
+    .form-group {
+        margin-bottom: 0.8rem;
+    }
+    
+    .form-group label {
+        font-size: 0.75rem;
+    }
+    
+    .form-group input {
+        padding: 0.6rem;
+        font-size: 0.75rem;
+    }
+    
+    .auth-btn {
+        padding: 0.7rem;
+        font-size: 0.8rem;
+    }
+    
+    .social-btn {
+        padding: 0.6rem;
+        font-size: 0.75rem;
+    }
+    
+    .social-btn i {
+        font-size: 1rem;
+    }
+    
+    .auth-footer {
+        font-size: 0.75rem;
+    }
+    
+    .auth-footer a {
+        font-size: 0.75rem;
+    }
+}

@@ -20,13 +20,13 @@ class CategoryModal {
     }
 
     setupEventListeners() {
-        // Open category modal
+        // Handle category button click - redirect to categories page
         if (this.categoriesBtn) {
             console.log('Setting up click listener for categories button');
             this.categoriesBtn.addEventListener('click', (e) => {
                 console.log('Categories button clicked!');
                 e.preventDefault();
-                this.openCategoryModal();
+                window.location.href = 'categories.html';
             });
         } else {
             console.error('Categories button not found!');
@@ -83,9 +83,6 @@ class CategoryModal {
     }
 
     selectCategory(category) {
-        // Close the modal
-        this.closeModal();
-        
         // Redirect to the selected category
         window.location.href = `categories.html?category=${category}`;
     }
