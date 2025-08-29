@@ -507,7 +507,7 @@
   <script type="module" src="cart.js"></script>
   <script type="module" src="search.js"></script>
   <script type="module">
-    import { db } from 'firebase-config.js';
+    import { db } from './firebase-config.js';
     import { collection, getDocs, query, where, orderBy } from 'https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js';
 
     const params = new URLSearchParams(window.location.search);
