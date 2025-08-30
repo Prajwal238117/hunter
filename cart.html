@@ -13,22 +13,23 @@
     <header class="header">
         <nav class="navbar">
             <div class="nav-brand">
-                <i class="fas fa-gamepad"></i>
-                <span>CGAPH</span>
+                <img src="logo.png" alt="CGAPH Logo" class="nav-logo">
             </div>
             <ul class="nav-menu">
                 <li><a href="index.html" class="nav-link">Home</a></li>
-                <li><a href="index.html#games" class="nav-link">Games</a></li>
-                <li><a href="index.html#gift-cards" class="nav-link">Gift Cards</a></li>
-                <li><a href="product-details.html" class="nav-link">Products</a></li>
-        
-                <li><a href="about.html" class="nav-link">About</a></li>
-                <li><a href="contact.html" class="nav-link">Contact</a></li>
+                <li><a href="all-products.html" class="nav-link">Products</a></li>
+                <li><a href="index.html#latest-purchases" class="nav-link">Recent</a></li>
+                <li><a href="index.html#features" class="nav-link">Features</a></li>
             </ul>
-            <div class="nav-search">
-                <button id="searchToggle" class="search-toggle">
-                    <i class="fas fa-search"></i>
-                </button>
+            <div class="nav-cart">
+                <a href="cart.html">
+                    <i class="fas fa-shopping-cart"></i>
+                    <span class="cart-count">0</span>
+                </a>
+            </div>
+            <div class="nav-auth">
+                <a href="login.html" class="nav-link">Login</a>
+                <a href="register.html" class="nav-link">Register</a>
             </div>
             <div class="hamburger">
                 <span class="bar"></span>
@@ -38,25 +39,7 @@
         </nav>
     </header>
 
-    <!-- Search Overlay -->
-    <div id="searchOverlay" class="search-overlay">
-        <div class="search-overlay-content">
-            <div class="search-overlay-header">
-                <h2>Search Products</h2>
-                <button id="closeSearch" class="close-search">
-                    <i class="fas fa-times"></i>
-                </button>
-            </div>
-            <div class="search-overlay-input">
-                <i class="fas fa-search search-icon"></i>
-                <input type="text" id="overlaySearchInput" placeholder="Search for products..." class="overlay-search-input">
-                <button id="overlaySearchBtn" class="overlay-search-btn">
-                    <i class="fas fa-search"></i>
-                </button>
-            </div>
-            <div id="overlaySearchResults" class="overlay-search-results"></div>
-        </div>
-    </div>
+
 
     <!-- Cart Section -->
     <section class="cart-section">
@@ -101,7 +84,11 @@
                             </a>
                         </div>
                     </div>
-                </div> <div class="empty-cart" id="emptyCart" style="display: none;">
+                </div>
+            </div>
+            
+            <!-- Empty Cart State -->
+            <div class="empty-cart" id="emptyCart" style="display: none;">
                 <div class="empty-cart-icon">
                     <i class="fas fa-shopping-cart"></i>
                 </div>
@@ -112,9 +99,6 @@
                     Start Shopping
                 </a>
             </div>
-            </div>
-            
-           
         </div>
     </section>
 
@@ -123,8 +107,8 @@
                 <!-- Footer content will be populated by cart.js -->
     </footer>
 
-    <script type="module" src="toast.js"></script>
-    <script type="module" src="cart.js"></script>
-    <script type="module" src="search.js"></script>
+    <script type="module" src="./toast.js"></script>
+    <script type="module" src="./cart.js"></script>
+    <script type="module" src="./loading.js"></script>
 </body>
 </html>

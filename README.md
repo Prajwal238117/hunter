@@ -10,7 +10,7 @@ A modern, responsive e-commerce website built with HTML and CSS for selling digi
 - **Interactive Elements**: Hover effects, smooth transitions, and engaging animations
 - **Professional Color Scheme**: Purple-blue gradients with gold accents
 
-### Product Categories
+### Product Types
 - **Game Top-ups**: Fortnite V-Bucks, Roblox Robux, Clash Royale Gems, PUBG Mobile UC
 - **Gift Cards**: Steam, PlayStation, Xbox, Netflix
 - **Mobile Games**: Popular mobile game currencies
@@ -19,13 +19,13 @@ A modern, responsive e-commerce website built with HTML and CSS for selling digi
 ### Website Pages & Sections
 
 #### Main Pages
-1. **Homepage** (`index.html`): Landing page with hero section, categories, and features
+1. **Homepage** (`index.html`): Landing page with hero section, products, and features
 2. **Login Page** (`login.html`): User authentication with social login options
 3. **Register Page** (`register.html`): User registration with password strength indicator
 4. **Profile Page** (`profile.html`): User account management with tabs for overview, orders, settings, and security
 5. **Product Details** (`product-details.html`): Detailed product page with options, reviews, and related products
 6. **Payment/Checkout** (`payment.html`): Secure checkout process with multiple payment methods
-7. **Help Center** (`help-center.html`): FAQs, categories, and support links
+7. **Help Center** (`help-center.html`): FAQs, products, and support links
 8. **Terms of Service** (`terms.html`), **Privacy Policy** (`privacy.html`), **Refund Policy** (`refund.html`)
 9. **About Us** (`about.html`): Team and story
 10. **Contact** (`contact.html`): Contact form and company info
@@ -111,7 +111,7 @@ The website is fully responsive and optimized for:
 - **Visual Product Icons**: Professional icons using Font Awesome
 
 #### Shopping Experience
-- **Category-based Browsing**: Organized product categories
+- **Product Browsing**: Direct access to all products
 - **Product Filtering**: Easy navigation and search
 - **Shopping Cart**: Add to cart functionality (ready for JavaScript)
 - **Wishlist**: Save favorite products for later
@@ -136,8 +136,8 @@ The website is fully responsive and optimized for:
 2. Update gradient backgrounds in header and hero sections
 3. Adjust accent colors for buttons and highlights
 
-### Adding New Categories
-1. Add new category cards in the categories section
+### Adding New Products
+1. Add new product cards in the products section
 2. Include appropriate Font Awesome icons
 3. Update navigation if needed
 

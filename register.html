@@ -4,45 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Register - CGAPH</title>
-    <link rel="stylesheet" href="styles.css">
     <link rel="stylesheet" href="auth-styles.css">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
 </head>
 <body>
-    <!-- Header -->
-    <header class="header">
-        <nav class="navbar">
-            <div class="nav-brand">
-                <i class="fas fa-gamepad"></i>
-                <span>CGAPH</span>
-            </div>
-            <ul class="nav-menu">
-                <li><a href="index.html" class="nav-link">Home</a></li>
-                <li><a href="index.html#games" class="nav-link">Games</a></li>
-                <li><a href="index.html#gift-cards" class="nav-link">Gift Cards</a></li>
-                <li><a href="product-details.html" class="nav-link">Products</a></li>
-        
-                <li><a href="about.html" class="nav-link">About</a></li>
-                <li><a href="contact.html" class="nav-link">Contact</a></li>
-            </ul>
-            <div class="nav-cart">
-                <a href="cart.html">
-                <i class="fas fa-shopping-cart"></i>
-                <span class="cart-count">0</span>
-                </a>
-            </div>
-            <div class="nav-auth">
-                <a href="login.html" class="nav-link">Login</a>
-                <a href="register.html" class="nav-link">Register</a>
-            </div>
-            <div class="hamburger">
-                <span class="bar"></span>
-                <span class="bar"></span>
-                <span class="bar"></span>
-            </div>
-        </nav>
-    </header>
-
     <!-- Register Section -->
     <section class="auth-section">
         <div class="auth-container">
@@ -93,6 +58,9 @@
                         <div class="input-group">
                             <i class="fas fa-lock"></i>
                             <input type="password" id="password" name="password" required>
+                            <button type="button" class="toggle-password" onclick="togglePassword('password')">
+                                <i class="fas fa-eye"></i>
+                            </button>
                         </div>
                         <div class="password-strength">
                             <div class="strength-bar">
@@ -107,15 +75,13 @@
                         <div class="input-group">
                             <i class="fas fa-lock"></i>
                             <input type="password" id="confirmPassword" name="confirmPassword" required>
+                            <button type="button" class="toggle-password" onclick="togglePassword('confirmPassword')">
+                                <i class="fas fa-eye"></i>
+                            </button>
                         </div>
                     </div>
                     
                     <div class="form-options">
-                        <label class="checkbox-label">
-                            <input type="checkbox" name="newsletter">
-                            <span class="checkmark"></span>
-                            Subscribe to newsletter
-                        </label>
                         <label class="checkbox-label">
                             <input type="checkbox" name="terms" required>
                             <span class="checkmark"></span>
@@ -123,21 +89,20 @@
                         </label>
                     </div>
                     
-                    <button type="submit" class="auth-button">
+                    <button type="submit" class="auth-btn">
                         <i class="fas fa-user-plus"></i>
                         Create Account
                     </button>
                 </form>
                 
-                <div class="social-login">
-                    <p>Or sign up with</p>
-                    <div class="social-buttons">
+                <div class="divider">
+                    <span>Or sign up with</span>
+                </div>
+                
                         <button class="social-btn google">
                             <i class="fab fa-google"></i>
                             Google
                         </button>
-                    </div>
-                </div>
                 
                 <div class="auth-footer">
                     <p>Already have an account? <a href="login.html">Sign in here</a></p>
@@ -146,10 +111,6 @@
         </div>
     </section>
 
-    <!-- Footer -->
-    <footer class="footer">
-                <!-- Footer content will be populated by cart.js -->
-    </footer>
 <script>
 // Inline fallback for password strength meter (works even if modules fail to load)
 (function(){
@@ -170,32 +131,26 @@
     var pw=document.getElementById('password'); if(!pw) return; update(); pw.addEventListener('input', update);
   });
 })();
-</script>
-<script type="module" src="toast.js"></script>
-<script type="module" src="register.js"></script>
-<script type="module" src="cart.js"></script>
-<script>
-    // Hamburger menu functionality
-    document.addEventListener('DOMContentLoaded', function() {
-        const hamburger = document.querySelector('.hamburger');
-        const navMenu = document.querySelector('.nav-menu');
-        
-        if (hamburger && navMenu) {
-            hamburger.addEventListener('click', () => {
-                hamburger.classList.toggle('active');
-                navMenu.classList.toggle('active');
-            });
 
-            // Close menu when clicking on a link
-            document.querySelectorAll('.nav-link').forEach(link => {
-                link.addEventListener('click', () => {
-                    hamburger.classList.remove('active');
-                    navMenu.classList.remove('active');
-                });
-            });
-        }
-    });
+// Toggle password visibility
+function togglePassword(inputId) {
+    const input = document.getElementById(inputId);
+    const button = input.nextElementSibling;
+    const icon = button.querySelector('i');
+    
+    if (input.type === 'password') {
+        input.type = 'text';
+        icon.classList.remove('fa-eye');
+        icon.classList.add('fa-eye-slash');
+    } else {
+        input.type = 'password';
+        icon.classList.remove('fa-eye-slash');
+        icon.classList.add('fa-eye');
+    }
+}
 </script>
+<script type="module" src="./toast.js"></script>
+<script type="module" src="./register.js"></script>
+<script type="module" src="./loading.js"></script>
 </body>
 </html>
-

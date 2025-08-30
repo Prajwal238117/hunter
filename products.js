@@ -308,6 +308,7 @@ class ProductManager {
 
         const cartItem = {
             id: this.currentProduct.id,
+            productId: this.currentProduct.id, // Add productId for sales tracking
             name: this.currentProduct.name,
             variant: this.selectedVariant,
             image: this.currentProduct.imagePath,

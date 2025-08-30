@@ -1,171 +1,255 @@
 <!DOCTYPE html>
+
 <html lang="en">
+
 <head>
+
     <meta charset="UTF-8">
+
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
     <title>Product - CGAPH</title>
     <link rel="stylesheet" href="styles.css">
+
     <link rel="stylesheet" href="product-styles.css">
+
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
 </head>
+
 <body>
+
     <!-- Header -->
+
     <header class="header">
+
         <nav class="navbar">
+
             <div class="nav-brand">
-                <i class="fas fa-gamepad"></i>
-                <span>CGAPH</span>
+                <img src="logo.png" alt="CGAPH Logo" class="nav-logo">
             </div>
+
             <ul class="nav-menu">
+
                 <li><a href="index.html" class="nav-link">Home</a></li>
-                <li><a href="index.html#games" class="nav-link">Games</a></li>
-                <li><a href="index.html#gift-cards" class="nav-link">Gift Cards</a></li>
-                <li><a href="product-details.html" class="nav-link">Products</a></li>
-        
-                <li><a href="about.html" class="nav-link">About</a></li>
-                <li><a href="contact.html" class="nav-link">Contact</a></li>
+
+                <li><a href="all-products.html" class="nav-link">Products</a></li>
+                <li><a href="index.html#latest-purchases" class="nav-link">Recent</a></li>
+                <li><a href="index.html#features" class="nav-link">Features</a></li>
             </ul>
-                        <div class="nav-search">
-                <button id="searchToggle" class="search-toggle">
-                    <i class="fas fa-search"></i>
-                </button>
-            </div>
+
             <div class="nav-cart">
+
                 <a href="cart.html">
                 <i class="fas fa-shopping-cart"></i>
+
                 <span class="cart-count">0</span>
+
                 </a>
             </div>
-            
-              <div class="hamburger" aria-label="Menu" role="button" tabindex="0">
+            <div class="nav-auth">
+                <a href="login.html" class="nav-link">Login</a>
+                <a href="register.html" class="nav-link">Register</a>
+            </div>
+            <div class="hamburger" aria-label="Menu" role="button" tabindex="0">
                 <span class="bar"></span>
                 <span class="bar"></span>
                 <span class="bar"></span>
             </div>
+
         </nav>
+
     </header>
 
-    <!-- Search Overlay -->
-    <div id="searchOverlay" class="search-overlay">
-        <div class="search-overlay-content">
-            <div class="search-overlay-header">
-                <h2>Search Products</h2>
-                <button id="closeSearch" class="close-search">
-                    <i class="fas fa-times"></i>
-                </button>
-            </div>
-            <div class="search-overlay-input">
-                <i class="fas fa-search search-icon"></i>
-                <input type="text" id="overlaySearchInput" placeholder="Search for products..." class="overlay-search-input">
-                <button id="overlaySearchBtn" class="overlay-search-btn">
-                    <i class="fas fa-search"></i>
-                </button>
-            </div>
-           
-        </div>
-    </div>
+
+
+
 
     <!-- Product Details Section -->
+
     <section class="product-details-section">
+
         <div class="product-container">
+
             <!-- Breadcrumb -->
+
             <div class="breadcrumb">
+
                 <a href="index.html">Home</a>
+
                 <i class="fas fa-chevron-right"></i>
-                <a href="index.html#games">Games</a>
+
+                <a href="all-products.html">Products</a>
                 <i class="fas fa-chevron-right"></i>
+
                 <span>Product</span>
             </div>
 
+
+
             <!-- Product Main -->
+
             <div class="product-main">
+
                 <!-- Product Image -->
+
                 <div class="product-image-section">
+
                     <div class="product-image">
+
                         <i class="fas fa-image"></i>
                     </div>
+
                     <div class="product-gallery" style="display:none"></div>
                 </div>
 
+
+
                 <!-- Product Info -->
+
                 <div class="product-info-section">
+
                     <div class="product-header">
+
                         <h1>Product Name</h1>
                         <div class="product-rating">
+
                             <div class="stars">
+
                                 <i class="fas fa-star"></i>
+
                                 <i class="fas fa-star"></i>
+
                                 <i class="fas fa-star"></i>
+
                                 <i class="fas fa-star"></i>
+
                                 <i class="fas fa-star-half-alt"></i>
+
                             </div>
+
                             <span class="rating-text">No ratings yet</span>
                         </div>
+
                         <p class="product-description">
+
                             Product description will appear here...
                         </p>
+
                     </div>
+
+
 
                     <!-- Product Options -->
+
                     <div class="product-options">
+
                         <h3>Select Amount</h3>
+
                         <div class="option-grid">
+
                             <!-- Product variants will be loaded here -->
                         </div>
+
                     </div>
 
+
+
                     <!-- Purchase Section -->
+
                     <div class="purchase-section">
+
                         <div class="selected-option">
+
                             <span class="selected-amount">Select a variant</span>
                             <span class="selected-price">Rs 0</span>
                         </div>
+
                         <div class="purchase-actions">
+
                             <button class="btn-add-cart">
+
                                 <i class="fas fa-shopping-cart"></i>
+
                                 Add to Cart
+
                             </button>
+
                             <button class="btn-buy-now">
+
                                 <i class="fas fa-bolt"></i>
+
                                 Buy Now
+
                             </button>
+
                         </div>
+
                     </div>
+
+
 
                     <!-- Product Features -->
+
                     <div class="product-features">
+
                         <h3>Features</h3>
+
                         <ul class="features-list">
+
                             <li><i class="fas fa-check"></i> Instant delivery via email</li>
+
                             <li><i class="fas fa-check"></i> Works on all platforms (PC, PS4, Xbox, Switch, Mobile)</li>
+
                             <li><i class="fas fa-check"></i> No region restrictions</li>
+
                             <li><i class="fas fa-check"></i> 24/7 customer support</li>
+
                             <li><i class="fas fa-check"></i> Secure payment processing</li>
+
                         </ul>
+
                     </div>
+
                 </div>
+
             </div>
 
+
+
             <!-- Product Details Tabs -->
+
             <div class="product-tabs">
+
                 <div class="tab-navigation">
+
                     <button class="tab-btn active" data-tab="reviews">Reviews</button>
                 </div>
 
+
+
                 <div class="tab-content">
+
                     <!-- Reviews Tab (only) -->
                     <div class="tab-panel active" id="reviews">
                         <div class="reviews-header">
+
                             <div class="reviews-summary">
+
                                 <div class="overall-rating">
+
                                     <span class="rating-number" id="avgRating">-</span>
                                     <div class="stars" id="avgStars"></div>
                                     <span class="total-reviews" id="totalReviews">0 reviews</span>
                                     </div>
+
                                 <div class="rating-bars" id="ratingBars"></div>
                                 </div>
+
                             <button class="btn-write-review" id="writeReviewBtn">Write a Review</button>
                         </div>
+
+
 
                         <div class="reviews-list" id="reviewsList"></div>
 
@@ -183,35 +267,52 @@
                                             <option value="1">1 - Terrible</option>
                                         </select>
                                         </div>
+
                                     <div class="form-group">
                                         <label for="reviewText">Your Review</label>
                                         <textarea id="reviewText" required placeholder="Share your experience..."></textarea>
                                             </div>
+
                                         </div>
+
                                 <div class="product-actions">
                                     <button type="submit" class="btn">Submit Review</button>
                                     <button type="button" class="btn" id="cancelReviewBtn">Cancel</button>
                                     </div>
+
                             </form>
                         </div>
+
                     </div>
+
                 </div>
+
             </div>
 
+
+
             <!-- Related Products -->
+
             
         </div>
+
     </section>
 
+
+
     <!-- Footer -->
+
     <footer class="footer">
+
                 <!-- Footer content will be populated by cart.js -->
     </footer>
 
-    <script type="module" src="toast.js"></script>
-    <script type="module" src="cart.js"></script>
-    <script type="module" src="products.js"></script>
-    <script type="module" src="search.js"></script>
+
+    <script type="module" src="./toast.js"></script>
+    <script type="module" src="./cart.js"></script>
+    <script type="module" src="./products.js"></script>
+    <script type="module" src="./loading.js"></script>
 </body>
+
 </html>
 

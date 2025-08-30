@@ -322,7 +322,9 @@ class Cart {
         // Base menu items
         navMenu.innerHTML = `
             <li><a href="index.html" class="nav-link">Home</a></li>
-            <li><a href="index.html#categories" class="nav-link">Categories</a></li>
+            <li><a href="all-products.html" class="nav-link">Products</a></li>
+            <li><a href="index.html#latest-purchases" class="nav-link">Recent</a></li>
+            <li><a href="index.html#features" class="nav-link">Features</a></li>
         `;
 
         // Auth-aware links

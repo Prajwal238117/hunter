@@ -59,30 +59,16 @@ class LatestPurchases {
             return;
         }
 
-        const tableHTML = `
-            <div class="purchases-table-container">
-                <table class="purchases-table">
-                    <thead>
-                        <tr>
-                            <th>Customer</th>
-                            <th>Products</th>
-                            <th>Amount</th>
-                            <th>Status</th>
-                            <th>Payment</th>
-                            <th>Date</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        ${purchases.map(purchase => this.createPurchaseRow(purchase)).join('')}
-                    </tbody>
-                </table>
+        const cardsHTML = `
+            <div class="purchases-grid">
+                ${purchases.map(purchase => this.createPurchaseCard(purchase)).join('')}
             </div>
         `;
         
-        this.purchasesList.innerHTML = tableHTML;
+        this.purchasesList.innerHTML = cardsHTML;
     }
 
-    createPurchaseRow(purchase) {
+    createPurchaseCard(purchase) {
         const date = purchase.createdAt?.toDate?.() || new Date(purchase.createdAt) || new Date();
         const formattedDate = date.toLocaleDateString('en-US', {
             month: 'short',
@@ -108,38 +94,44 @@ class LatestPurchases {
         }
 
         return `
-            <tr class="purchase-row">
-                <td class="customer-cell">
+            <div class="purchase-card">
+                <div class="purchase-header">
                     <div class="customer-info">
                         <i class="fas fa-user"></i>
-                        <span>${customerName}</span>
+                        <span class="customer-name">${customerName}</span>
                     </div>
-                </td>
-                <td class="products-cell">
-                    <div class="products-info">
-                        <i class="fas fa-shopping-bag"></i>
-                        <span>${itemsText}</span>
+                    <div class="purchase-status">
+                        <span class="status-badge ${status}">${status.toUpperCase()}</span>
                     </div>
-                </td>
-                <td class="amount-cell">
-                    <span class="amount">${cleanAmount}</span>
-                </td>
-                <td class="status-cell">
-                    <span class="status-badge ${status}">${status.toUpperCase()}</span>
-                </td>
-                <td class="payment-cell">
-                    <div class="payment-info">
-                        <i class="${paymentMethod.icon}"></i>
-                        <span>${paymentMethod.name}</span>
+                </div>
+                
+                <div class="purchase-details">
+                    <div class="detail-row">
+                        <div class="detail-item">
+                            <i class="fas fa-shopping-bag"></i>
+                            <span>${itemsText}</span>
+                        </div>
                     </div>
-                </td>
-                <td class="date-cell">
-                    <div class="date-info">
+                    
+                    <div class="detail-row">
+                        <div class="detail-item">
+                            <i class="fas fa-money-bill-wave"></i>
+                            <span class="amount">${cleanAmount}</span>
+                        </div>
+                        <div class="detail-item">
+                            <i class="${paymentMethod.icon}"></i>
+                            <span>${paymentMethod.name}</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="purchase-footer">
+                    <div class="purchase-date">
                         <i class="fas fa-clock"></i>
                         <span>${formattedDate}</span>
                     </div>
-                </td>
-            </tr>
+                </div>
+            </div>
         `;
     }
 
@@ -163,7 +155,7 @@ class LatestPurchases {
                 <div class="error-message">
                     <i class="fas fa-exclamation-triangle"></i>
                     <p>Unable to load recent purchases.</p>
-                    <button onclick="window.location.reload()" class="test-data-btn">Retry</button>
+                    <button onclick="window.location.reload()" class="retry-btn">Retry</button>
                 </div>
             `;
         }

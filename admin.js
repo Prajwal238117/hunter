@@ -160,6 +160,24 @@ function wirePaymentActions() {
     try {
       if (target.classList.contains('btn-approve')) {
         await updateDoc(ref, { status: 'approved', reviewedAt: new Date() });
+        
+        // Increment sales count for the products
+        try {
+          const paymentData = (await getDoc(ref)).data();
+          const productIds = paymentData.productIds || [];
+          
+          for (const productId of productIds) {
+            const productRef = doc(db, 'products', productId);
+            const productDoc = await getDoc(productRef);
+            if (productDoc.exists()) {
+              const currentSales = productDoc.data().salesCount || 0;
+              await updateDoc(productRef, { salesCount: currentSales + 1 });
+            }
+          }
+        } catch (error) {
+          console.error('Error updating sales count:', error);
+        }
+        
         await loadPayments();
         showToast('Payment approved', 'success');
       }
@@ -204,7 +222,7 @@ async function loadProducts() {
           </div>
           <div class="product-info">
             <h3>${product.name}</h3>
-            <p class="muted">${product.category || 'Uncategorized'}</p>
+            <p class="muted">Digital Product</p>
             <p class="product-price">Rs ${basePrice}</p>
             <p class="muted">${variants.length} variant${variants.length !== 1 ? 's' : ''}</p>
             <div class="product-actions">
@@ -345,7 +363,7 @@ async function editProduct(productId) {
     
     // Populate form fields
     document.getElementById('productName').value = product.name || '';
-    document.getElementById('productCategory').value = product.category || '';
+            // Category field removed - no longer needed
     document.getElementById('productDescription').value = product.description || '';
     document.getElementById('productImage').value = product.imageUrl || product.imagePath || '';
     document.getElementById('productFeatures').value = (product.features || []).join('\n');
@@ -430,7 +448,7 @@ async function handleProductSubmit(e) {
   try {
     const formData = new FormData(e.target);
     const productName = document.getElementById('productName').value;
-    const productCategory = document.getElementById('productCategory').value;
+          // Category field removed - no longer needed
     const productDescription = document.getElementById('productDescription').value;
     const productImageInput = document.getElementById('productImage');
     const productImageUrl = document.getElementById('productImageUrl');
@@ -487,7 +505,7 @@ async function handleProductSubmit(e) {
     
     const productData = {
       name: productName,
-      category: productCategory,
+              // Category field removed - no longer needed
       description: productDescription,
       imagePath: imageData,
       features: features,

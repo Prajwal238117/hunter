@@ -3,7 +3,6 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="google-adsense-account" content="ca-pub-4664229395164784">
     <title>CGAPH - Game Top-ups & Gift Cards</title>
     <link rel="stylesheet" href="styles.css">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
@@ -13,16 +12,13 @@
     <header class="header">
         <nav class="navbar">
             <div class="nav-brand">
-                <i class="fas fa-gamepad"></i>
-                <span>CGAPH</span>
+                <img src="logo.png" alt="CGAPH Logo" class="nav-logo">
             </div>
             <ul class="nav-menu">
                 <li><a href="#home" class="nav-link">Home</a></li>
-                
-               
-                <li><a href="#" class="nav-link" id="categoriesBtn">Categories</a></li>
-                       
-                
+                <li><a href="#top-products" class="nav-link">Products</a></li>
+                <li><a href="#latest-purchases" class="nav-link">Recent</a></li>
+                <li><a href="#features" class="nav-link">Features</a></li>
             </ul>
             <div class="nav-cart">
                 <a href="cart.html">
@@ -67,14 +63,12 @@
         </div>
     </div>
 
-
-
     <!-- Hero Section -->
     <section id="home" class="hero">
         <div class="hero-content">
             <h1 class="hero-title animate-slide-up">Digital Gaming & Entertainment</h1>
             <p class="hero-subtitle animate-slide-up animate-delay-1">Get instant top-ups, gift cards, and digital content for your favorite games and platforms</p>
-            <button class="cta-button animate-slide-up animate-delay-2" onclick="window.location.href='categories.html'">Shop Now</button>
+            <button class="cta-button animate-slide-up animate-delay-2" onclick="window.location.href='all-products.html'">Shop Now</button>
         </div>
         <div class="hero-image animate-float">
             <i class="fas fa-rocket"></i>
@@ -89,52 +83,35 @@
         </div>
     </section>
 
-    <!-- Categories Section -->
-    <section class="categories">
-        <h2 class="section-title animate-on-scroll">Shop by Category</h2>
-        <div class="category-grid">
-            <a class="category-card animate-on-scroll animate-delay-1" href="categories.html?category=game-topups">
-                <i class="fas fa-gamepad"></i>
-                <h3>Game Top-ups</h3>
-                <p>V-Bucks, Robux, and more</p>
-            </a>
-            <a class="category-card animate-on-scroll animate-delay-2" href="categories.html?category=gift-cards">
-                <i class="fas fa-gift"></i>
-                <h3>Gift Cards</h3>
-                <p>Steam, PlayStation, Xbox</p>
-            </a>
-            <a class="category-card animate-on-scroll animate-delay-3" href="categories.html?category=mobile-games">
-                <i class="fas fa-mobile-alt"></i>
-                <h3>Mobile Games</h3>
-                <p>Clash Royale, PUBG Mobile</p>
-            </a>
-            <a class="category-card animate-on-scroll animate-delay-4" href="categories.html?category=streaming">
-                <i class="fas fa-tv"></i>
-                <h3>Streaming</h3>
-                <p>Netflix, Spotify, Disney+</p>
-            </a>
+    <!-- Top Products Section -->
+    <section id="top-products" class="top-products">
+        <h2 class="section-title animate-on-scroll">Top Products</h2>
+        <p class="section-subtitle animate-on-scroll">Most popular products based on sales</p>
+        <div class="products-container">
+            <div id="topProductsList" class="products-list">
+                <div class="loading-spinner">
+                    <i class="fas fa-spinner fa-spin"></i>
+                    <p></p>
+                </div>
+            </div>
         </div>
     </section>
 
-    <!-- Dynamic products coming soon -->
-    <section id="games" class="products" style="display:none"></section>
-    <section id="gift-cards" class="gift-cards" style="display:none"></section>
-
     <!-- Latest Purchases Section -->
-    <section class="latest-purchases">
+    <section id="latest-purchases" class="latest-purchases">
         <h2 class="section-title animate-on-scroll">Latest Purchases</h2>
         <div class="purchases-container">
             <div id="latestPurchasesList" class="purchases-list">
                 <div class="loading-spinner">
                     <i class="fas fa-spinner fa-spin"></i>
-                    <p>Loading recent purchases...</p>
+                    <p></p>
                 </div>
             </div>
         </div>
     </section>
 
     <!-- Features Section -->
-    <section class="features">
+    <section id="features" class="features">
         <h2>Why Choose CGAPH?</h2>
         <div class="features-grid">
             <div class="feature">
@@ -164,21 +141,13 @@
     <footer id="contact" class="footer">
         <!-- Footer content will be populated by cart.js -->
     </footer>
-<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4664229395164784"
-     crossorigin="anonymous"></script>
-<ins class="adsbygoogle"
-     style="display:block"
-     data-ad-format="fluid"
-     data-ad-layout-key="-gw-3+1f-3d+2z"
-     data-ad-client="ca-pub-4664229395164784"
-     data-ad-slot="4712325419"></ins>
-<script>
-     (adsbygoogle = window.adsbygoogle || []).push({});
-</script>
-    <script type="module" src="toast.js"></script>
-    <script type="module" src="cart.js"></script>
-    <script type="module" src="search.js"></script>
-    <script type="module" src="scroll-animations.js"></script>
-    <script type="module" src="latest-purchases.js"></script>
+
+    <script type="module" src="./toast.js"></script>
+    <script type="module" src="./cart.js"></script>
+    <script type="module" src="./search.js"></script>
+    <script type="module" src="./scroll-animations.js"></script>
+    <script type="module" src="./latest-purchases.js"></script>
+    <script type="module" src="./top-products.js"></script>
+    <script type="module" src="./loading.js"></script>
 </body>
 </html>

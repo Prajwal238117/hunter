@@ -88,10 +88,10 @@ class ProductSearch {
         
         return this.products.filter(product => {
             const nameMatch = product.name?.toLowerCase().includes(searchTerm);
-            const categoryMatch = product.category?.toLowerCase().includes(searchTerm);
+            // Category search removed
             const descriptionMatch = product.description?.toLowerCase().includes(searchTerm);
             
-            return nameMatch || categoryMatch || descriptionMatch;
+            return nameMatch || descriptionMatch;
         }).slice(0, 8); // Limit to 8 results
     }
 
@@ -154,7 +154,7 @@ class ProductSearch {
                     </div>
                     <div class="overlay-search-result-details">
                         <div class="overlay-search-result-title">${product.name}</div>
-                        <div class="overlay-search-result-category">${product.category || 'Uncategorized'}</div>
+                        <div class="overlay-search-result-type">Digital Product</div>
                     </div>
                     <div class="overlay-search-result-price">
                         ${basePrice !== 'N/A' ? `Rs ${basePrice}` : 'N/A'}
@@ -183,19 +183,11 @@ class ProductSearch {
             return;
         }
 
-        // Store search results and redirect to categories page with search filter
+        // Store search results and redirect to all products page with search filter
         localStorage.setItem('searchQuery', query);
         localStorage.setItem('searchResults', JSON.stringify(results));
         
-        // Check if we're currently on a category page and preserve that category
-        const urlParams = new URLSearchParams(window.location.search);
-        const currentCategory = urlParams.get('category');
-        
-        if (currentCategory) {
-            window.location.href = `categories.html?category=${currentCategory}&search=${encodeURIComponent(query)}`;
-        } else {
-            window.location.href = 'categories.html?search=' + encodeURIComponent(query);
-        }
+        window.location.href = 'all-products.html?search=' + encodeURIComponent(query);
     }
 }
 

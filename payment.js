@@ -145,6 +145,9 @@ function handleSubmit() {
       const checkoutData = JSON.parse(localStorage.getItem('checkoutData') || '{}');
       const extraValues = checkoutData.extraFieldsData || [];
 
+      // Get product IDs from cart items
+      const productIds = currentCart.map(item => item.productId).filter(id => id);
+      
       const payload = {
         email: document.getElementById('email')?.value || '',
         phone: document.getElementById('phone')?.value || '',
@@ -153,6 +156,7 @@ function handleSubmit() {
         orderTotal: getOrderTotal(),
         orderItems: currentCart,
         orderExtras: extraValues,
+        productIds: productIds, // Add product IDs for sales tracking
         screenshotImageId: uploadResult.id,
         screenshotUrl: uploadResult.url,
         screenshotFilename: uploadResult.filename,
