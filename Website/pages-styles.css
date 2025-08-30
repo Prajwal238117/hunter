@@ -1,0 +1,352 @@
+/* Shared Styles for Informational Pages */
+
+.page-hero {
+  margin-top: 80px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  padding: 4rem 2rem;
+}
+
+.page-hero .page-hero-inner {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.page-hero h1 {
+  font-size: 2.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.page-hero p {
+  opacity: 0.9;
+}
+
+.page-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem;
+}
+
+.content-card {
+  background: white;
+  border-radius: 15px;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+  padding: 2rem;
+}
+
+.section-title {
+  font-size: 1.5rem;
+  color: #333;
+  margin-bottom: 1rem;
+}
+
+.section-subtitle {
+  color: #666;
+  margin-bottom: 2rem;
+}
+
+.grid {
+  display: grid;
+  gap: 1.5rem;
+}
+
+.grid-2 { grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); }
+.grid-3 { grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); }
+
+.badge {
+  display: inline-block;
+  background: #f8f9fa;
+  color: #666;
+  border: 1px solid #e9ecef;
+  border-radius: 999px;
+  padding: 0.25rem 0.75rem;
+  font-size: 0.85rem;
+}
+
+.kbd {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  background: #f8f9fa;
+  border: 1px solid #e9ecef;
+  border-bottom-width: 3px;
+  border-radius: 6px;
+  padding: 0 0.4rem;
+}
+
+/* Help Center */
+.search-bar {
+  display: flex;
+  gap: 0.75rem;
+  margin-top: 1rem;
+}
+.search-bar input {
+  flex: 1;
+  padding: 0.9rem 1rem;
+  border: none;
+  border-radius: 10px;
+}
+.search-bar button {
+  background: #ffd700;
+  color: #333;
+  border: none;
+  border-radius: 10px;
+  padding: 0.9rem 1.25rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.faq-item {
+  border: 1px solid #e9ecef;
+  border-radius: 12px;
+  padding: 1rem 1.25rem;
+  background: white;
+}
+.faq-item summary {
+  list-style: none;
+  cursor: pointer;
+  font-weight: 600;
+  color: #333;
+}
+.faq-item p { color: #555; margin-top: 0.75rem; }
+
+/* About */
+.team-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1.5rem; }
+.team-card {
+  background: white;
+  border: 1px solid #e9ecef;
+  border-radius: 15px;
+  text-align: center;
+  padding: 1.5rem;
+}
+.team-avatar {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 1rem;
+  border: 3px solid #667eea;
+}
+
+.team-avatar i {
+  font-size: 3rem;
+  color: white;
+}
+.team-card h4 { margin-bottom: 0.25rem; color: #333; }
+.team-card span { display: block; color: #667eea; font-weight: 600; margin-bottom: 0.25rem; }
+.team-card a { color: #666; text-decoration: none; }
+
+/* Contact */
+.contact-grid { display: grid; grid-template-columns: 2fr 1fr; gap: 2rem; }
+.contact-form .form-group { margin-bottom: 1rem; }
+.contact-form label { display:block; margin-bottom: 0.4rem; color: #333; font-weight: 600; }
+.contact-form input, .contact-form textarea {
+  width: 100%; padding: 0.9rem 1rem; border: 2px solid #e9ecef; border-radius: 10px; background: #f8f9fa;
+}
+.contact-form textarea { min-height: 140px; resize: vertical; }
+.contact-form button { background: #667eea; color: white; border: none; padding: 0.9rem 1.25rem; border-radius: 10px; font-weight: 600; cursor: pointer; }
+
+.contact-info .info-item { display: flex; align-items: flex-start; gap: 0.75rem; margin-bottom: 1rem; }
+.contact-info i { color: #667eea; margin-top: 0.25rem; }
+
+/* Policy Pages */
+.policy-section h2 { color: #333; margin-top: 1rem; }
+.policy-section p, .policy-section li { color: #555; line-height: 1.7; }
+.policy-section ul { margin-left: 1.25rem; }
+
+/* Responsive */
+@media (max-width: 900px) {
+  .contact-grid { grid-template-columns: 1fr; }
+}
+
+/* Mobile Responsive */
+@media (max-width: 768px) {
+    .page-container {
+        padding: 1rem;
+        margin-top: 80px;
+    }
+    
+    .page-header h1 {
+        font-size: 1.8rem;
+    }
+    
+    .page-header p {
+        font-size: 1rem;
+    }
+    
+
+    
+
+    
+    .products-grid {
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+    }
+    
+    .product-card {
+        padding: 1.5rem;
+    }
+    
+    .product-card i {
+        font-size: 2.5rem;
+    }
+    
+    .product-card h3 {
+        font-size: 1.3rem;
+    }
+    
+    .product-card p {
+        font-size: 0.9rem;
+    }
+    
+    .product-price {
+        font-size: 1.2rem;
+    }
+    
+    .search-section {
+        padding: 1.5rem;
+    }
+    
+    .search-input {
+        padding: 0.8rem;
+        font-size: 0.9rem;
+    }
+    
+    .search-btn {
+        padding: 0.8rem 1.2rem;
+        font-size: 0.9rem;
+    }
+    
+    .filter-section {
+        padding: 1rem;
+    }
+    
+    .filter-btn {
+        padding: 0.6rem 1rem;
+        font-size: 0.8rem;
+    }
+    
+    /* Hide icons on mobile for better space usage */
+    .product-card i {
+        font-size: 2.5rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .page-container {
+        padding: 0.5rem;
+    }
+    
+    .page-header h1 {
+        font-size: 1.6rem;
+    }
+    
+    .page-header p {
+        font-size: 0.9rem;
+    }
+    
+    .products-grid {
+        gap: 1rem;
+    }
+    
+    .product-card {
+        padding: 1rem;
+    }
+    
+    .product-card i {
+        font-size: 2rem;
+    }
+    
+    .product-card h3 {
+        font-size: 1.2rem;
+    }
+    
+    .product-card p {
+        font-size: 0.8rem;
+    }
+    
+    .product-price {
+        font-size: 1.1rem;
+    }
+    
+    .search-section {
+        padding: 1rem;
+    }
+    
+    .search-input {
+        padding: 0.7rem;
+        font-size: 0.8rem;
+    }
+    
+    .search-btn {
+        padding: 0.7rem 1rem;
+        font-size: 0.8rem;
+    }
+    
+    .filter-section {
+        padding: 0.8rem;
+    }
+    
+    .filter-btn {
+        padding: 0.5rem 0.8rem;
+        font-size: 0.75rem;
+    }
+}
+
+@media (max-width: 360px) {
+    .page-header h1 {
+        font-size: 1.4rem;
+    }
+    
+    .page-header p {
+        font-size: 0.85rem;
+    }
+    
+    .products-grid {
+        gap: 0.8rem;
+    }
+    
+    .product-card {
+        padding: 0.8rem;
+    }
+    
+    .product-card i {
+        font-size: 1.8rem;
+    }
+    
+    .product-card h3 {
+        font-size: 1.1rem;
+    }
+    
+    .product-card p {
+        font-size: 0.75rem;
+    }
+    
+    .product-price {
+        font-size: 1rem;
+    }
+    
+    .search-section {
+        padding: 0.8rem;
+    }
+    
+    .search-input {
+        padding: 0.6rem;
+        font-size: 0.75rem;
+    }
+    
+    .search-btn {
+        padding: 0.6rem 0.8rem;
+        font-size: 0.75rem;
+    }
+    
+    .filter-section {
+        padding: 0.6rem;
+    }
+    
+    .filter-btn {
+        padding: 0.4rem 0.6rem;
+        font-size: 0.7rem;
+    }
+}

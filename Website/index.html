@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CGAPH - Game Top-ups & Gift Cards</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <nav class="navbar">
+            <div class="nav-brand">
+                <img src="logo.png" alt="CGAPH Logo" class="nav-logo">
+            </div>
+            <ul class="nav-menu">
+                <li><a href="#home" class="nav-link">Home</a></li>
+                <li><a href="#top-products" class="nav-link">Products</a></li>
+                <li><a href="#latest-purchases" class="nav-link">Recent</a></li>
+                <li><a href="#features" class="nav-link">Features</a></li>
+            </ul>
+            <div class="nav-cart">
+                <a href="cart.html">
+                <i class="fas fa-shopping-cart"></i>
+                <span class="cart-count">0</span>
+                </a>
+            </div>
+            <div class="nav-search">
+                <button id="searchToggle" class="search-toggle">
+                    <i class="fas fa-search"></i>
+                </button>
+            </div>
+            <div class="nav-auth">
+                <a href="login.html" class="nav-link">Login</a>
+                <a href="register.html" class="nav-link">Register</a>
+            </div>
+            <div class="hamburger">
+                <span class="bar"></span>
+                <span class="bar"></span>
+                <span class="bar"></span>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Search Overlay -->
+    <div id="searchOverlay" class="search-overlay">
+        <div class="search-overlay-content">
+            <div class="search-overlay-header">
+                <h2>Search Products</h2>
+                <button id="closeSearch" class="close-search">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="search-overlay-input">
+                <i class="fas fa-search search-icon"></i>
+                <input type="text" id="overlaySearchInput" placeholder="Search for products..." class="overlay-search-input">
+                <button id="overlaySearchBtn" class="overlay-search-btn">
+                    <i class="fas fa-search"></i>
+                </button>
+            </div>
+            <div id="overlaySearchResults" class="overlay-search-results"></div>
+        </div>
+    </div>
+
+    <!-- Hero Section -->
+    <section id="home" class="hero">
+        <div class="hero-content">
+            <h1 class="hero-title animate-slide-up">Digital Gaming & Entertainment</h1>
+            <p class="hero-subtitle animate-slide-up animate-delay-1">Get instant top-ups, gift cards, and digital content for your favorite games and platforms</p>
+            <button class="cta-button animate-slide-up animate-delay-2" onclick="window.location.href='all-products.html'">Shop Now</button>
+        </div>
+        <div class="hero-image animate-float">
+            <i class="fas fa-rocket"></i>
+        </div>
+        
+        <!-- Animated background elements -->
+        <div class="hero-bg-elements">
+            <div class="floating-icon icon-1"><i class="fas fa-gamepad"></i></div>
+            <div class="floating-icon icon-2"><i class="fas fa-gift"></i></div>
+            <div class="floating-icon icon-3"><i class="fas fa-mobile-alt"></i></div>
+            <div class="floating-icon icon-4"><i class="fas fa-tv"></i></div>
+        </div>
+    </section>
+
+    <!-- Top Products Section -->
+    <section id="top-products" class="top-products">
+        <h2 class="section-title animate-on-scroll">Top Products</h2>
+        <p class="section-subtitle animate-on-scroll">Most popular products based on sales</p>
+        <div class="products-container">
+            <div id="topProductsList" class="products-list">
+                <div class="loading-spinner">
+                    <i class="fas fa-spinner fa-spin"></i>
+                    <p></p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Latest Purchases Section -->
+    <section id="latest-purchases" class="latest-purchases">
+        <h2 class="section-title animate-on-scroll">Latest Purchases</h2>
+        <div class="purchases-container">
+            <div id="latestPurchasesList" class="purchases-list">
+                <div class="loading-spinner">
+                    <i class="fas fa-spinner fa-spin"></i>
+                    <p></p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section id="features" class="features">
+        <h2>Why Choose CGAPH?</h2>
+        <div class="features-grid">
+            <div class="feature">
+                <i class="fas fa-bolt"></i>
+                <h3>Instant Delivery</h3>
+                <p>Get your codes instantly via email</p>
+            </div>
+            <div class="feature">
+                <i class="fas fa-shield-alt"></i>
+                <h3>Secure Payment</h3>
+                <p>100% secure payment processing</p>
+            </div>
+            <div class="feature">
+                <i class="fas fa-headset"></i>
+                <h3>24/7 Support</h3>
+                <p>Round the clock customer support</p>
+            </div>
+            <div class="feature">
+                <i class="fas fa-globe"></i>
+                <h3>Global Service</h3>
+                <p>Available worldwide</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer id="contact" class="footer">
+        <!-- Footer content will be populated by cart.js -->
+    </footer>
+
+    <script type="module" src="./toast.js"></script>
+    <script type="module" src="./cart.js"></script>
+    <script type="module" src="./search.js"></script>
+    <script type="module" src="./scroll-animations.js"></script>
+    <script type="module" src="./latest-purchases.js"></script>
+    <script type="module" src="./top-products.js"></script>
+    <script type="module" src="./loading.js"></script>
+</body>
+</html>

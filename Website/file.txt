@@ -1,0 +1,58 @@
+// Paste these into Firebase Console > Firestore Rules when you're ready
+// This template supports both admins/{uid}.active and users/{uid}.role == 'admin'
+// Adjust as needed.
+
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function isSignedIn() { return request.auth != null; }
+    function isAdminsDocAdmin() {
+      return isSignedIn() &&
+        exists(/databases/$(database)/documents/admins/$(request.auth.uid)) &&
+        get(/databases/$(database)/documents/admins/$(request.auth.uid)).data.active == true;
+    }
+    function isRoleAdmin() {
+      return isSignedIn() &&
+        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin';
+    }
+    function isAdmin() { return isAdminsDocAdmin() || isRoleAdmin(); }
+
+    match /users/{uid} {
+      // Allow the user to see/update their own profile
+      allow read, create, update: if isSignedIn() && request.auth.uid == uid;
+      // Allow admins to list and read all users
+      allow read: if isAdmin();
+      allow delete: if false;
+    }
+
+    match /payments/{doc} {
+      allow create: if isSignedIn();
+      // Admins can read; users can read their own by email
+      allow read: if isAdmin() || (isSignedIn() && resource.data.email == request.auth.token.email);
+      allow update: if isAdmin();
+      allow delete: if false;
+    }
+
+    match /admins/{uid} {
+      allow read: if isSignedIn() && request.auth.uid == uid;
+      allow write: if false;
+    }
+
+    match /products/{productId} {
+      allow read: if true;
+      allow create, update, delete: if isAdmin();
+
+      match /reviews/{reviewId} {
+        allow read: if true;
+        allow create: if isSignedIn()
+          && request.resource.data.uid == request.auth.uid
+          && request.resource.data.rating is number
+          && request.resource.data.rating >= 1
+          && request.resource.data.rating <= 5
+          && request.resource.data.text is string
+          && request.resource.data.text.size() > 0;
+        allow update, delete: if false;
+      }
+    }
+  }
+}

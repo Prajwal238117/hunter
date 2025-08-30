@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>About Us - CGAPH</title>
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="pages-styles.css" />
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet" />
+</head>
+<body>
+  <header class="header">
+    <nav class="navbar">
+      <div class="nav-brand">
+        <i class="fas fa-gamepad"></i>
+        <span>CGAPH</span>
+      </div>
+      <ul class="nav-menu">
+        <li><a href="index.html" class="nav-link">Home</a></li>
+        <li><a href="all-products.html" class="nav-link">Products</a></li>
+        <li><a href="index.html#latest-purchases" class="nav-link">Recent</a></li>
+        <li><a href="index.html#features" class="nav-link">Features</a></li>
+      </ul>
+      <div class="nav-cart">
+        <a href="cart.html">
+        <i class="fas fa-shopping-cart"></i>
+        <span class="cart-count">0</span>
+        </a>
+      </div>
+      <div class="nav-auth">
+        <a href="login.html" class="nav-link">Login</a>
+        <a href="register.html" class="nav-link">Register</a>
+      </div>
+      <div class="hamburger">
+        <span class="bar"></span>
+        <span class="bar"></span>
+        <span class="bar"></span>
+      </div>
+    </nav>
+  </header>
+
+  <section class="page-hero">
+    <div class="page-hero-inner">
+      <h1>About CGAPH</h1>
+      <p>Created by three friends to make digital items simple, fast, and reliable.</p>
+    </div>
+  </section>
+
+  <main class="page-container">
+    <section class="content-card" style="margin-bottom:1.5rem;">
+      <h2 class="section-title">Our Story</h2>
+       <p class="section-subtitle">CGAPH is a platform for instant delivery of digital gaming top-ups, gift cards, and entertainment codes. Built with a passion for gaming and technology, our mission is to provide a safe and smooth experience for players worldwide.</p>
+    </section>
+
+    <section class="content-card">
+      <h2 class="section-title">Founders</h2>
+      <div class="team-grid">
+        <div class="team-card">
+          <div class="team-avatar">
+            <i class="fas fa-user"></i>
+          </div>
+          <h4>Prajwal Bhusal</h4>
+          <span>Designer, Creator & Founder</span>
+        </div>
+        <div class="team-card">
+          <div class="team-avatar">
+            <i class="fas fa-user"></i>
+          </div>
+          <h4>Prashant Subedi</h4>
+          <span>Co‑founder</span>
+        </div>
+        <div class="team-card">
+          <div class="team-avatar">
+            <i class="fas fa-user"></i>
+          </div>
+          <h4>Saroj Rijal</h4>
+          <span>Co‑founder</span>
+        </div>
+        <div class="team-card">
+          <div class="team-avatar">
+            <i class="fas fa-user"></i>
+          </div>
+          <h4>Niru Gnawali</h4>
+          <span>Promoter</span>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+            <!-- Footer content will be populated by cart.js -->
+  </footer>
+
+  <script type="module" src="./cart.js"></script>
+  <script type="module" src="./loading.js"></script>
+</body>
+</html>
