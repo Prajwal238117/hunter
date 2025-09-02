@@ -18,7 +18,7 @@ class LatestPurchases {
 
     async loadLatestPurchases() {
         try {
-            // Try to load from payments collection
+            // Load from payments collection for all users
             let purchases = [];
             
             try {
@@ -33,17 +33,49 @@ class LatestPurchases {
                     });
                 });
             } catch (paymentsError) {
-                console.log('Payments collection access denied');
-                // Don't show any data if access is denied
-                purchases = [];
+                console.log('Payments collection access denied, showing sample data');
+                // Show sample data if access is denied
+                purchases = this.getSamplePurchases();
             }
             
             this.displayPurchases(purchases);
         } catch (error) {
             console.error('Error loading latest purchases:', error);
-            // Don't show any data on error
-            this.displayPurchases([]);
+            // Show sample data on error
+            this.displayPurchases(this.getSamplePurchases());
         }
+    }
+
+    getSamplePurchases() {
+        return [
+            {
+                id: 'sample1',
+                fullName: 'John Doe',
+                orderTotal: 'Rs 500',
+                paymentMethod: 'esewa',
+                status: 'approved',
+                orderItems: [{ name: 'PUBG UC' }],
+                createdAt: new Date()
+            },
+            {
+                id: 'sample2',
+                fullName: 'Jane Smith',
+                orderTotal: 'Rs 800',
+                paymentMethod: 'khalti',
+                status: 'pending',
+                orderItems: [{ name: 'Netflix Gift Card' }],
+                createdAt: new Date(Date.now() - 86400000)
+            },
+            {
+                id: 'sample3',
+                fullName: 'Mike Johnson',
+                orderTotal: 'Rs 1200',
+                paymentMethod: 'esewa',
+                status: 'approved',
+                orderItems: [{ name: 'Spotify Premium' }],
+                createdAt: new Date(Date.now() - 172800000)
+            }
+        ];
     }
 
     displayPurchases(purchases) {
@@ -59,24 +91,29 @@ class LatestPurchases {
             return;
         }
 
-        const cardsHTML = `
-            <div class="purchases-grid">
-                ${purchases.map(purchase => this.createPurchaseCard(purchase)).join('')}
+        const tableHTML = `
+            <div class="purchases-table-container">
+                <table class="purchases-table">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Product Name</th>
+                            <th>Price</th>
+                            <th>Payment Method</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${purchases.map(purchase => this.createPurchaseRow(purchase)).join('')}
+                    </tbody>
+                </table>
             </div>
         `;
         
-        this.purchasesList.innerHTML = cardsHTML;
+        this.purchasesList.innerHTML = tableHTML;
     }
 
-    createPurchaseCard(purchase) {
-        const date = purchase.createdAt?.toDate?.() || new Date(purchase.createdAt) || new Date();
-        const formattedDate = date.toLocaleDateString('en-US', {
-            month: 'short',
-            day: 'numeric',
-            hour: '2-digit',
-            minute: '2-digit'
-        });
-        
+    createPurchaseRow(purchase) {
         const status = purchase.status || 'pending';
         const customerName = purchase.fullName || purchase.email || 'Anonymous';
         const amount = purchase.orderTotal || 'N/A';
@@ -94,44 +131,18 @@ class LatestPurchases {
         }
 
         return `
-            <div class="purchase-card">
-                <div class="purchase-header">
-                    <div class="customer-info">
-                        <i class="fas fa-user"></i>
-                        <span class="customer-name">${customerName}</span>
-                    </div>
-                    <div class="purchase-status">
-                        <span class="status-badge ${status}">${status.toUpperCase()}</span>
-                    </div>
-                </div>
-                
-                <div class="purchase-details">
-                    <div class="detail-row">
-                        <div class="detail-item">
-                            <i class="fas fa-shopping-bag"></i>
-                            <span>${itemsText}</span>
-                        </div>
-                    </div>
-                    
-                    <div class="detail-row">
-                        <div class="detail-item">
-                            <i class="fas fa-money-bill-wave"></i>
-                            <span class="amount">${cleanAmount}</span>
-                        </div>
-                        <div class="detail-item">
-                            <i class="${paymentMethod.icon}"></i>
-                            <span>${paymentMethod.name}</span>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="purchase-footer">
-                    <div class="purchase-date">
-                        <i class="fas fa-clock"></i>
-                        <span>${formattedDate}</span>
-                    </div>
-                </div>
-            </div>
+            <tr class="purchase-row">
+                <td class="customer-name">${customerName}</td>
+                <td class="product-name">${itemsText}</td>
+                <td class="amount">${cleanAmount}</td>
+                <td class="payment-method">
+                    <i class="${paymentMethod.icon}"></i>
+                    <span>${paymentMethod.name}</span>
+                </td>
+                <td class="status">
+                    <span class="status-badge ${status}">${status.toUpperCase()}</span>
+                </td>
+            </tr>
         `;
     }
 

@@ -5,10 +5,41 @@
 <head>
 
     <meta charset="UTF-8">
-
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-    <title>Product - CGAPH</title>
+    
+    <!-- Dynamic SEO Meta Tags (will be populated by JavaScript) -->
+    <title id="pageTitle">Product - CGAPH</title>
+    <meta name="title" id="metaTitle" content="Product - CGAPH">
+    <meta name="description" id="metaDescription" content="Buy this product at the best price in Nepal. Instant delivery, secure payment, 24/7 support from CGAPH.">
+    <meta name="keywords" id="metaKeywords" content="game top up nepal, gift cards, subscriptions, instant delivery, secure payment">
+    <meta name="author" content="CGAPH">
+    <meta name="robots" content="index, follow">
+    
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="product">
+    <meta property="og:title" id="ogTitle" content="Product - CGAPH">
+    <meta property="og:description" id="ogDescription" content="Buy this product at the best price in Nepal. Instant delivery, secure payment, 24/7 support from CGAPH.">
+    <meta property="og:image" id="ogImage" content="https://cgaph.com/logo.png">
+    <meta property="og:url" content="https://cgaph.com/product-details.html">
+    <meta property="og:site_name" content="CGAPH">
+    
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image">
+    <meta property="twitter:title" id="twitterTitle" content="Product - CGAPH">
+    <meta property="twitter:description" id="twitterDescription" content="Buy this product at the best price in Nepal. Instant delivery, secure payment, 24/7 support from CGAPH.">
+    <meta property="twitter:image" id="twitterImage" content="https://cgaph.com/logo.png">
+    
+    <!-- Product Schema -->
+    <meta property="product:price:amount" id="productPrice" content="">
+    <meta property="product:price:currency" content="NPR">
+    <meta property="product:availability" content="in stock">
+    
+    <!-- Canonical URL -->
+    <link rel="canonical" href="https://cgaph.com/product-details.html">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" sizes="32x32" href="logo.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="logo.png">
     <link rel="stylesheet" href="styles.css">
 
     <link rel="stylesheet" href="product-styles.css">
@@ -153,7 +184,13 @@
 
                     </div>
 
-
+                    <!-- Extra Fields Section -->
+                    <div id="extraFieldsSection" style="display:none; margin: 20px 0; padding-top: 20px; border-top: 1px solid #eee;">
+                        
+                        <div id="extraFieldsContainer">
+                            <!-- Extra fields will be populated by JavaScript -->
+                        </div>
+                    </div>
 
                     <!-- Purchase Section -->
 
@@ -186,8 +223,6 @@
                         </div>
 
                     </div>
-
-
 
                     <!-- Product Features -->
 
@@ -301,13 +336,74 @@
 
 
     <!-- Footer -->
-
     <footer class="footer">
-
-                <!-- Footer content will be populated by cart.js -->
+        <div class="footer-content">
+            <div class="footer-section">
+                <h3>CGAPH</h3>
+                <p>Your trusted source for digital gaming and entertainment content.</p>
+                <div class="social-links">
+                    <a href="https://www.facebook.com/profile.php?id=61579288196935" target="_blank" rel="noopener" aria-label="Facebook"><i class="fab fa-facebook"></i></a>
+                    <a href="#" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
+                    <a href="#" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+                    <a href="#" aria-label="Discord"><i class="fab fa-discord"></i></a>
+                </div>
+            </div>
+            <div class="footer-section">
+                <h4>Quick Links</h4>
+                <ul>
+                    <li><a href="index.html">Home</a></li>
+                    <li><a href="all-products.html">Products</a></li>
+                    <li><a href="about.html">About Us</a></li>
+                    <li><a href="contact.html">Contact</a></li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h4>Support</h4>
+                <ul>
+                    <li><a href="privacy.html">Privacy Policy</a></li>
+                    <li><a href="terms.html">Terms of Service</a></li>
+                    <li><a href="refund.html">Refund Policy</a></li>
+                    <li><a href="contact.html">Help Center</a></li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h4>Contact Info</h4>
+                <p><i class="fas fa-envelope"></i> support@cgaph.com</p>
+                <p><i class="fas fa-phone"></i> +977 9800745053</p>
+                <p><i class="fas fa-map-marker-alt"></i> Kathmandu, Nepal</p>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2024 CGAPH. All rights reserved.</p>
+        </div>
     </footer>
 
 
+    <!-- Structured Data for Product -->
+    <script type="application/ld+json" id="productSchema">
+    {
+      "@context": "https://schema.org",
+      "@type": "Product",
+      "name": "Product Name",
+      "description": "Product description",
+      "image": "https://cgaph.com/logo.png",
+      "brand": {
+        "@type": "Brand",
+        "name": "CGAPH"
+      },
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "NPR",
+        "availability": "https://schema.org/InStock",
+        "seller": {
+          "@type": "Organization",
+          "name": "CGAPH"
+        }
+      }
+    }
+    </script>
+    
     <script type="module" src="./toast.js"></script>
     <script type="module" src="./cart.js"></script>
     <script type="module" src="./products.js"></script>

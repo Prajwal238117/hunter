@@ -83,6 +83,235 @@ function showTab(tabName) {
 // Make showTab globally available
 window.showTab = showTab;
 
+// Order Details Modal Functions
+async function showOrderDetails(paymentId) {
+  try {
+    const paymentDoc = await getDoc(doc(db, 'payments', paymentId));
+    if (!paymentDoc.exists()) {
+      showToast('Payment not found', 'error');
+      return;
+    }
+
+    const paymentData = paymentDoc.data();
+    const orderItems = paymentData.orderItems || [];
+    
+    // Build order details HTML
+    let orderDetailsHTML = '';
+    
+    if (orderItems.length > 0) {
+      orderDetailsHTML = orderItems.map(item => {
+        const extraFieldsHTML = item.extraFields && item.extraFields.length > 0 
+          ? item.extraFields.map(field => `<p><strong>${field.label}:</strong> ${field.value}</p>`).join('')
+          : '<p><em>No extra fields</em></p>';
+        
+        return `
+          <div class="order-item">
+            <h4>${item.name}</h4>
+            <p><strong>Variant:</strong> <span>${item.variant?.label || item.variant?.name || 'N/A'}</span></p>
+            <p><strong>Quantity:</strong> <span>${item.quantity || 1}</span></p>
+            <p><strong>Price:</strong> <span>Rs ${item.price || 'N/A'}</span></p>
+            <p><strong>Total:</strong> <span class="item-total">Rs ${((item.price || 0) * (item.quantity || 1)).toFixed(2)}</span></p>
+            <div class="extra-fields">
+              <h5>Extra Fields:</h5>
+              ${extraFieldsHTML}
+            </div>
+          </div>
+        `;
+      }).join('<hr>');
+    } else {
+      orderDetailsHTML = '<p><em>No order items found</em></p>';
+    }
+
+    // Show modal
+    const modal = document.getElementById('orderDetailsModal');
+    const modalContent = document.getElementById('orderDetailsContent');
+    
+    if (modal && modalContent) {
+      modalContent.innerHTML = `
+        <div class="modal-header">
+          <h3>Order Details</h3>
+          <button class="close-modal" onclick="closeOrderDetailsModal()">&times;</button>
+        </div>
+        <div class="modal-body">
+          <div class="customer-info">
+            <h4>Customer Information</h4>
+            <p><strong>Name:</strong> ${paymentData.fullName || 'N/A'}</p>
+            <p><strong>Email:</strong> ${paymentData.email || 'N/A'}</p>
+            <p><strong>Phone:</strong> ${paymentData.phone || 'N/A'}</p>
+          </div>
+          <div class="order-items">
+            <h4>Order Items (${orderItems.length} item${orderItems.length !== 1 ? 's' : ''})</h4>
+            ${orderDetailsHTML}
+          </div>
+          <div class="order-summary">
+            <h4>Order Summary</h4>
+            <p><strong>Total Items:</strong> ${orderItems.reduce((sum, item) => sum + (item.quantity || 1), 0)}</p>
+            <p><strong>Total Amount:</strong> Rs ${paymentData.orderTotal || 'N/A'}</p>
+            <p><strong>Payment Method:</strong> ${paymentData.paymentMethod || 'N/A'}</p>
+            <p><strong>Order Date:</strong> ${paymentData.createdAt?.toDate?.()?.toLocaleString() || 'N/A'}</p>
+          </div>
+        </div>
+      `;
+      
+      modal.style.display = 'block';
+    }
+  } catch (error) {
+    console.error('Error loading order details:', error);
+    showToast('Failed to load order details', 'error');
+  }
+}
+
+function closeOrderDetailsModal() {
+  const modal = document.getElementById('orderDetailsModal');
+  if (modal) {
+    modal.style.display = 'none';
+  }
+}
+
+// Screenshot viewing functions
+function viewBase64Image(base64Data, filename) {
+  const modal = document.getElementById('orderDetailsModal');
+  const modalContent = document.getElementById('orderDetailsContent');
+  
+  if (modal && modalContent) {
+    modalContent.innerHTML = `
+      <div class="modal-header">
+        <h3>Screenshot: ${filename}</h3>
+        <button class="close-modal" onclick="closeOrderDetailsModal()">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="screenshot-viewer">
+          <img src="${base64Data}" alt="${filename}" style="max-width: 100%; height: auto; border-radius: 10px;">
+        </div>
+      </div>
+    `;
+    
+    modal.style.display = 'block';
+  }
+}
+
+// Coupon Management Functions
+const couponsCol = collection(db, 'coupons');
+
+async function loadCoupons() {
+    const tbody = document.querySelector('#couponsTable tbody');
+    if (!tbody) return;
+    
+    tbody.innerHTML = '<tr><td colspan="9">Loading coupons...</td></tr>';
+    
+    try {
+        const q = query(couponsCol, orderBy('createdAt', 'desc'));
+        const snap = await getDocs(q);
+        
+        if (snap.empty) {
+            tbody.innerHTML = '<tr><td colspan="9">No coupons available.</td></tr>';
+            return;
+        }
+        
+        const rows = [];
+        snap.forEach(docSnap => {
+            const coupon = docSnap.data();
+            rows.push(createCouponRow(docSnap.id, coupon));
+        });
+        
+        tbody.dataset.allRows = JSON.stringify(rows);
+        tbody.innerHTML = rows.join('');
+        
+    } catch (error) {
+        console.error('Error loading coupons:', error);
+        tbody.innerHTML = '<tr><td colspan="9">Failed to load coupons.</td></tr>';
+    }
+}
+
+function createCouponRow(id, coupon) {
+    const status = coupon.isActive ? 'Active' : 'Inactive';
+    const statusClass = coupon.isActive ? 'status-active' : 'status-inactive';
+    const expiryDate = coupon.expiryDate ? coupon.expiryDate.toDate().toLocaleDateString() : 'No expiry';
+    
+    return `
+        <tr data-id="${id}">
+            <td><strong>${coupon.code}</strong></td>
+            <td>${coupon.type === 'percentage' ? coupon.value + '%' : 'Rs ' + coupon.value}</td>
+            <td>${coupon.type === 'percentage' ? 'Percentage' : 'Fixed Amount'}</td>
+            <td>Rs ${coupon.minAmount}</td>
+            <td>${coupon.usageLimit}</td>
+            <td>${coupon.usedCount || 0}</td>
+            <td>${expiryDate}</td>
+            <td><span class="status-badge ${statusClass}">${status}</span></td>
+            <td class="actions">
+                <button class="btn btn-warning btn-sm" onclick="editCoupon('${id}')">
+                    <i class="fas fa-edit"></i>
+                </button>
+                <button class="btn btn-danger btn-sm" onclick="deleteCoupon('${id}')">
+                    <i class="fas fa-trash"></i>
+                </button>
+            </td>
+        </tr>
+    `;
+}
+
+function openAddCouponModal() {
+    document.getElementById('addCouponModal').style.display = 'block';
+    document.body.style.overflow = 'hidden';
+}
+
+function closeAddCouponModal() {
+    document.getElementById('addCouponModal').style.display = 'none';
+    document.body.style.overflow = 'auto';
+    document.getElementById('couponForm').reset();
+}
+
+// Setup coupon form submission
+function setupCouponForm() {
+    const couponForm = document.getElementById('couponForm');
+    if (couponForm) {
+        couponForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const formData = {
+                code: document.getElementById('couponCode').value.trim().toUpperCase(),
+                type: document.getElementById('couponType').value,
+                value: parseFloat(document.getElementById('couponValue').value),
+                minAmount: parseFloat(document.getElementById('couponMinAmount').value),
+                usageLimit: parseInt(document.getElementById('couponUsageLimit').value),
+                expiryDate: new Date(document.getElementById('couponExpiry').value),
+                description: document.getElementById('couponDescription').value.trim(),
+                isActive: true,
+                usedCount: 0,
+                createdAt: serverTimestamp()
+            };
+            
+            try {
+                // Check if coupon code already exists
+                const existingCoupon = await getDoc(doc(db, 'coupons', formData.code));
+                if (existingCoupon.exists()) {
+                    showToast('Coupon code already exists', 'error');
+                    return;
+                }
+                
+                // Create coupon document with code as ID
+                await setDoc(doc(db, 'coupons', formData.code), formData);
+                
+                showToast('Coupon created successfully!', 'success');
+                closeAddCouponModal();
+                loadCoupons();
+                
+            } catch (error) {
+                console.error('Error creating coupon:', error);
+                showToast('Failed to create coupon', 'error');
+            }
+        });
+    }
+}
+
+// Make functions globally available
+window.showOrderDetails = showOrderDetails;
+window.closeOrderDetailsModal = closeOrderDetailsModal;
+window.viewBase64Image = viewBase64Image;
+window.showToast = showToast;
+window.openAddCouponModal = openAddCouponModal;
+window.closeAddCouponModal = closeAddCouponModal;
+
 // Payment Management Functions
 function statusBadge(status) {
   const cls = status === 'approved' ? 'status-approved'
@@ -93,56 +322,74 @@ function statusBadge(status) {
 }
 
 function rowTemplate(id, data) {
-  const created = data.createdAt?.toDate?.() || new Date(0);
-  const dateStr = created.toLocaleString();
-  const contact = `${data.email || ''}<br/><span class="muted">${data.phone || ''}</span>`;
-  const billing = `${data.fullName || ''}<br/><span class="muted">${data.address || ''}, ${data.city || ''}, ${data.state || ''} ${data.zipCode || ''}, ${data.country || ''}</span>`;
-  const pay = `${data.paymentMethod || ''}<br/><strong>${data.orderTotal || ''}</strong>`;
+  const status = data.status || 'pending';
   
   // Handle screenshot display - support both Cloudflare URLs and base64
   let ss = '-';
   if (data.screenshotUrl) {
-    if (data.screenshotUrl.startsWith('data:image')) {
+    if (data.screenshotUrl === 'MANUAL_VERIFICATION_REQUIRED') {
+      // Manual verification required
+      ss = `<span class="manual-verification" style="color: #ed8936; font-weight: 600;">
+        <i class="fas fa-exclamation-triangle"></i> Manual Verification Required
+      </span>`;
+    } else if (data.screenshotUrl.startsWith('data:image')) {
       // Base64 image - show in modal
       ss = `<button class="screenshot-link" onclick="viewBase64Image('${data.screenshotUrl}', '${data.screenshotFilename || 'Screenshot'}')">View Base64</button>`;
     } else {
       // Cloudflare URL - direct link
-      ss = `<a class="screenshot-link" href="${data.screenshotUrl}" target="_blank">View Cloudflare</a>`;
+      ss = `<a class="screenshot-link" href="${data.screenshotUrl}" target="_blank">View Screenshot</a>`;
     }
   }
   
-  const status = data.status || 'pending';
   return `
     <tr data-id="${id}">
-      <td>${dateStr}</td>
-      <td>${contact}</td>
-      <td>${billing}</td>
-      <td>${pay}</td>
-      <td>${ss}</td>
+      <td>${data.fullName || 'Customer'}</td>
       <td>${statusBadge(status)}</td>
       <td class="actions">
+        <button class="btn-order-details" onclick="showOrderDetails('${id}')">Order Details</button>
         <button class="btn-approve">Approve</button>
         <button class="btn-reject">Reject</button>
       </td>
+      <td>${data.orderTotal || 'N/A'}</td>
+      <td>${ss}</td>
     </tr>
   `;
 }
 
 async function loadPayments() {
+  console.log('loadPayments called');
   const tbody = document.querySelector('#paymentsTable tbody');
-  if (!tbody) return;
+  if (!tbody) {
+    console.log('No tbody found for paymentsTable');
+    return;
+  }
   
-  tbody.innerHTML = '<tr><td colspan="8">Loading...</td></tr>';
+  console.log('Setting loading message');
+  tbody.innerHTML = '<tr><td colspan="5">Loading...</td></tr>';
+  
   try {
+    console.log('Querying payments collection...');
     const q = query(paymentsCol, orderBy('createdAt', 'desc'), limit(200));
     const snap = await getDocs(q);
+    console.log('Payments query result:', snap.size, 'documents');
+    
     const rows = [];
-    snap.forEach(docSnap => rows.push(rowTemplate(docSnap.id, docSnap.data())));
+    snap.forEach(docSnap => {
+      console.log('Processing payment:', docSnap.id, docSnap.data());
+      rows.push(rowTemplate(docSnap.id, docSnap.data()));
+    });
+    
     tbody.dataset.allRows = JSON.stringify(rows);
-    tbody.innerHTML = rows.length ? rows.join('') : '<tr><td colspan="8">No payments yet.</td></tr>';
+    if (rows.length > 0) {
+      console.log('Rendering', rows.length, 'payment rows');
+      tbody.innerHTML = rows.join('');
+    } else {
+      console.log('No payments found, showing empty message');
+      tbody.innerHTML = '<tr><td colspan="5">No payments yet.</td></tr>';
+    }
   } catch (err) {
-    console.error(err);
-    tbody.innerHTML = '<tr><td colspan="8">Failed to load.</td></tr>';
+    console.error('Error in loadPayments:', err);
+    tbody.innerHTML = '<tr><td colspan="5">Failed to load.</td></tr>';
   }
 }
 
@@ -243,9 +490,14 @@ async function loadProducts() {
 
 function setupProductForm() {
   const productForm = document.getElementById('productForm');
+  const editProductForm = document.getElementById('editProductForm');
   
   if (productForm) {
     productForm.addEventListener('submit', handleProductSubmit);
+  }
+  
+  if (editProductForm) {
+    editProductForm.addEventListener('submit', handleEditProductSubmit);
   }
 }
 
@@ -307,6 +559,10 @@ function removeVariant(element) {
 function removeExtraField(element) {
   element.parentElement.remove();
 }
+
+// Make these functions globally available
+window.removeVariant = removeVariant;
+window.removeExtraField = removeExtraField;
 function cancelAddProduct() {
   const addProductForm = document.getElementById('addProductForm');
   const addProductBtn = document.getElementById('addProductBtn');
@@ -352,6 +608,8 @@ let editingProductId = null;
 
 async function editProduct(productId) {
   try {
+    console.log('Edit product called with ID:', productId);
+    
     const productDoc = await getDoc(doc(db, 'products', productId));
     if (!productDoc.exists()) {
       showToast('Product not found', 'error');
@@ -359,17 +617,29 @@ async function editProduct(productId) {
     }
     
     const product = productDoc.data();
+    console.log('Product data loaded:', product);
+    
     editingProductId = productId;
     
-    // Populate form fields
-    document.getElementById('productName').value = product.name || '';
-            // Category field removed - no longer needed
-    document.getElementById('productDescription').value = product.description || '';
-    document.getElementById('productImage').value = product.imageUrl || product.imagePath || '';
-    document.getElementById('productFeatures').value = (product.features || []).join('\n');
+    // Populate edit form fields
+    document.getElementById('editProductId').value = productId;
+    document.getElementById('editProductName').value = product.name || '';
+    document.getElementById('editProductCategory').value = product.category || '';
+    document.getElementById('editProductDescription').value = product.description || '';
+    document.getElementById('editProductTags').value = product.tags ? product.tags.join(', ') : '';
+    document.getElementById('editProductStatus').value = product.status || 'active';
+    document.getElementById('editProductFeatures').value = (product.features || []).join('\n');
+    document.getElementById('editFeaturedProduct').checked = product.featured || false;
+    document.getElementById('editProductPriority').value = product.priority || '2';
+    
+    // Check if these fields exist before setting them
+    const metaTitleField = document.getElementById('editProductMetaTitle');
+    const metaDescField = document.getElementById('editProductMetaDescription');
+    if (metaTitleField) metaTitleField.value = product.metaTitle || '';
+    if (metaDescField) metaDescField.value = product.metaDescription || '';
     
     // Populate variants
-    const variantsContainer = document.getElementById('variantsContainer');
+    const variantsContainer = document.getElementById('editVariantsContainer');
     variantsContainer.innerHTML = '';
     
     if (product.variants && product.variants.length > 0) {
@@ -378,26 +648,20 @@ async function editProduct(productId) {
         variantDiv.className = 'variant-item';
         variantDiv.innerHTML = `
           <div class="variant-grid">
-            <div class="form-group">
-              <label>Label (e.g. 1000 V-Bucks)</label>
-              <input type="text" class="variant-label" value="${variant.label || ''}" required>
-            </div>
-            <div class="form-group">
-              <label>Price (Rs)</label>
-              <input type="number" class="variant-price" step="0.01" value="${variant.price || ''}" required>
-            </div>
-          </div>
+            <input type="text" class="variant-label" placeholder="Variant name (e.g., 100 Diamonds)" value="${variant.label || ''}" required>
+            <input type="number" class="variant-price" placeholder="Price" step="0.01" value="${variant.price || ''}" required>
           <button type="button" class="remove-variant" onclick="removeVariant(this)">×</button>
+          </div>
         `;
         variantsContainer.appendChild(variantDiv);
       });
     } else {
       // Add default variant if none exist
-      addVariant();
+      addEditVariant();
     }
     
     // Populate extra fields
-    const extraFieldsContainer = document.getElementById('extraFieldsContainer');
+    const extraFieldsContainer = document.getElementById('editExtraFieldsContainer');
     extraFieldsContainer.innerHTML = '';
     
     if (product.extraFields && product.extraFields.length > 0) {
@@ -406,35 +670,26 @@ async function editProduct(productId) {
         fieldDiv.className = 'extra-item';
         fieldDiv.innerHTML = `
           <div class="variant-grid">
-            <div class="form-group">
-              <label>Field Label</label>
-              <input type="text" class="extra-label" value="${field.label || ''}" required>
-            </div>
-            <div class="form-group">
-              <label>Placeholder / Hint</label>
-              <input type="text" class="extra-placeholder" value="${field.placeholder || ''}" required>
-            </div>
-            <div class="form-group">
-              <label>Required?</label>
+            <input type="text" class="extra-label" placeholder="Field label (e.g., Game ID)" value="${field.label || ''}" required>
+            <input type="text" class="extra-placeholder" placeholder="Placeholder text" value="${field.placeholder || ''}">
               <select class="extra-required">
-                <option value="true" ${field.required ? 'selected' : ''}>Yes</option>
-                <option value="false" ${!field.required ? 'selected' : ''}>No</option>
+              <option value="true" ${field.required ? 'selected' : ''}>Required</option>
+              <option value="false" ${!field.required ? 'selected' : ''}>Optional</option>
               </select>
-            </div>
-          </div>
           <button type="button" class="remove-variant" onclick="removeExtraField(this)">×</button>
+          </div>
         `;
         extraFieldsContainer.appendChild(fieldDiv);
       });
+    } else {
+      // Add default extra field if none exist
+      addEditExtraField();
     }
     
-    // Show form and update button text
-    document.getElementById('addProductForm').style.display = 'block';
-    document.getElementById('addProductBtn').style.display = 'none';
-    document.querySelector('#productForm button[type="submit"]').textContent = 'Update Product';
-    
-    // Scroll to form
-    document.getElementById('addProductForm').scrollIntoView({ behavior: 'smooth' });
+    // Show edit modal
+    console.log('Opening edit modal...');
+    openEditProductModal();
+    console.log('Edit modal opened successfully');
     
   } catch (error) {
     console.error('Error loading product for edit:', error);
@@ -448,11 +703,15 @@ async function handleProductSubmit(e) {
   try {
     const formData = new FormData(e.target);
     const productName = document.getElementById('productName').value;
-          // Category field removed - no longer needed
+    const productCategory = document.getElementById('productCategory').value;
     const productDescription = document.getElementById('productDescription').value;
+    const productTags = document.getElementById('productTags').value;
+    const productStatus = document.getElementById('productStatus').value;
     const productImageInput = document.getElementById('productImage');
     const productImageUrl = document.getElementById('productImageUrl');
     const productFeatures = document.getElementById('productFeatures').value;
+    const featuredProduct = document.getElementById('featuredProduct').checked;
+    const productPriority = document.getElementById('productPriority').value;
     
     // Handle image upload - support both file upload and URL input
     let imageData = null;
@@ -486,6 +745,11 @@ async function handleProductSubmit(e) {
       }
     });
     
+    if (!productCategory) {
+      showToast('Product category is required', 'error');
+      return;
+    }
+    
     if (variants.length === 0) {
       showToast('At least one variant is required', 'error');
       return;
@@ -505,15 +769,21 @@ async function handleProductSubmit(e) {
     
     const productData = {
       name: productName,
-              // Category field removed - no longer needed
+      category: productCategory,
       description: productDescription,
+      tags: productTags.split(',').map(tag => tag.trim()).filter(tag => tag),
+      status: productStatus,
       imagePath: imageData,
       features: features,
       variants: variants,
       extraFields: extras,
+      featured: featuredProduct,
+      priority: parseInt(productPriority),
       createdAt: serverTimestamp(),
       updatedAt: serverTimestamp()
     };
+    
+    console.log('Saving product data:', productData);
     
     if (editingProductId) {
       // Update existing product
@@ -534,6 +804,106 @@ async function handleProductSubmit(e) {
   } catch (error) {
     console.error('Error adding product:', error);
     showToast('Error adding product', 'error');
+  }
+}
+
+async function handleEditProductSubmit(e) {
+  e.preventDefault();
+  
+  console.log('Edit product form submitted');
+  
+  try {
+    if (!editingProductId) {
+      showToast('No product selected for editing', 'error');
+      return;
+    }
+    
+    console.log('Editing product ID:', editingProductId);
+    
+    const productName = document.getElementById('editProductName').value;
+    const productCategory = document.getElementById('editProductCategory').value;
+    const productDescription = document.getElementById('editProductDescription').value;
+    const productTags = document.getElementById('editProductTags').value;
+    const productStatus = document.getElementById('editProductStatus').value;
+    const productFeatures = document.getElementById('editProductFeatures').value;
+    const featuredProduct = document.getElementById('editFeaturedProduct').checked;
+    const productPriority = document.getElementById('editProductPriority').value;
+    
+    console.log('Form values collected:', {
+      productName,
+      productCategory,
+      productDescription,
+      productTags,
+      productStatus,
+      productFeatures,
+      featuredProduct,
+      productPriority
+    });
+    
+    if (!productCategory) {
+      showToast('Product category is required', 'error');
+      return;
+    }
+    
+    // Collect variants
+    const variantElements = document.querySelectorAll('#editVariantsContainer .variant-item');
+    const variants = [];
+    
+    variantElements.forEach(variantEl => {
+      const label = variantEl.querySelector('.variant-label').value;
+      const price = parseFloat(variantEl.querySelector('.variant-price').value);
+      
+      if (label && price) {
+        variants.push({
+          label,
+          price
+        });
+      }
+    });
+    
+    if (variants.length === 0) {
+      showToast('At least one variant is required', 'error');
+      return;
+    }
+    
+    // Collect extra fields
+    const extras = [];
+    document.querySelectorAll('#editExtraFieldsContainer .extra-item').forEach(item => {
+      const label = item.querySelector('.extra-label')?.value?.trim();
+      const placeholder = item.querySelector('.extra-placeholder')?.value?.trim() || '';
+      const required = (item.querySelector('.extra-required')?.value || 'true') === 'true';
+      if (label) extras.push({ label, placeholder, required });
+    });
+    
+    // Process features
+    const features = productFeatures.split('\n').filter(f => f.trim()).map(f => f.trim());
+    
+    const productData = {
+      name: productName,
+      category: productCategory,
+      description: productDescription,
+      tags: productTags.split(',').map(tag => tag.trim()).filter(tag => tag),
+      status: productStatus,
+      features: features,
+      variants: variants,
+      extraFields: extras,
+      featured: featuredProduct,
+      priority: parseInt(productPriority),
+      updatedAt: serverTimestamp()
+    };
+    
+    console.log('Updating product data:', productData);
+    
+    // Update existing product
+    await updateDoc(doc(db, 'products', editingProductId), productData);
+    showToast('Product updated successfully!', 'success');
+    
+    closeEditProductModal();
+    await loadProducts();
+    
+  } catch (error) {
+    console.error('Error updating product:', error);
+    showToast('Error updating product', 'error');
   }
 }
 
@@ -703,6 +1073,16 @@ async function updateUserRole(userId, newRole) {
       return;
     }
 
+    // Debug: Check current user authentication
+    const currentUser = auth.currentUser;
+    if (!currentUser) {
+      showToast('You must be signed in to update user roles', 'error');
+      return;
+    }
+
+    console.log('Current user:', currentUser.uid);
+    console.log('Updating user role for:', userId, 'to:', newRole);
+
     // Update the user document
     const userRef = doc(db, 'users', userId);
     await updateDoc(userRef, {
@@ -719,12 +1099,16 @@ async function updateUserRole(userId, newRole) {
     
   } catch (error) {
     console.error('Error updating user role:', error);
+    console.error('Error code:', error.code);
+    console.error('Error message:', error.message);
     
     // Provide more specific error messages
     if (error.code === 'permission-denied') {
-      showToast('Permission denied. You may not have admin rights.', 'error');
+      showToast('Permission denied. Check if you have admin rights in Firebase Console.', 'error');
     } else if (error.code === 'not-found') {
       showToast('User document not found', 'error');
+    } else if (error.code === 'unavailable') {
+      showToast('Firebase service unavailable. Please try again.', 'error');
     } else {
       showToast(`Error updating user role: ${error.message}`, 'error');
     }
@@ -814,48 +1198,62 @@ window.updateUserRole = updateUserRole;
 window.viewUserDetails = viewUserDetails;
 window.viewContactMessage = viewContactMessage;
 window.viewBase64Image = viewBase64Image;
-window.editProduct = function(productId) {
-  showToast('Edit product - coming soon', 'info');
+window.openEditProductModal = function() {
+  document.getElementById('editProductModal').style.display = 'block';
+  document.body.style.overflow = 'hidden';
+};
+window.closeEditProductModal = function() {
+  document.getElementById('editProductModal').style.display = 'none';
+  document.body.style.overflow = 'auto';
+  // Reset form
+  document.getElementById('editProductForm').reset();
+  // Clear image preview
+  if (document.getElementById('editImagePreview')) {
+    document.getElementById('editImagePreview').style.display = 'none';
+  }
+  // Reset editing product ID
+  if (typeof editingProductId !== 'undefined') {
+    editingProductId = null;
+  }
 };
 
-function viewBase64Image(base64Data, filename) {
-  // Create a modal to display the base64 image
-  const modal = document.createElement('div');
-  modal.style.cssText = `
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0, 0, 0, 0.8);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    z-index: 10000;
-  `;
+window.addEditVariant = function() {
+  const container = document.getElementById('editVariantsContainer');
+  if (!container) return;
   
-  modal.innerHTML = `
-    <div style="background: white; padding: 20px; border-radius: 10px; max-width: 90%; max-height: 90%; overflow: auto;">
-      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
-        <h3>${filename}</h3>
-        <button onclick="this.closest('div[style*=\'position: fixed\']').remove()" style="background: none; border: none; font-size: 24px; cursor: pointer;">×</button>
-      </div>
-      <img src="${base64Data}" style="max-width: 100%; height: auto;" alt="${filename}">
+  const variantItem = document.createElement('div');
+  variantItem.className = 'variant-item';
+  variantItem.innerHTML = `
+    <div class="variant-grid">
+      <input type="text" class="variant-label" placeholder="Variant name (e.g., 100 Diamonds)" required>
+      <input type="number" class="variant-price" placeholder="Price" step="0.01" required>
+      <button type="button" class="remove-variant" onclick="removeVariant(this)">×</button>
     </div>
   `;
-  
-  document.body.appendChild(modal);
-  
-  // Close modal when clicking outside
-  modal.addEventListener('click', (e) => {
-    if (e.target === modal) {
-      modal.remove();
-    }
-  });
-}
+  container.appendChild(variantItem);
+};
 
-// Make viewBase64Image globally available
-window.viewBase64Image = viewBase64Image;
+window.addEditExtraField = function() {
+  const container = document.getElementById('editExtraFieldsContainer');
+  if (!container) return;
+  
+  const extraItem = document.createElement('div');
+  extraItem.className = 'extra-item';
+  extraItem.innerHTML = `
+    <div class="variant-grid">
+      <input type="text" class="extra-label" placeholder="Field label (e.g., Game ID)" required>
+      <input type="text" class="extra-placeholder" placeholder="Placeholder text">
+      <select class="extra-required">
+        <option value="true">Required</option>
+        <option value="false">Optional</option>
+      </select>
+      <button type="button" class="remove-variant" onclick="removeExtraField(this)">×</button>
+    </div>
+  `;
+  container.appendChild(extraItem);
+};
+
+
 
 function setAdminStatus(text) {
   const el = document.getElementById('adminStatus');
@@ -891,13 +1289,18 @@ async function requireAdmin() {
 
 // Initialize admin panel functionality
 function initializeAdminPanel() {
+  console.log('initializeAdminPanel called');
+  
   // Setup tabs
+  console.log('Setting up tabs...');
   setupTabs();
   
   // Setup image upload functionality
+  console.log('Setting up image upload...');
   setupImageUpload();
   
   // Setup payment management
+  console.log('Setting up payment management...');
   loadPayments();
   wirePaymentActions();
   document.getElementById('refreshBtn')?.addEventListener('click', loadPayments);
@@ -909,33 +1312,55 @@ function initializeAdminPanel() {
       const all = JSON.parse(tbody?.dataset?.allRows || '[]');
       if (!q) { tbody.innerHTML = all.join(''); return; }
       const filtered = all.filter(html => html.toLowerCase().includes(q));
-      tbody.innerHTML = filtered.length ? filtered.join('') : '<tr><td colspan="7">No matches.</td></tr>';
-    });
-  }
-  
-  // Setup product management
-  loadProducts();
-  setupProductForm();
-  document.getElementById('refreshProductsBtn')?.addEventListener('click', loadProducts);
-  
-  // Setup user management
-  loadUsers();
-  document.getElementById('refreshUsersBtn')?.addEventListener('click', loadUsers);
-  const usersSearch = document.getElementById('searchUsersInput');
-  if (usersSearch) {
-    usersSearch.addEventListener('input', () => {
-      const tbody = document.querySelector('#usersTable tbody');
-      const q = usersSearch.value.trim().toLowerCase();
-      const all = JSON.parse(tbody?.dataset?.allRows || '[]');
-      if (!q) { tbody.innerHTML = all.join(''); return; }
-      const filtered = all.filter(html => html.toLowerCase().includes(q));
       tbody.innerHTML = filtered.length ? filtered.join('') : '<tr><td colspan="5">No matches.</td></tr>';
     });
   }
   
-  // Setup contact management
-  loadContacts();
-  document.getElementById('refreshContactsBtn')?.addEventListener('click', loadContacts);
+  // Setup product management
+  console.log('Setting up product management...');
+  loadProducts();
+  setupProductForm();
+  document.getElementById('refreshProductsBtn')?.addEventListener('click', loadProducts);
+  
+      // Setup user management
+    console.log('Setting up user management...');
+    loadUsers();
+    document.getElementById('refreshUsersBtn')?.addEventListener('click', loadUsers);
+    const usersSearch = document.getElementById('searchUsersInput');
+    if (usersSearch) {
+        usersSearch.addEventListener('input', () => {
+            const tbody = document.querySelector('#usersTable tbody');
+            const q = usersSearch.value.trim().toLowerCase();
+            const all = JSON.parse(tbody?.dataset?.allRows || '[]');
+            if (!q) { tbody.innerHTML = all.join(''); return; }
+            const filtered = all.filter(html => html.toLowerCase().includes(q));
+            tbody.innerHTML = filtered.length ? filtered.join('') : '<tr><td colspan="5">No matches.</td></tr>';
+        });
+    }
+    
+    // Setup coupon management
+    console.log('Setting up coupon management...');
+    loadCoupons();
+    setupCouponForm();
+    document.getElementById('refreshCouponsBtn')?.addEventListener('click', loadCoupons);
+    const couponsSearch = document.getElementById('searchCouponsInput');
+    if (couponsSearch) {
+        couponsSearch.addEventListener('input', () => {
+            const tbody = document.querySelector('#couponsTable tbody');
+            const q = couponsSearch.value.trim().toLowerCase();
+            const all = JSON.parse(tbody?.dataset?.allRows || '[]');
+            if (!q) { tbody.innerHTML = all.join(''); return; }
+            const filtered = all.filter(html => html.toLowerCase().includes(q));
+            tbody.innerHTML = filtered.length ? filtered.join('') : '<tr><td colspan="9">No matches.</td></tr>';
+        });
+    }
+    
+    // Setup contact management
+    console.log('Setting up contact management...');
+    loadContacts();
+    document.getElementById('refreshContactsBtn')?.addEventListener('click', loadContacts);
+  
+  console.log('Admin panel initialization complete');
 }
 
 // Show access denied message

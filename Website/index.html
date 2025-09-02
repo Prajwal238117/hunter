@@ -3,9 +3,89 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CGAPH - Game Top-ups & Gift Cards</title>
+    
+    <!-- Primary Meta Tags -->
+    <title>CGAPH - Best Game Top-ups, Gift Cards & Subscriptions in Nepal | Instant Delivery</title>
+    <meta name="title" content="CGAPH - Best Game Top-ups, Gift Cards & Subscriptions in Nepal | Instant Delivery">
+    <meta name="description" content="Buy game top-ups, gift cards, and subscriptions at the best prices in Nepal. Free Fire diamonds, PUBG UC, Netflix, Spotify premium. Instant delivery, secure payment, 24/7 support.">
+    <meta name="keywords" content="game top up nepal, free fire diamonds, pubg uc, gift cards nepal, netflix subscription, spotify premium, mobile gaming, esewa payment, khalti payment">
+    <meta name="author" content="CGAPH">
+    <meta name="robots" content="index, follow">
+    <meta name="language" content="English">
+    <meta name="revisit-after" content="7 days">
+    
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://cgaph.com/">
+    <meta property="og:title" content="CGAPH - Best Game Top-ups, Gift Cards & Subscriptions in Nepal">
+    <meta property="og:description" content="Buy game top-ups, gift cards, and subscriptions at the best prices in Nepal. Free Fire diamonds, PUBG UC, Netflix, Spotify premium. Instant delivery, secure payment, 24/7 support.">
+    <meta property="og:image" content="https://cgaph.com/logo.png">
+    <meta property="og:site_name" content="CGAPH">
+    <meta property="og:locale" content="en_US">
+    
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image">
+    <meta property="twitter:url" content="https://cgaph.com/">
+    <meta property="twitter:title" content="CGAPH - Best Game Top-ups, Gift Cards & Subscriptions in Nepal">
+    <meta property="twitter:description" content="Buy game top-ups, gift cards, and subscriptions at the best prices in Nepal. Free Fire diamonds, PUBG UC, Netflix, Spotify premium. Instant delivery, secure payment, 24/7 support.">
+    <meta property="twitter:image" content="https://cgaph.com/logo.png">
+    
+    <!-- Additional SEO Meta Tags -->
+    <meta name="theme-color" content="#667eea">
+    <meta name="msapplication-TileColor" content="#667eea">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="CGAPH">
+    
+    <!-- Canonical URL -->
+    <link rel="canonical" href="https://cgaph.com/">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" sizes="32x32" href="logo.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="logo.png">
+    <link rel="apple-touch-icon" href="logo.png">
     <link rel="stylesheet" href="styles.css">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    
+    <!-- Structured Data (JSON-LD) -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "Organization",
+      "name": "CGAPH",
+      "url": "https://cgaph.com",
+      "logo": "https://cgaph.com/logo.png",
+      "description": "Best Game Top-ups, Gift Cards & Subscriptions in Nepal",
+      "address": {
+        "@type": "PostalAddress",
+        "addressCountry": "Nepal"
+      },
+      "contactPoint": {
+        "@type": "ContactPoint",
+        "email": "support@cgaph.com",
+        "contactType": "customer service"
+      },
+      "sameAs": [
+        "https://facebook.com/cgaph",
+        "https://instagram.com/cgaph"
+      ]
+    }
+    </script>
+    
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebSite",
+      "name": "CGAPH",
+      "url": "https://cgaph.com",
+      "description": "Buy game top-ups, gift cards, and subscriptions at the best prices in Nepal",
+      "potentialAction": {
+        "@type": "SearchAction",
+        "target": "https://cgaph.com/search?q={search_term_string}",
+        "query-input": "required name=search_term_string"
+      }
+    }
+    </script>
 </head>
 <body>
     <!-- Header -->
@@ -18,7 +98,7 @@
                 <li><a href="#home" class="nav-link">Home</a></li>
                 <li><a href="#top-products" class="nav-link">Products</a></li>
                 <li><a href="#latest-purchases" class="nav-link">Recent</a></li>
-                <li><a href="#features" class="nav-link">Features</a></li>
+                <li><a href="features.html" class="nav-link">Features</a></li>
             </ul>
             <div class="nav-cart">
                 <a href="cart.html">
@@ -26,11 +106,7 @@
                 <span class="cart-count">0</span>
                 </a>
             </div>
-            <div class="nav-search">
-                <button id="searchToggle" class="search-toggle">
-                    <i class="fas fa-search"></i>
-                </button>
-            </div>
+
             <div class="nav-auth">
                 <a href="login.html" class="nav-link">Login</a>
                 <a href="register.html" class="nav-link">Register</a>
@@ -43,36 +119,8 @@
         </nav>
     </header>
 
-    <!-- Search Overlay -->
-    <div id="searchOverlay" class="search-overlay">
-        <div class="search-overlay-content">
-            <div class="search-overlay-header">
-                <h2>Search Products</h2>
-                <button id="closeSearch" class="close-search">
-                    <i class="fas fa-times"></i>
-                </button>
-            </div>
-            <div class="search-overlay-input">
-                <i class="fas fa-search search-icon"></i>
-                <input type="text" id="overlaySearchInput" placeholder="Search for products..." class="overlay-search-input">
-                <button id="overlaySearchBtn" class="overlay-search-btn">
-                    <i class="fas fa-search"></i>
-                </button>
-            </div>
-            <div id="overlaySearchResults" class="overlay-search-results"></div>
-        </div>
-    </div>
-
-    <!-- Hero Section -->
-    <section id="home" class="hero">
-        <div class="hero-content">
-            <h1 class="hero-title animate-slide-up">Digital Gaming & Entertainment</h1>
-            <p class="hero-subtitle animate-slide-up animate-delay-1">Get instant top-ups, gift cards, and digital content for your favorite games and platforms</p>
-            <button class="cta-button animate-slide-up animate-delay-2" onclick="window.location.href='all-products.html'">Shop Now</button>
-        </div>
-        <div class="hero-image animate-float">
-            <i class="fas fa-rocket"></i>
-        </div>
+    
+    
         
         <!-- Animated background elements -->
         <div class="hero-bg-elements">
@@ -83,12 +131,39 @@
         </div>
     </section>
 
-    <!-- Top Products Section -->
-    <section id="top-products" class="top-products">
-        <h2 class="section-title animate-on-scroll">Top Products</h2>
-        <p class="section-subtitle animate-on-scroll">Most popular products based on sales</p>
+
+
+    <!-- Game Top-Up Section -->
+    <section id="game-topup" class="category-section">
+        <h2 class="section-title animate-on-scroll">Game Top-Up</h2>
         <div class="products-container">
-            <div id="topProductsList" class="products-list">
+            <div id="gameTopupList" class="products-list">
+                <div class="loading-spinner">
+                    <i class="fas fa-spinner fa-spin"></i>
+                    <p></p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Gift Card Section -->
+    <section id="gift-card" class="category-section">
+        <h2 class="section-title animate-on-scroll">Gift Card</h2>
+        <div class="products-container">
+            <div id="giftCardList" class="products-list">
+                <div class="loading-spinner">
+                    <i class="fas fa-spinner fa-spin"></i>
+                    <p></p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Subscription Section -->
+    <section id="subscription" class="category-section">
+        <h2 class="section-title animate-on-scroll">Subscription</h2>
+        <div class="products-container">
+            <div id="subscriptionList" class="products-list">
                 <div class="loading-spinner">
                     <i class="fas fa-spinner fa-spin"></i>
                     <p></p>
@@ -110,44 +185,56 @@
         </div>
     </section>
 
-    <!-- Features Section -->
-    <section id="features" class="features">
-        <h2>Why Choose CGAPH?</h2>
-        <div class="features-grid">
-            <div class="feature">
-                <i class="fas fa-bolt"></i>
-                <h3>Instant Delivery</h3>
-                <p>Get your codes instantly via email</p>
-            </div>
-            <div class="feature">
-                <i class="fas fa-shield-alt"></i>
-                <h3>Secure Payment</h3>
-                <p>100% secure payment processing</p>
-            </div>
-            <div class="feature">
-                <i class="fas fa-headset"></i>
-                <h3>24/7 Support</h3>
-                <p>Round the clock customer support</p>
-            </div>
-            <div class="feature">
-                <i class="fas fa-globe"></i>
-                <h3>Global Service</h3>
-                <p>Available worldwide</p>
-            </div>
-        </div>
-    </section>
+
 
     <!-- Footer -->
     <footer id="contact" class="footer">
-        <!-- Footer content will be populated by cart.js -->
+        <div class="footer-content">
+            <div class="footer-section">
+                <h3>CGAPH</h3>
+                <p>Your trusted source for digital gaming and entertainment content.</p>
+                <div class="social-links">
+                    <a href="https://www.facebook.com/profile.php?id=61579288196935" target="_blank" rel="noopener" aria-label="Facebook"><i class="fab fa-facebook"></i></a>
+                    <a href="#" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
+                    <a href="#" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+                    <a href="#" aria-label="Discord"><i class="fab fa-discord"></i></a>
+                </div>
+            </div>
+            <div class="footer-section">
+                <h4>Quick Links</h4>
+                <ul>
+                    <li><a href="index.html">Home</a></li>
+                    <li><a href="all-products.html">Products</a></li>
+                    <li><a href="about.html">About Us</a></li>
+                    <li><a href="contact.html">Contact</a></li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h4>Support</h4>
+                <ul>
+                    <li><a href="privacy.html">Privacy Policy</a></li>
+                    <li><a href="terms.html">Terms of Service</a></li>
+                    <li><a href="refund.html">Refund Policy</a></li>
+                    <li><a href="contact.html">Help Center</a></li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h4>Contact Info</h4>
+                <p><i class="fas fa-envelope"></i> support@cgaph.com</p>
+                <p><i class="fas fa-phone"></i> +977 9800745053</p>
+                <p><i class="fas fa-map-marker-alt"></i> Kathmandu, Nepal</p>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2024 CGAPH. All rights reserved.</p>
+        </div>
     </footer>
 
     <script type="module" src="./toast.js"></script>
     <script type="module" src="./cart.js"></script>
-    <script type="module" src="./search.js"></script>
     <script type="module" src="./scroll-animations.js"></script>
     <script type="module" src="./latest-purchases.js"></script>
-    <script type="module" src="./top-products.js"></script>
+    <script type="module" src="./category-products.js"></script>
     <script type="module" src="./loading.js"></script>
 </body>
 </html>

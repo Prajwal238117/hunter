@@ -3,7 +3,31 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Contact Us - CGAPH</title>
+  
+  <!-- Primary Meta Tags -->
+  <title>Contact Us - CGAPH | Game Top-ups & Gift Cards Support Nepal</title>
+  <meta name="title" content="Contact Us - CGAPH | Game Top-ups & Gift Cards Support Nepal">
+  <meta name="description" content="Contact CGAPH for game top-ups, gift cards, and subscription support in Nepal. Get help with Free Fire diamonds, PUBG UC, Netflix, and more. 24/7 customer support.">
+  <meta name="keywords" content="contact cgaph, game top up support nepal, customer service, free fire support, pubg support, gift card help">
+  <meta name="author" content="CGAPH">
+  <meta name="robots" content="index, follow">
+  
+  <!-- Open Graph / Facebook -->
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://cgaph.com/contact.html">
+  <meta property="og:title" content="Contact Us - CGAPH | Game Top-ups & Gift Cards Support Nepal">
+  <meta property="og:description" content="Contact CGAPH for game top-ups, gift cards, and subscription support in Nepal. Get help with Free Fire diamonds, PUBG UC, Netflix, and more. 24/7 customer support.">
+  <meta property="og:image" content="https://cgaph.com/logo.png">
+  
+  <!-- Twitter -->
+  <meta property="twitter:card" content="summary_large_image">
+  <meta property="twitter:url" content="https://cgaph.com/contact.html">
+  <meta property="twitter:title" content="Contact Us - CGAPH | Game Top-ups & Gift Cards Support Nepal">
+  <meta property="twitter:description" content="Contact CGAPH for game top-ups, gift cards, and subscription support in Nepal. Get help with Free Fire diamonds, PUBG UC, Netflix, and more. 24/7 customer support.">
+  <meta property="twitter:image" content="https://cgaph.com/logo.png">
+  
+  <!-- Canonical URL -->
+  <link rel="canonical" href="https://cgaph.com/contact.html">
   <link rel="stylesheet" href="styles.css" />
   <link rel="stylesheet" href="pages-styles.css" />
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet" />
@@ -77,14 +101,14 @@
           <i class="fas fa-envelope"></i>
           <div>
             <strong>Email</strong>
-            <div>cgaph.np@gmail.com</div>
+                            <div>support@cgaph.com</div>
           </div>
         </div>
         <div class="info-item">
           <i class="fas fa-phone"></i>
           <div>
             <strong>Phone</strong>
-            <div>+977 9768281599</div>
+            <div>+977 9800745053</div>
           </div>
         </div>
         <div class="info-item">
@@ -99,13 +123,50 @@
   </main>
 
   <footer class="footer">
-            <!-- Footer content will be populated by cart.js -->
+    <div class="footer-content">
+      <div class="footer-section">
+        <h3>CGAPH</h3>
+        <p>Your trusted source for digital gaming and entertainment content.</p>
+        <div class="social-links">
+          <a href="https://www.facebook.com/profile.php?id=61579288196935" target="_blank" rel="noopener" aria-label="Facebook"><i class="fab fa-facebook"></i></a>
+          <a href="#" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
+          <a href="#" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+          <a href="#" aria-label="Discord"><i class="fab fa-discord"></i></a>
+        </div>
+      </div>
+      <div class="footer-section">
+        <h4>Quick Links</h4>
+        <ul>
+          <li><a href="index.html">Home</a></li>
+          <li><a href="all-products.html">Products</a></li>
+          <li><a href="about.html">About Us</a></li>
+          <li><a href="contact.html">Contact</a></li>
+        </ul>
+      </div>
+      <div class="footer-section">
+        <h4>Support</h4>
+        <ul>
+          <li><a href="privacy.html">Privacy Policy</a></li>
+          <li><a href="terms.html">Terms of Service</a></li>
+          <li><a href="refund.html">Refund Policy</a></li>
+          <li><a href="contact.html">Help Center</a></li>
+        </ul>
+      </div>
+      <div class="footer-section">
+        <h4>Contact Info</h4>
+        <p><i class="fas fa-envelope"></i> support@cgaph.com</p>
+        <p><i class="fas fa-phone"></i> +977 9800745053</p>
+        <p><i class="fas fa-map-marker-alt"></i> Kathmandu, Nepal</p>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>&copy; 2024 CGAPH. All rights reserved.</p>
+    </div>
   </footer>
 
-  <script type="module" src="./toast.js"></script>
-  <script type="module" src="./cart.js"></script>
-  <script type="module" src="./loading.js"></script>
-  <script>
+  <script type="module">
+    import { showToast } from './toast.js';
+    
     // Contact form functionality
     document.addEventListener('DOMContentLoaded', function() {
       const contactForm = document.getElementById('contactForm');
@@ -128,19 +189,22 @@
             existingContacts.push(formData);
             localStorage.setItem('contactMessages', JSON.stringify(existingContacts));
             
-            // Show success message
-            alert('Thank you! Your message has been sent successfully. We\'ll get back to you soon.');
+            // Show success message using toast
+            showToast('Thank you! Your message has been sent successfully. We\'ll get back to you soon.', 'success');
             
             // Reset form
             contactForm.reset();
             
           } catch (error) {
             console.error('Error sending message:', error);
-            alert('Sorry, there was an error sending your message. Please try again.');
+            showToast('Sorry, there was an error sending your message. Please try again.', 'error');
           }
         });
       }
     });
   </script>
+  
+  <script type="module" src="./cart.js"></script>
+  <script type="module" src="./loading.js"></script>
 </body>
 </html>

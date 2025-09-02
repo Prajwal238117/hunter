@@ -123,6 +123,9 @@ class ProductManager {
         // Update page title
         document.title = `${product.name} - CGAPH`;
 
+        // Update SEO meta tags
+        this.updateSEOMetaTags(product);
+
         // Update breadcrumb
         const breadcrumb = document.querySelector('.breadcrumb span');
         if (breadcrumb) breadcrumb.textContent = product.name;
@@ -158,6 +161,11 @@ class ProductManager {
             this.displayFeatures(product.features);
         }
 
+        // Display extra fields if they exist
+        if (product.extraFields && product.extraFields.length > 0) {
+            this.displayExtraFields(product.extraFields);
+        }
+
         // Update tab content
         if (product.tabContent) {
             this.updateTabContent(product.tabContent);
@@ -171,18 +179,150 @@ class ProductManager {
         const headerText = document.querySelector('.product-header .product-rating .rating-text');
         if (headerStars) headerStars.innerHTML = this.starIcons(summary.avg || 0);
         if (headerText) headerText.textContent = `${summary.avg ? summary.avg.toFixed(1) : '-'} (${summary.total || 0} reviews)`;
+        
+        // Initialize cart count display
+        this.initializeCartCount();
+    }
+
+    updateSEOMetaTags(product) {
+        // Update meta title
+        const metaTitle = document.getElementById('metaTitle');
+        if (metaTitle) {
+            metaTitle.setAttribute('content', `${product.name} - Best Price in Nepal | CGAPH`);
+        }
+
+        // Update meta description
+        const metaDescription = document.getElementById('metaDescription');
+        if (metaDescription) {
+            const description = product.description.length > 160 
+                ? product.description.substring(0, 157) + '...'
+                : product.description;
+            metaDescription.setAttribute('content', `Buy ${product.name} at the best price in Nepal. ${description} Instant delivery, secure payment, 24/7 support from CGAPH.`);
+        }
+
+        // Update meta keywords
+        const metaKeywords = document.getElementById('metaKeywords');
+        if (metaKeywords) {
+            const keywords = [
+                product.name.toLowerCase(),
+                'game top up nepal',
+                'instant delivery',
+                'secure payment',
+                'cgaph',
+                'nepal'
+            ].join(', ');
+            metaKeywords.setAttribute('content', keywords);
+        }
+
+        // Update Open Graph tags
+        const ogTitle = document.getElementById('ogTitle');
+        if (ogTitle) {
+            ogTitle.setAttribute('content', `${product.name} - Best Price in Nepal | CGAPH`);
+        }
+
+        const ogDescription = document.getElementById('ogDescription');
+        if (ogDescription) {
+            const ogDesc = product.description.length > 200 
+                ? product.description.substring(0, 197) + '...'
+                : product.description;
+            ogDescription.setAttribute('content', `Buy ${product.name} at the best price in Nepal. ${ogDesc} Instant delivery, secure payment, 24/7 support from CGAPH.`);
+        }
+
+        const ogImage = document.getElementById('ogImage');
+        if (ogImage && product.imageUrl) {
+            ogImage.setAttribute('content', product.imageUrl);
+        }
+
+        // Update Twitter tags
+        const twitterTitle = document.getElementById('twitterTitle');
+        if (twitterTitle) {
+            twitterTitle.setAttribute('content', `${product.name} - Best Price in Nepal | CGAPH`);
+        }
+
+        const twitterDescription = document.getElementById('twitterDescription');
+        if (twitterDescription) {
+            const twitterDesc = product.description.length > 200 
+                ? product.description.substring(0, 197) + '...'
+                : product.description;
+            twitterDescription.setAttribute('content', `Buy ${product.name} at the best price in Nepal. ${twitterDesc} Instant delivery, secure payment, 24/7 support from CGAPH.`);
+        }
+
+        const twitterImage = document.getElementById('twitterImage');
+        if (twitterImage && product.imageUrl) {
+            twitterImage.setAttribute('content', product.imageUrl);
+        }
+
+        // Update product price meta tag
+        const productPrice = document.getElementById('productPrice');
+        if (productPrice && product.variants && product.variants.length > 0) {
+            const lowestPrice = Math.min(...product.variants.map(v => v.price));
+            productPrice.setAttribute('content', lowestPrice.toString());
+        }
+
+        // Update structured data
+        this.updateStructuredData(product);
+    }
+
+    updateStructuredData(product) {
+        const schemaScript = document.getElementById('productSchema');
+        if (!schemaScript) return;
+
+        const lowestPrice = product.variants && product.variants.length > 0 
+            ? Math.min(...product.variants.map(v => v.price))
+            : 0;
+
+        const structuredData = {
+            "@context": "https://schema.org",
+            "@type": "Product",
+            "name": product.name,
+            "description": product.description,
+            "image": product.imageUrl || "https://cgaph.com/logo.png",
+            "brand": {
+                "@type": "Brand",
+                "name": "CGAPH"
+            },
+            "offers": {
+                "@type": "Offer",
+                "price": lowestPrice.toString(),
+                "priceCurrency": "NPR",
+                "availability": "https://schema.org/InStock",
+                "seller": {
+                    "@type": "Organization",
+                    "name": "CGAPH"
+                }
+            }
+        };
+
+        if (product.variants && product.variants.length > 0) {
+            structuredData.hasVariant = product.variants.map(variant => ({
+                "@type": "Product",
+                "name": `${product.name} - ${variant.label}`,
+                "offers": {
+                    "@type": "Offer",
+                    "price": variant.price.toString(),
+                    "priceCurrency": "NPR",
+                    "availability": "https://schema.org/InStock"
+                }
+            }));
+        }
+
+        schemaScript.textContent = JSON.stringify(structuredData, null, 2);
     }
 
     displayVariants(variants) {
         const optionsGrid = document.querySelector('.option-grid');
         if (!optionsGrid) return;
 
+        // Display variants in the order they were added (no sorting)
         const variantsHTML = variants.map((variant, index) => `
             <div class="option-card" data-price="${variant.price}" data-variant-index="${index}">
-                <div class="option-header">
-                    <span class="option-amount">${variant.label || 'Option'}</span>
+                <div class="option-icon">
+                    <i class="fas fa-coins"></i>
                 </div>
-                <div class="option-price">Rs ${variant.price}</div>
+                <div class="option-content">
+                    <div class="option-amount">${variant.label || 'Option'}</div>
+                    <div class="option-price">Rs ${variant.price}</div>
+                </div>
             </div>
         `).join('');
 
@@ -209,6 +349,7 @@ class ProductManager {
             selectedCard.classList.add('active');
         }
 
+        // Use the variant index directly since we're not sorting anymore
         this.selectedVariant = this.currentProduct.variants[variantIndex];
         this.updateSelectedOption();
     }
@@ -235,6 +376,42 @@ class ProductManager {
         ).join('');
 
         featuresList.innerHTML = featuresHTML;
+    }
+
+    displayExtraFields(extraFields) {
+        const extraWrap = document.getElementById('extraFieldsSection');
+        const extraContainer = document.getElementById('extraFieldsContainer');
+        
+        if (!extraWrap || !extraContainer) {
+            console.log('Missing extraFieldsSection or extraFieldsContainer elements!');
+            return;
+        }
+
+        // Show and populate extra fields
+        extraWrap.style.display = 'block';
+        extraContainer.innerHTML = extraFields.map(field => `
+            <div class="form-group extra-field" data-label="${field.label}">
+                <label>${field.label}${field.required ? ' *' : ''}</label>
+                <input 
+                    type="text" 
+                    placeholder="${field.placeholder || ''}" 
+                    ${field.required ? 'required' : ''} 
+                />
+            </div>
+        `).join('');
+        
+        console.log('Extra fields displayed:', extraFields);
+    }
+
+    validateExtraFields() {
+        if (!this.currentProduct.extraFields || this.currentProduct.extraFields.length === 0) {
+            return true; // No extra fields to validate
+        }
+
+        const requiredFields = document.querySelectorAll('#extraFieldsContainer .extra-field input[required]');
+        const allFilled = Array.from(requiredFields).every(input => input.value.trim() !== '');
+        
+        return allFilled;
     }
 
     updateTabContent(tabContent) {
@@ -303,8 +480,29 @@ class ProductManager {
             return;
         }
 
+        // Validate required extra fields
+        if (!this.validateExtraFields()) {
+            showToast('Please fill in all required fields', 'error');
+            return;
+        }
+
         console.log('Adding to cart - currentProduct:', this.currentProduct); // Debug log
         console.log('Adding to cart - extraFields:', this.currentProduct.extraFields); // Debug log
+
+        // Collect extra field values from the product page
+        const extraFieldsData = [];
+        if (this.currentProduct.extraFields && this.currentProduct.extraFields.length > 0) {
+            document.querySelectorAll('#extraFieldsContainer .extra-field').forEach(div => {
+                const label = div.getAttribute('data-label');
+                const input = div.querySelector('input');
+                if (label && input) {
+                    extraFieldsData.push({
+                        label: label,
+                        value: input.value.trim()
+                    });
+                }
+            });
+        }
 
         const cartItem = {
             id: this.currentProduct.id,
@@ -313,31 +511,36 @@ class ProductManager {
             variant: this.selectedVariant,
             image: this.currentProduct.imagePath,
             price: this.selectedVariant.price,
-            extraFields: this.currentProduct.extraFields || []
+            extraFields: extraFieldsData
         };
 
         console.log('Cart item being added:', cartItem); // Debug log
 
-        // Get existing cart from localStorage
-        let cart = JSON.parse(localStorage.getItem('cart') || '[]');
-        
-        // Check if item already exists in cart
-        const existingItemIndex = cart.findIndex(item => 
-            item.id === cartItem.id && item.variant?.label === cartItem.variant?.label
-        );
-
-        if (existingItemIndex !== -1) {
-            cart[existingItemIndex].quantity = (cart[existingItemIndex].quantity || 1) + 1;
+        // Use the global cart instance if available
+        if (window.cart) {
+            window.cart.addItem(cartItem);
         } else {
-            cartItem.quantity = 1;
-            cart.push(cartItem);
+            // Fallback to localStorage if cart.js is not loaded
+            let cart = JSON.parse(localStorage.getItem('cart') || '[]');
+            
+            // Check if item already exists in cart
+            const existingItemIndex = cart.findIndex(item => 
+                item.id === cartItem.id && item.variant?.label === cartItem.variant?.label
+            );
+
+            if (existingItemIndex !== -1) {
+                cart[existingItemIndex].quantity = (cart[existingItemIndex].quantity || 1) + 1;
+            } else {
+                cartItem.quantity = 1;
+                cart.push(cartItem);
+            }
+
+            // Save to localStorage
+            localStorage.setItem('cart', JSON.stringify(cart));
+            
+            // Update cart count display
+            this.updateCartCountDisplay(cart.length);
         }
-
-        // Save to localStorage
-        localStorage.setItem('cart', JSON.stringify(cart));
-
-        // Update cart count
-        this.updateCartCount(cart.length);
 
         showToast('Added to cart successfully!', 'success');
     }
@@ -377,6 +580,25 @@ class ProductManager {
         cartCountElements.forEach(element => {
             element.textContent = count;
         });
+    }
+    
+    updateCartCountDisplay(count) {
+        const cartCountElements = document.querySelectorAll('.cart-count');
+        cartCountElements.forEach(element => {
+            element.textContent = count;
+        });
+    }
+    
+    initializeCartCount() {
+        // Try to get cart count from global cart instance first
+        if (window.cart) {
+            window.cart.updateCartCount();
+        } else {
+            // Fallback to localStorage
+            const cart = JSON.parse(localStorage.getItem('cart') || '[]');
+            const cartCount = cart.reduce((total, item) => total + (item.quantity || 1), 0);
+            this.updateCartCountDisplay(cartCount);
+        }
     }
 
     async loadLatestReviews(productId) {
@@ -571,6 +793,13 @@ document.addEventListener('DOMContentLoaded', async () => {
     
     // Make productManager globally accessible
     window.productManager = productManager;
+    
+    // Initialize cart count display after a short delay to ensure cart.js is loaded
+    setTimeout(() => {
+        if (productManager.initializeCartCount) {
+            productManager.initializeCartCount();
+        }
+    }, 100);
 });
 
 export { ProductManager };

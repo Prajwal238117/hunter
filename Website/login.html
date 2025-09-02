@@ -32,9 +32,6 @@
                         <div class="input-group">
                             <i class="fas fa-lock"></i>
                             <input type="password" id="password" name="password" required>
-                            <button type="button" class="toggle-password" onclick="togglePassword('password')">
-                                <i class="fas fa-eye"></i>
-                            </button>
                         </div>
                     </div>
                     
@@ -49,7 +46,7 @@
                     
                     <button type="submit" class="auth-btn">
                         <i class="fas fa-sign-in-alt"></i>
-                        Sign In
+                        Login
                     </button>
                 </form>
                 
@@ -57,10 +54,10 @@
                     <span>Or sign in with</span>
                 </div>
                 
-                <button class="social-btn google">
-                    <i class="fab fa-google"></i>
-                    Google
-                </button>
+                        <button class="social-btn google">
+                            <i class="fab fa-google"></i>
+                            Google
+                        </button>
                 
                 <div class="auth-footer">
                     <p>Don't have an account? <a href="register.html">Sign up here</a></p>
@@ -72,23 +69,6 @@
     <script type="module" src="./login.js"></script>
     <script type="module" src="./toast.js"></script>
     <script type="module" src="./loading.js"></script>
-    <script>
-        // Toggle password visibility
-        function togglePassword(inputId) {
-            const input = document.getElementById(inputId);
-            const button = input.nextElementSibling;
-            const icon = button.querySelector('i');
-            
-            if (input.type === 'password') {
-                input.type = 'text';
-                icon.classList.remove('fa-eye');
-                icon.classList.add('fa-eye-slash');
-            } else {
-                input.type = 'password';
-                icon.classList.remove('fa-eye-slash');
-                icon.classList.add('fa-eye');
-            }
-        }
-    </script>
+
 </body>
 </html>

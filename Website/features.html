@@ -3,9 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>My Profile - CGAPH</title>
+    <title>Features - CGAPH</title>
     <link rel="stylesheet" href="styles.css">
-    <link rel="stylesheet" href="profile-styles.css">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
 </head>
 <body>
@@ -13,14 +12,13 @@
     <header class="header">
         <nav class="navbar">
             <div class="nav-brand">
-                <i class="fas fa-gamepad"></i>
-                <span>CGAPH</span>
+                <img src="logo.png" alt="CGAPH Logo" class="nav-logo">
             </div>
             <ul class="nav-menu">
                 <li><a href="index.html" class="nav-link">Home</a></li>
                 <li><a href="all-products.html" class="nav-link">Products</a></li>
-                <li><a href="index.html#latest-purchases" class="nav-link">Recent</a></li>
-                <li><a href="index.html#features" class="nav-link">Features</a></li>
+                <li><a href="features.html" class="nav-link active">Features</a></li>
+                <li><a href="about.html" class="nav-link">About</a></li>
             </ul>
             <div class="nav-cart">
                 <a href="cart.html">
@@ -40,70 +38,83 @@
         </nav>
     </header>
 
-    <!-- Profile Section -->
-    <section class="profile-section">
-        <div class="profile-container">
-            <!-- Profile Sidebar -->
-            <div class="profile-sidebar">
-                <div class="profile-header">
-                    <div class="profile-avatar">
-                        <i class="fas fa-user"></i>
-                    </div>
-                    <h3 id="profileName">User</h3>
-                    <p id="profileEmail"></p>
-                </div>
-                
-                <nav class="profile-nav">
-                    <a href="#overview" class="nav-item active" data-tab="overview">
-                        <i class="fas fa-home"></i>
-                        Overview
-                    </a>
-                </nav>
-                
-                <div class="profile-stats">
-                    <div class="stat-item">
-                        <span class="stat-number" id="ordersCount">0</span>
-                        <span class="stat-label">Orders</span>
-                    </div>
-                    <div class="stat-item">
-                        <span class="stat-number" id="totalSpent">$0</span>
-                        <span class="stat-label">Spent</span>
-                    </div>
-                    </div>
-                
-                <div class="profile-actions">
-                    <button class="logout-btn" onclick="logout()">
-                        <i class="fas fa-sign-out-alt"></i>
-                        Logout
-                    </button>
-                </div>
-            </div>
+    <!-- Features Hero Section -->
+    <section class="features-hero">
+        <div class="features-hero-content">
+            <h1 class="features-hero-title">Why Choose CGAPH?</h1>
+            <p class="features-hero-subtitle">Discover what makes us the preferred choice for digital gaming and entertainment services</p>
+        </div>
+    </section>
 
-            <!-- Profile Content -->
-            <div class="profile-content">
-                <!-- Overview Tab -->
-                <div class="tab-content active" id="overview">
-                    <div class="content-header">
-                        <h2>Account Overview</h2>
-                        <p>Welcome back! Here's what's happening with your account.</p>
+    <!-- Features Section -->
+    <section id="features" class="features">
+        <div class="features-container">
+            <div class="features-grid">
+                <div class="feature">
+                    <div class="feature-icon">
+                        <i class="fas fa-bolt"></i>
                     </div>
-                    
-                    <div class="overview-grid">
-                        <div class="overview-card">
-                            <div class="card-header">
-                                <i class="fas fa-chart-line"></i>
-                                <h3>Recent Orders</h3>
-                            </div>
-                            <div class="activity-list" id="activityList"></div>
-                        </div>
+                    <h3>Instant Delivery</h3>
+                    <p>Get your codes instantly via email. No waiting, no delays - your digital content is delivered immediately after payment confirmation.</p>
+                </div>
+                
+                <div class="feature">
+                    <div class="feature-icon">
+                        <i class="fas fa-shield-alt"></i>
                     </div>
+                    <h3>Secure Payment</h3>
+                    <p>100% secure payment processing with multiple payment options including eSewa, Khalti, and IME Pay. Your financial information is always protected.</p>
+                </div>
+                
+                <div class="feature">
+                    <div class="feature-icon">
+                        <i class="fas fa-headset"></i>
+                    </div>
+                    <h3>24/7 Support</h3>
+                    <p>Round the clock customer support. Our dedicated team is always available to help you with any questions or issues.</p>
+                </div>
+                
+                <div class="feature">
+                    <div class="feature-icon">
+                        <i class="fas fa-globe"></i>
+                    </div>
+                    <h3>Global Service</h3>
+                    <p>Available worldwide. We serve customers from all corners of the globe with our comprehensive digital services.</p>
+                </div>
+                
+                <div class="feature">
+                    <div class="feature-icon">
+                        <i class="fas fa-mobile-alt"></i>
+                    </div>
+                    <h3>Mobile Friendly</h3>
+                    <p>Fully responsive design that works perfectly on all devices. Shop from your phone, tablet, or desktop with ease.</p>
+                </div>
+                
+                <div class="feature">
+                    <div class="feature-icon">
+                        <i class="fas fa-tags"></i>
+                    </div>
+                    <h3>Best Prices</h3>
+                    <p>Competitive pricing on all our services. We offer the best value for your money without compromising on quality.</p>
                 </div>
             </div>
         </div>
     </section>
 
+    <!-- CTA Section -->
+    <section class="features-cta">
+        <div class="cta-content">
+            <h2>Ready to Experience CGAPH?</h2>
+            <p>Join thousands of satisfied customers who trust us for their digital gaming and entertainment needs.</p>
+            <div class="cta-buttons">
+                <a href="all-products.html" class="cta-btn primary">Shop Now</a>
+                <a href="register.html" class="cta-btn secondary">Create Account</a>
+            </div>
+        </div>
+    </section>
+
     <!-- Footer -->
-    <footer class="footer">
+    <footer id="contact" class="footer">
         <div class="footer-content">
             <div class="footer-section">
                 <h3>CGAPH</h3>
@@ -144,9 +155,10 @@
             <p>&copy; 2024 CGAPH. All rights reserved.</p>
         </div>
     </footer>
-    <script type="module" src="./toast.js"></script>
-    <script type="module" src="./profile.js"></script>
-    <script type="module" src="./cart.js"></script>
 
+    <script type="module" src="./toast.js"></script>
+    <script type="module" src="./cart.js"></script>
+    <script type="module" src="./scroll-animations.js"></script>
+    <script type="module" src="./loading.js"></script>
 </body>
 </html>
