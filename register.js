@@ -20,21 +20,21 @@ function updateStrengthUI(score, pwValue) {
   const text = document.getElementById('strengthText');
   if (!fill) return;
   // Reset classes
-  fill.classList.remove('weak', 'fair', 'good', 'strong');
+  fill.classList.remove('strength-weak', 'strength-fair', 'strength-good', 'strength-strong');
   if (!pwValue) {
     if (text) text.textContent = 'Password strength';
     return;
   }
-  let cls = 'weak';
-  if (score <= 1) cls = 'weak';
-  else if (score === 2) cls = 'fair';
-  else if (score === 3) cls = 'good';
-  else cls = 'strong';
+  let cls = 'strength-weak';
+  if (score <= 1) cls = 'strength-weak';
+  else if (score === 2) cls = 'strength-fair';
+  else if (score === 3) cls = 'strength-good';
+  else cls = 'strength-strong';
   fill.classList.add(cls);
   if (text) {
     const labels = ['Very weak', 'Weak', 'Okay', 'Good', 'Strong'];
     // Map our cls to label index
-    const labelIndex = cls === 'weak' ? 1 : cls === 'fair' ? 2 : cls === 'good' ? 3 : 4;
+    const labelIndex = cls === 'strength-weak' ? 1 : cls === 'strength-fair' ? 2 : cls === 'strength-good' ? 3 : 4;
     text.textContent = 'Password strength: ' + labels[labelIndex];
   }
 }

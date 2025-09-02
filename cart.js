@@ -1,11 +1,13 @@
 import { showToast } from './toast.js';
 import { auth, db } from './firebase-config.js';
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-auth.js";
+import { doc, getDoc } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
 
 // Cart functionality
 class Cart {
     constructor() {
         this.items = this.loadCart();
+        this.appliedCoupon = null;
         this.init();
     }
 
@@ -38,6 +40,20 @@ class Cart {
 
     removeItem(itemId) {
         this.items = this.items.filter(item => item.id !== itemId);
+        
+        // Clear coupon if cart is empty or if minimum order requirement not met
+        if (this.items.length === 0) {
+            this.appliedCoupon = null;
+            localStorage.removeItem('appliedCoupon');
+        } else if (this.appliedCoupon) {
+            const subtotal = this.getTotal();
+            if (subtotal < this.appliedCoupon.minAmount) {
+                this.appliedCoupon = null;
+                localStorage.removeItem('appliedCoupon');
+                showToast('Coupon removed - minimum order amount not met', 'info');
+            }
+        }
+        
         this.saveCart();
         this.renderCart();
         showToast('Item removed from cart', 'info');
@@ -50,6 +66,17 @@ class Cart {
                 this.removeItem(itemId);
             } else {
                 item.quantity = newQuantity;
+                
+                // Check if coupon is still valid after quantity change
+                if (this.appliedCoupon) {
+                    const subtotal = this.getTotal();
+                    if (subtotal < this.appliedCoupon.minAmount) {
+                        this.appliedCoupon = null;
+                        localStorage.removeItem('appliedCoupon');
+                        showToast('Coupon removed - minimum order amount not met', 'info');
+                    }
+                }
+                
                 this.saveCart();
                 this.renderCart();
             }
@@ -73,7 +100,14 @@ class Cart {
     updateCartCount() {
         const cartCount = this.items.reduce((total, item) => total + item.quantity, 0);
         const cartCountElements = document.querySelectorAll('.cart-count');
+        
         cartCountElements.forEach(element => {
+            element.textContent = cartCount;
+        });
+        
+        // Also update any cart count elements that might be in the navigation
+        const navCartCounts = document.querySelectorAll('nav .cart-count');
+        navCartCounts.forEach(element => {
             element.textContent = cartCount;
         });
     }
@@ -94,7 +128,6 @@ class Cart {
             if (emptyCart) emptyCart.style.display = 'block';
             if (cartCount) cartCount.textContent = '0 items in your cart';
             if (checkoutBtn) checkoutBtn.disabled = true;
-            this.hideExtraFields();
             return;
         }
 
@@ -136,15 +169,40 @@ class Cart {
         // Update summary
         const subtotalValue = this.getTotal();
         const taxValue = this.getTax();
+        const discountValue = this.getDiscountAmount();
         const grandTotal = this.getGrandTotal();
 
         if (subtotal) subtotal.textContent = `Rs ${subtotalValue.toFixed(2)}`;
         if (tax) tax.textContent = `Rs ${taxValue.toFixed(2)}`;
+        
+        // Show/hide discount row
+        const discountRow = document.getElementById('discountRow');
+        const discountAmount = document.getElementById('discountAmount');
+        if (discountRow && discountAmount) {
+            if (discountValue > 0) {
+                discountRow.style.display = 'flex';
+                discountAmount.textContent = `-Rs ${discountValue.toFixed(2)}`;
+            } else {
+                discountRow.style.display = 'none';
+            }
+        }
+        
+        // Show/hide applied coupon info
+        const appliedCouponInfo = document.getElementById('appliedCouponInfo');
+        const couponCodeDisplay = document.getElementById('couponCodeDisplay');
+        if (appliedCouponInfo && couponCodeDisplay) {
+            if (this.appliedCoupon) {
+                appliedCouponInfo.style.display = 'block';
+                couponCodeDisplay.textContent = `${this.appliedCoupon.code} - ${this.appliedCoupon.type === 'percentage' ? this.appliedCoupon.value + '%' : 'Rs ' + this.appliedCoupon.value} off`;
+            } else {
+                appliedCouponInfo.style.display = 'none';
+            }
+        }
+        
         if (total) total.textContent = `Rs ${grandTotal.toFixed(2)}`;
         if (cartCount) cartCount.textContent = `${this.items.length} item${this.items.length !== 1 ? 's' : ''} in your cart`;
 
-        // Render extra fields and validate checkout availability
-        this.renderExtraFields();
+        // Validate checkout availability
         this.validateCheckout();
 
         this.updateCartCount();
@@ -152,77 +210,16 @@ class Cart {
 
     clearCart() {
         this.items = [];
+        this.appliedCoupon = null;
+        localStorage.removeItem('appliedCoupon');
         this.saveCart();
         this.renderCart();
         showToast('Cart cleared', 'info');
     }
 
-    renderExtraFields() {
-        const extraWrap = document.getElementById('extraFieldsSection');
-        const extraContainer = document.getElementById('extraFieldsContainer');
-        
-        console.log('renderExtraFields called'); // Debug log
-        console.log('extraWrap element:', extraWrap); // Debug log
-        console.log('extraContainer element:', extraContainer); // Debug log
-        
-        if (!extraWrap || !extraContainer) {
-            console.log('Missing extraFieldsSection or extraFieldsContainer elements!'); // Debug log
-            return;
-        }
 
-        // Collect unique extra fields from all cart items
-        const extraFields = [];
-        console.log('Cart items for extra fields:', this.items); // Debug log
-        
-        this.items.forEach((item, index) => {
-            console.log(`Item ${index} (${item.name}) full item data:`, item); // Debug log
-            console.log(`Item ${index} (${item.name}) extra fields:`, item.extraFields); // Debug log
-            if (item.extraFields && Array.isArray(item.extraFields)) {
-                item.extraFields.forEach(field => {
-                    const id = (field.label || '').trim().toLowerCase();
-                    if (!id) return;
-                    if (!extraFields.find(f => f.id === id)) {
-                        extraFields.push({
-                            id,
-                            label: field.label,
-                            placeholder: field.placeholder || '',
-                            required: !!field.required
-                        });
-                    }
-                });
-            }
-        });
 
-        console.log('Collected extra fields:', extraFields); // Debug log
 
-        if (extraFields.length === 0) {
-            extraWrap.style.display = 'none';
-            return;
-        }
-
-        // Show and populate extra fields
-        console.log('Showing extra fields section'); // Debug log
-        extraWrap.style.display = 'block';
-        extraContainer.innerHTML = extraFields.map(field => `
-            <div class="form-group extra-field" data-label="${field.label}">
-                <label>${field.label}${field.required ? ' *' : ''}</label>
-                <input 
-                    type="text" 
-                    placeholder="${field.placeholder}" 
-                    ${field.required ? 'required' : ''} 
-                    onchange="cart.validateCheckout()"
-                    oninput="cart.validateCheckout()"
-                />
-            </div>
-        `).join('');
-        
-        console.log('Extra fields HTML set:', extraContainer.innerHTML); // Debug log
-    }
-
-    hideExtraFields() {
-        const extraWrap = document.getElementById('extraFieldsSection');
-        if (extraWrap) extraWrap.style.display = 'none';
-    }
 
     validateCheckout() {
         const checkoutBtn = document.getElementById('checkoutBtn');
@@ -233,33 +230,12 @@ class Cart {
             return;
         }
 
-        // Check if all required extra fields are filled
-        const requiredFields = document.querySelectorAll('#extraFieldsContainer .extra-field input[required]');
-        const allFilled = Array.from(requiredFields).every(input => input.value.trim() !== '');
-
-        checkoutBtn.disabled = !allFilled;
-        
-        if (!allFilled && requiredFields.length > 0) {
-            checkoutBtn.innerHTML = '<i class="fas fa-exclamation-triangle"></i> Complete Required Fields';
-        } else {
+        // Enable checkout button
+        checkoutBtn.disabled = false;
             checkoutBtn.innerHTML = '<i class="fas fa-credit-card"></i> Proceed to Checkout';
-        }
     }
 
-    getExtraFieldsData() {
-        const extraFieldsData = [];
-        document.querySelectorAll('#extraFieldsContainer .extra-field').forEach(div => {
-            const label = div.getAttribute('data-label');
-            const input = div.querySelector('input');
-            if (label && input) {
-                extraFieldsData.push({
-                    label: label,
-                    value: input.value.trim()
-                });
-            }
-        });
-        return extraFieldsData;
-    }
+
 
     checkout() {
         if (this.items.length === 0) {
@@ -267,31 +243,12 @@ class Cart {
             return;
         }
 
-        // Validate required extra fields
-        const requiredFields = document.querySelectorAll('#extraFieldsContainer .extra-field input[required]');
-        const missingFields = Array.from(requiredFields).filter(input => input.value.trim() === '');
-        
-        if (missingFields.length > 0) {
-            showToast('Please fill in all required fields before proceeding to checkout', 'error');
-            // Focus on the first missing field
-            missingFields[0].focus();
-            return;
-        }
-
-        // Save extra fields data to cart items
-        const extraFieldsData = this.getExtraFieldsData();
-        this.items.forEach(item => {
-            item.extraFieldsData = extraFieldsData;
-        });
-        this.saveCart();
-
         // Redirect to payment page with cart data
         const cartData = {
             items: this.items,
             subtotal: this.getTotal(),
             tax: this.getTax(),
-            total: this.getGrandTotal(),
-            extraFieldsData: extraFieldsData
+            total: this.getGrandTotal()
         };
 
         localStorage.setItem('checkoutData', JSON.stringify(cartData));
@@ -302,7 +259,6 @@ class Cart {
         this.renderCart();
         this.setupEventListeners();
         this.setupHeaderNavigation();
-        this.setupFooterInfo();
     }
 
     setupEventListeners() {
@@ -311,6 +267,26 @@ class Cart {
         if (checkoutBtn) {
             checkoutBtn.addEventListener('click', () => this.checkout());
         }
+
+        // Coupon functionality
+        const applyCouponBtn = document.getElementById('applyCouponBtn');
+        const couponInput = document.getElementById('couponCode');
+        const removeCouponBtn = document.getElementById('removeCouponBtn');
+        
+        if (applyCouponBtn && couponInput) {
+            applyCouponBtn.addEventListener('click', () => this.handleCouponApply());
+            
+            // Allow Enter key to apply coupon
+            couponInput.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') {
+                    this.handleCouponApply();
+                }
+            });
+        }
+        
+        if (removeCouponBtn) {
+            removeCouponBtn.addEventListener('click', () => this.removeCoupon());
+        }
     }
 
     setupHeaderNavigation() {
@@ -318,6 +294,9 @@ class Cart {
         const legacyAuth = document.querySelector('.nav-auth');
         if (legacyAuth) legacyAuth.remove();
         if (!navMenu) return;
+
+        // Setup logo click functionality
+        this.setupLogoClick();
 
         // Base menu items
         navMenu.innerHTML = `
@@ -330,73 +309,34 @@ class Cart {
         // Auth-aware links
         const authLi = document.createElement('li');
         authLi.className = 'nav-auth-links';
-        authLi.innerHTML = `<a href="login.html" class="nav-link">Login</a> / <a href="register.html" class="nav-link">Sign Up</a>`;
         navMenu.appendChild(authLi);
 
+        // Listen for auth state changes
         onAuthStateChanged(auth, (user) => {
             if (!user) {
+                // User not signed in
                 authLi.innerHTML = `<a href="login.html" class="nav-link">Login</a> / <a href="register.html" class="nav-link">Sign Up</a>`;
             } else {
+                // User signed in
                 authLi.innerHTML = `<a href="profile.html" class="nav-link">My Profile</a>`;
             }
         });
+
+        // Setup hamburger menu functionality
+        this.setupHamburgerMenu();
     }
 
-    setupFooterInfo() {
-        const footer = document.querySelector('.footer');
-        if (!footer) return;
-
-        // Complete footer structure
-        footer.innerHTML = `
-            <div class="footer-content">
-                <div class="footer-section">
-                    <h3>CGAPH</h3>
-                    <p>Your trusted source for digital gaming and entertainment content.</p>
-                    <div class="social-links">
-                        <a href="https://www.facebook.com/profile.php?id=61579288196935" target="_blank" rel="noopener" aria-label="Facebook"><i class="fab fa-facebook"></i></a>
-                        <a href="#" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
-                        <a href="#" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
-                        <a href="#" aria-label="Discord"><i class="fab fa-discord"></i></a>
-                    </div>
-                </div>
-                <div class="footer-section">
-                    <h4>Quick Links</h4>
-                    <ul>
-                        <li><a href="terms.html">Terms of Service</a></li>
-                        <li><a href="privacy.html">Privacy Policy</a></li>
-                        <li><a href="refund.html">Refund Policy</a></li>
-                    </ul>
-                </div>
-                <div class="footer-section">
-                    <h4>Company</h4>
-                    <ul>
-                        <li><a href="about.html">About Us</a></li>
-                        <li><a href="contact.html">Contact</a></li>
-                    </ul>
-                </div>
-                <div class="footer-section">
-                    <h4>Contact Us</h4>
-                    <p><i class="fas fa-map-marker-alt"></i> Butwal-4, Hatbazar, Nepal</p>
-                    <p><i class="fas fa-phone"></i> +977 9768281599</p>
-                    <p><i class="fas fa-envelope"></i> cgaph.np@gmail.com</p>
-                </div>
-            </div>
-            <div class="footer-bottom">
-                <p>&copy; 2024 CGAPH. All rights reserved.</p>
-            </div>
-        `;
+    setupLogoClick() {
+        const logoElements = document.querySelectorAll('.nav-brand, .nav-brand img, .nav-brand i, .nav-brand span');
+        logoElements.forEach(element => {
+            element.style.cursor = 'pointer';
+            element.addEventListener('click', () => {
+                window.location.href = 'index.html';
+            });
+        });
     }
-}
 
-// Initialize cart when DOM is loaded
-let cart;
-document.addEventListener('DOMContentLoaded', () => {
-    cart = new Cart();
-    
-    // Make cart globally accessible for onclick handlers
-    window.cart = cart;
-    
-    // Initialize hamburger menu
+    setupHamburgerMenu() {
     const hamburger = document.querySelector('.hamburger');
     const navMenu = document.querySelector('.nav-menu');
     
@@ -413,7 +353,146 @@ document.addEventListener('DOMContentLoaded', () => {
                 navMenu.classList.remove('active');
             });
         });
+
+            // Close menu when clicking outside
+            document.addEventListener('click', (e) => {
+                if (!hamburger.contains(e.target) && !navMenu.contains(e.target)) {
+                    hamburger.classList.remove('active');
+                    navMenu.classList.remove('active');
+                }
+            });
+        }
     }
+
+    // Coupon functionality
+    async applyCoupon(couponCode) {
+        try {
+            // Get coupon from Firebase
+            const couponRef = doc(db, 'coupons', couponCode);
+            const couponDoc = await getDoc(couponRef);
+            
+            if (!couponDoc.exists()) {
+                return { success: false, message: 'Invalid coupon code' };
+            }
+            
+            const coupon = couponDoc.data();
+            
+            // Check if coupon is expired
+            if (coupon.expiryDate && new Date() > coupon.expiryDate.toDate()) {
+                return { success: false, message: 'Coupon has expired' };
+            }
+            
+            // Check if coupon usage limit reached
+            if (coupon.usedCount >= coupon.usageLimit) {
+                return { success: false, message: 'Coupon usage limit reached' };
+            }
+            
+            // Check minimum order amount
+            const subtotal = this.getTotal();
+            if (subtotal < coupon.minAmount) {
+                return { success: false, message: `Minimum order amount: Rs ${coupon.minAmount}` };
+            }
+            
+            // Apply coupon
+            this.appliedCoupon = coupon;
+            
+            // Store coupon in localStorage for payment page
+            localStorage.setItem('appliedCoupon', JSON.stringify(coupon));
+            
+            return { success: true, message: 'Coupon applied successfully!' };
+            
+        } catch (error) {
+            console.error('Error applying coupon:', error);
+            return { success: false, message: 'Error applying coupon' };
+        }
+    }
+
+    async handleCouponApply() {
+        const couponInput = document.getElementById('couponCode');
+        const couponMessage = document.getElementById('couponMessage');
+        const applyBtn = document.getElementById('applyCouponBtn');
+        
+        if (!couponInput || !couponMessage || !applyBtn) return;
+        
+        const couponCode = couponInput.value.trim().toUpperCase();
+        if (!couponCode) {
+            this.showCouponMessage('Please enter a coupon code', 'error');
+            return;
+        }
+        
+        // Disable button and show loading
+        applyBtn.disabled = true;
+        applyBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Applying...';
+        
+        try {
+            const result = await this.applyCoupon(couponCode);
+            
+            if (result.success) {
+                this.showCouponMessage(result.message, 'success');
+                this.renderCart(); // Re-render to show discount
+            } else {
+                this.showCouponMessage(result.message, 'error');
+            }
+        } catch (error) {
+            this.showCouponMessage('Error applying coupon', 'error');
+        } finally {
+            // Re-enable button
+            applyBtn.disabled = false;
+            applyBtn.innerHTML = '<i class="fas fa-tag"></i> Apply';
+        }
+    }
+
+    showCouponMessage(message, type) {
+        const couponMessage = document.getElementById('couponMessage');
+        if (couponMessage) {
+            couponMessage.textContent = message;
+            couponMessage.className = `coupon-message ${type}`;
+        }
+    }
+
+    removeCoupon() {
+        this.appliedCoupon = null;
+        localStorage.removeItem('appliedCoupon');
+    }
+
+    getDiscountAmount() {
+        if (!this.appliedCoupon) return 0;
+        
+        const subtotal = this.getTotal();
+        if (this.appliedCoupon.type === 'percentage') {
+            return (subtotal * this.appliedCoupon.value) / 100;
+        } else {
+            return Math.min(this.appliedCoupon.value, subtotal);
+        }
+    }
+
+    getGrandTotal() {
+        const subtotal = this.getTotal();
+        const tax = this.getTax();
+        const discount = this.getDiscountAmount();
+        return Math.max(0, subtotal + tax - discount);
+    }
+}
+
+// Initialize cart when DOM is loaded
+let cart;
+document.addEventListener('DOMContentLoaded', () => {
+    cart = new Cart();
+    
+    // Make cart globally accessible for onclick handlers
+    window.cart = cart;
+    
+    // Update cart count immediately after initialization
+    cart.updateCartCount();
+    
+    // Update cart count when page becomes visible (handles navigation back to page)
+    document.addEventListener('visibilitychange', () => {
+        if (!document.hidden) {
+            cart.updateCartCount();
+        }
+    });
+    
+
 });
 
 // Export for use in other modules

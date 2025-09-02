@@ -62,16 +62,40 @@
                             <span id="subtotal">Rs 0.00</span>
                         </div>
                         
+                        <!-- Coupon Section -->
+                        <div class="coupon-section">
+                            <div class="coupon-input-group">
+                                <input type="text" id="couponCode" placeholder="Enter coupon code" class="coupon-input">
+                                <button type="button" id="applyCouponBtn" class="apply-coupon-btn">
+                                    <i class="fas fa-tag"></i> Apply
+                                </button>
+                            </div>
+                            <div id="couponMessage" class="coupon-message"></div>
+                        </div>
+                        
+                        <!-- Applied Coupon Info -->
+                        <div class="applied-coupon-info" id="appliedCouponInfo" style="display: none;">
+                            <div class="coupon-badge">
+                                <i class="fas fa-tag"></i>
+                                <span id="couponCodeDisplay"></span>
+                                <button type="button" id="removeCouponBtn" class="remove-coupon-btn">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div class="summary-row" id="discountRow" style="display: none;">
+                            <span>Discount:</span>
+                            <span id="discountAmount">-Rs 0.00</span>
+                        </div>
+                        
                         <div class="summary-row total">
                             <span>Total:</span>
                             <span id="total">Rs 0.00</span>
                         </div>
                         
                         <!-- Extra Fields Section -->
-                        <div id="extraFieldsSection" style="display:none; margin: 20px 0; padding-top: 20px; border-top: 1px solid #eee;">
-                            <h4>Additional Information Required</h4>
-                            <div id="extraFieldsContainer"></div>
-                        </div>
+
                         
                         <button class="checkout-btn" id="checkoutBtn" disabled>
                             <i class="fas fa-credit-card"></i>
@@ -104,11 +128,49 @@
 
     <!-- Footer -->
     <footer class="footer">
-                <!-- Footer content will be populated by cart.js -->
+        <div class="footer-content">
+            <div class="footer-section">
+                <h3>CGAPH</h3>
+                <p>Your trusted source for digital gaming and entertainment content.</p>
+                <div class="social-links">
+                    <a href="https://www.facebook.com/profile.php?id=61579288196935" target="_blank" rel="noopener" aria-label="Facebook"><i class="fab fa-facebook"></i></a>
+                    <a href="#" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
+                    <a href="#" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+                    <a href="#" aria-label="Discord"><i class="fab fa-discord"></i></a>
+                </div>
+            </div>
+            <div class="footer-section">
+                <h4>Quick Links</h4>
+                <ul>
+                    <li><a href="index.html">Home</a></li>
+                    <li><a href="all-products.html">Products</a></li>
+                    <li><a href="about.html">About Us</a></li>
+                    <li><a href="contact.html">Contact</a></li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h4>Support</h4>
+                <ul>
+                    <li><a href="privacy.html">Privacy Policy</a></li>
+                    <li><a href="terms.html">Terms of Service</a></li>
+                    <li><a href="refund.html">Refund Policy</a></li>
+                    <li><a href="contact.html">Help Center</a></li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h4>Contact Info</h4>
+                <p><i class="fas fa-envelope"></i> support@cgaph.com</p>
+                <p><i class="fas fa-phone"></i> +977 9800745053</p>
+                <p><i class="fas fa-map-marker-alt"></i> Kathmandu, Nepal</p>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2024 CGAPH. All rights reserved.</p>
+        </div>
     </footer>
 
-    <script type="module" src="toast.js"></script>
-    <script type="module" src="cart.js"></script>
-    <script type="module" src="loading.js"></script>
+    <script type="module" src="./toast.js"></script>
+    <script type="module" src="./cart.js"></script>
+    <script type="module" src="./loading.js"></script>
 </body>
 </html>

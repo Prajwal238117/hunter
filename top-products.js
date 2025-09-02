@@ -69,14 +69,8 @@ class TopProducts {
         }
 
         const productsHTML = `
-            <div class="products-grid">
+            <div class="products-grid compact">
                 ${products.map(product => this.createProductCard(product)).join('')}
-            </div>
-            <div class="see-more-container">
-                <button class="see-more-btn" onclick="window.location.href='all-products.html'">
-                    <i class="fas fa-arrow-right"></i>
-                    See More Products
-                </button>
             </div>
         `;
         
@@ -87,28 +81,14 @@ class TopProducts {
         // Check for multiple possible image field names
         const imageUrl = product.imageUrl || product.image || product.imagePath || product.photo || product.thumbnail || '';
         const name = product.name || product.productName || 'Product';
-        const description = product.description || product.shortDescription || '';
-        const price = product.price || product.basePrice || 'N/A';
         const salesCount = product.salesCount || 0;
         const isHot = salesCount > 10; // Mark as hot if more than 10 sales
         
-        // Get the lowest price from variants if available
-        let displayPrice = price;
-        if (product.variants && product.variants.length > 0) {
-            const prices = product.variants.map(v => parseFloat(v.price)).filter(p => !isNaN(p));
-            if (prices.length > 0) {
-                const minPrice = Math.min(...prices);
-                displayPrice = `Rs ${minPrice.toFixed(2)}`;
-            }
-        } else if (typeof price === 'number') {
-            displayPrice = `Rs ${price.toFixed(2)}`;
-        }
-
         // Debug log to see what image data we have
         console.log('Product:', name, 'Image URL:', imageUrl);
 
         return `
-            <div class="product-card" onclick="window.location.href='product-details.html?id=${product.id}'">
+            <div class="product-card compact" onclick="window.location.href='product-details.html?id=${product.id}'">
                 ${isHot ? '<div class="hot-badge">HOT</div>' : ''}
                 <div class="product-image">
                     ${imageUrl ? 
@@ -121,17 +101,6 @@ class TopProducts {
                 </div>
                 <div class="product-info">
                     <h3 class="product-name">${name}</h3>
-                    <p class="product-description">${description}</p>
-                    <div class="product-meta">
-                        <span class="product-price">${displayPrice}</span>
-                        ${salesCount > 0 ? `<span class="sales-count">${salesCount} sold</span>` : ''}
-                    </div>
-                </div>
-                <div class="product-overlay">
-                    <button class="view-details-btn">
-                        <i class="fas fa-eye"></i>
-                        View Details
-                    </button>
                 </div>
             </div>
         `;

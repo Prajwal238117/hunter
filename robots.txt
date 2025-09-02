@@ -1,0 +1,24 @@
+User-agent: *
+Allow: /
+
+# Allow all pages
+Allow: /index.html
+Allow: /product-details.html
+Allow: /all-products.html
+Allow: /about.html
+Allow: /contact.html
+Allow: /features.html
+Allow: /privacy.html
+Allow: /terms.html
+Allow: /refund.html
+
+# Disallow admin and private areas
+Disallow: /admin.html
+Disallow: /admin.js
+Disallow: /firebase-config.js
+
+# Sitemap
+Sitemap: https://cgaph.com/sitemap.xml
+
+# Crawl delay (optional)
+Crawl-delay: 1

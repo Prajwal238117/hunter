@@ -124,6 +124,7 @@
                                 <div class="form-group">
                                 <label for="paymentScreenshot">Upload Screenshot (JPG/PNG)</label>
                                 <input type="file" id="paymentScreenshot" name="paymentScreenshot" accept="image/*" required>
+                                <small class="form-help">Maximum file size: 2MB. Images will be automatically compressed for optimal storage. For best results, use JPG images under 1MB.</small>
                                 </div>
                                 <div class="form-group">
                                 <img id="screenshotPreview" alt="Screenshot Preview" style="display:none; max-width:100%; border-radius:8px; border:1px solid #eee;" />
@@ -155,17 +156,19 @@
                                 <span id="summarySubtotal">Rs 0.00</span>
                             </div>
                             
+                            <!-- Coupon Discount Row -->
+                            <div class="total-row discount" id="summaryDiscount" style="display: none;">
+                                <span>Discount</span>
+                                <span id="summaryDiscountAmount">-Rs 0.00</span>
+                            </div>
+                            
                             <div class="total-row total">
                                 <span>Total</span>
                                 <span id="summaryTotal">Rs 0.00</span>
                             </div>
                         </div>
 
-                        <!-- Extra Product Fields Section -->
-                        <div id="extraFieldsSection" style="display:none; margin-top: 20px; padding-top: 20px; border-top: 1px solid #eee;">
-                            <h4>Additional Information Required</h4>
-                            <div id="extraFieldsContainer"></div>
-                        </div>
+
 
                         <button type="submit" form="paymentForm" class="btn-complete-order">
                             <i class="fas fa-lock"></i>
@@ -188,13 +191,51 @@
 
     <!-- Footer -->
     <footer class="footer">
-                <!-- Footer content will be populated by cart.js -->
+        <div class="footer-content">
+            <div class="footer-section">
+                <h3>CGAPH</h3>
+                <p>Your trusted source for digital gaming and entertainment content.</p>
+                <div class="social-links">
+                    <a href="https://www.facebook.com/profile.php?id=61579288196935" target="_blank" rel="noopener" aria-label="Facebook"><i class="fab fa-facebook"></i></a>
+                    <a href="#" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
+                    <a href="#" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+                    <a href="#" aria-label="Discord"><i class="fab fa-discord"></i></a>
+                </div>
+            </div>
+            <div class="footer-section">
+                <h4>Quick Links</h4>
+                <ul>
+                    <li><a href="index.html">Home</a></li>
+                    <li><a href="all-products.html">Products</a></li>
+                    <li><a href="about.html">About Us</a></li>
+                    <li><a href="contact.html">Contact</a></li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h4>Support</h4>
+                <ul>
+                    <li><a href="privacy.html">Privacy Policy</a></li>
+                    <li><a href="terms.html">Terms of Service</a></li>
+                    <li><a href="refund.html">Refund Policy</a></li>
+                    <li><a href="contact.html">Help Center</a></li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h4>Contact Info</h4>
+                <p><i class="fas fa-envelope"></i> support@cgaph.com</p>
+                <p><i class="fas fa-phone"></i> +977 9800745053</p>
+                <p><i class="fas fa-map-marker-alt"></i> Kathmandu, Nepal</p>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2024 CGAPH. All rights reserved.</p>
+        </div>
     </footer>
 
-    <script type="module" src="toast.js"></script>
-    <script type="module" src="cart.js"></script>
-    <!-- Page logic (ES modules -->
-    <script type="module" src="payment.js"></script>
-    <script type="module" src="loading.js"></script>
+    <script type="module" src="./toast.js"></script>
+    <script type="module" src="./cart.js"></script>
+    <!-- Page logic (ES modules) -->
+    <script type="module" src="./payment.js"></script>
+    <script type="module" src="./loading.js"></script>
 </body>
 </html>
