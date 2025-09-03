@@ -2,7 +2,7 @@
 
 .auth-section {
     min-height: 100vh;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(135deg, #1A1A2E 0%, #16213e 100%);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -32,13 +32,13 @@
 }
 
 .auth-card {
-    background: rgba(255, 255, 255, 0.95);
+    background: rgba(26, 26, 46, 0.95);
     backdrop-filter: blur(20px);
     border-radius: 24px;
     padding: 3rem 2.5rem;
-    box-shadow: 0 25px 80px rgba(0,0,0,0.15);
+    box-shadow: 0 25px 80px rgba(0,0,0,0.4);
     text-align: center;
-    border: 1px solid rgba(255, 255, 255, 0.2);
+    border: 1px solid rgba(139, 92, 246, 0.3);
     position: relative;
     overflow: hidden;
 }
@@ -50,7 +50,7 @@
     left: 0;
     right: 0;
     height: 4px;
-    background: linear-gradient(90deg, #667eea, #764ba2, #667eea);
+    background: linear-gradient(90deg, #8b5cf6, #6366f1, #8b5cf6);
     background-size: 200% 100%;
     animation: shimmer 3s ease-in-out infinite;
 }
@@ -66,7 +66,7 @@
 
 .auth-header i {
     font-size: 4.5rem;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(135deg, #8b5cf6 0%, #6366f1 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
@@ -82,14 +82,14 @@
 
 .auth-header h2 {
     font-size: 2.2rem;
-    color: #2d3748;
+    color: #f1f5f9;
     margin-bottom: 0.75rem;
     font-weight: 700;
     letter-spacing: -0.5px;
 }
 
 .auth-header p {
-    color: #718096;
+    color: #cbd5e1;
     font-size: 1.1rem;
     line-height: 1.6;
 }
@@ -111,7 +111,7 @@
 .form-group label {
     display: block;
     margin-bottom: 0.75rem;
-    color: #2d3748;
+    color: #f1f5f9;
     font-weight: 600;
     font-size: 0.95rem;
     letter-spacing: 0.5px;
@@ -126,7 +126,7 @@
 .input-group i {
     position: absolute;
     left: 1.2rem;
-    color: #667eea;
+    color: #8b5cf6;
     z-index: 1;
     font-size: 1.1rem;
     transition: all 0.3s ease;
@@ -135,25 +135,25 @@
 .input-group input {
     width: 100%;
     padding: 1.2rem 1.2rem 1.2rem 3.2rem;
-    border: 2px solid #e2e8f0;
+    border: 2px solid #475569;
     border-radius: 12px;
     font-size: 1rem;
     transition: all 0.3s ease;
-    background: rgba(248, 250, 252, 0.8);
-    color: #2d3748;
+    background: rgba(26, 26, 46, 0.8);
+    color: #f1f5f9;
     font-weight: 500;
 }
 
 .input-group input:focus {
     outline: none;
-    border-color: #667eea;
-    background: white;
-    box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
+    border-color: #8b5cf6;
+    background: #1A1A2E;
+    box-shadow: 0 0 0 4px rgba(139, 92, 246, 0.2);
     transform: translateY(-2px);
 }
 
 .input-group input:focus + i {
-    color: #5a6fd8;
+    color: #a855f7;
     transform: scale(1.1);
 }
 
@@ -162,7 +162,7 @@
     right: 1.2rem;
     background: none;
     border: none;
-    color: #333;
+    color: #cbd5e1;
     cursor: pointer;
     font-size: 1.1rem;
     z-index: 1;
@@ -172,8 +172,8 @@
 }
 
 .toggle-password:hover {
-    color: #000;
-    background: rgba(0, 0, 0, 0.1);
+    color: #f1f5f9;
+    background: #1A1A2E;
     transform: scale(1.1);
 }
 
@@ -191,7 +191,7 @@
     align-items: center;
     cursor: pointer;
     font-size: 0.9rem;
-    color: #4a5568;
+    color: #cbd5e1;
     transition: all 0.3s ease;
 }
 
@@ -206,22 +206,22 @@
 .checkmark {
     width: 20px;
     height: 20px;
-    border: 2px solid #e2e8f0;
+    border: 2px solid #475569;
     border-radius: 6px;
     margin-right: 0.75rem;
     position: relative;
     transition: all 0.3s ease;
-    background: white;
+    background: #1A1A2E;
 }
 
 .checkbox-label:hover .checkmark {
-    border-color: #667eea;
+    border-color: #8b5cf6;
     transform: scale(1.05);
 }
 
 .checkbox-label input[type="checkbox"]:checked + .checkmark {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    border-color: #667eea;
+    background: linear-gradient(135deg, #8b5cf6 0%, #6366f1 100%);
+    border-color: #8b5cf6;
     transform: scale(1.1);
 }
 
@@ -238,7 +238,7 @@
 }
 
 .forgot-password {
-    color: #667eea;
+    color: #06b6d4;
     text-decoration: none;
     font-size: 0.9rem;
     font-weight: 500;
@@ -246,7 +246,7 @@
 }
 
 .forgot-password:hover {
-    color: #5a6fd8;
+    color: #0891b2;
     text-decoration: underline;
     transform: translateY(-1px);
 }
@@ -254,7 +254,7 @@
 .auth-btn {
     width: 100%;
     padding: 1.2rem;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(135deg, #8b5cf6 0%, #6366f1 100%);
     color: white;
     border: none;
     border-radius: 12px;
@@ -285,7 +285,7 @@
 
 .auth-btn:hover {
     transform: translateY(-3px);
-    box-shadow: 0 15px 35px rgba(102, 126, 234, 0.4);
+    box-shadow: 0 15px 35px rgba(139, 92, 246, 0.4);
 }
 
 .auth-btn:active {
@@ -301,8 +301,8 @@
 .social-btn {
     width: 100%;
     padding: 1.1rem;
-    border: 2px solid #e2e8f0;
-    background: white;
+    border: 2px solid #475569;
+    background: #1e293b;
     border-radius: 12px;
     font-size: 1rem;
     font-weight: 500;
@@ -315,6 +315,7 @@
     margin-bottom: 1.5rem;
     position: relative;
     overflow: hidden;
+    color: #f1f5f9;
 }
 
 .social-btn::before {
@@ -336,13 +337,14 @@
 }
 
 .social-btn:hover {
-    border-color: #667eea;
+    border-color: #8b5cf6;
     transform: translateY(-2px);
-    box-shadow: 0 8px 25px rgba(102, 126, 234, 0.15);
+    box-shadow: 0 8px 25px rgba(139, 92, 246, 0.3);
+    background: #1A1A2E;
 }
 
 .social-btn:hover::before {
-    opacity: 0.05;
+    opacity: 0.1;
 }
 
 .social-btn.google {
@@ -359,20 +361,20 @@
 
 .auth-footer {
     margin-top: 2.5rem;
-    color: #718096;
+    color: #cbd5e1;
     font-size: 1rem;
     line-height: 1.6;
 }
 
 .auth-footer a {
-    color: #667eea;
+    color: #06b6d4;
     text-decoration: none;
     font-weight: 600;
     transition: all 0.3s ease;
 }
 
 .auth-footer a:hover {
-    color: #5a6fd8;
+    color: #0891b2;
     text-decoration: underline;
     transform: translateY(-1px);
 }
@@ -381,8 +383,10 @@
     display: flex;
     align-items: center;
     margin: 2.5rem 0;
-    color: #718096;
+    color: #cbd5e1;
     position: relative;
+    background: transparent;
+    padding: 0 1rem;
 }
 
 .divider::before,
@@ -390,16 +394,19 @@
     content: '';
     flex: 1;
     height: 1px;
-    background: linear-gradient(90deg, transparent, #e2e8f0, transparent);
+    background: linear-gradient(90deg, transparent, #475569, transparent);
 }
 
 .divider span {
-    padding: 0 1.5rem;
+    background: transparent;
+    padding: 0 1rem;
     font-size: 0.9rem;
     font-weight: 500;
-    background: rgba(255, 255, 255, 0.95);
-    backdrop-filter: blur(20px);
+    color: #94a3b8;
+    white-space: nowrap;
 }
+
+
 
 .password-strength {
     margin-top: 0.75rem;
@@ -408,7 +415,7 @@
 
 .strength-bar {
     height: 6px;
-    background: #e2e8f0;
+    background: #334155;
     border-radius: 3px;
     margin-top: 0.5rem;
     overflow: hidden;
@@ -858,6 +865,34 @@
         transform: translateX(0);
         opacity: 1;
     }
+}
+
+/* Toast Close Button */
+.toast-close {
+    float: right;
+    cursor: pointer;
+    margin-left: 10px;
+    background: transparent !important;
+    color: white !important;
+    border: none !important;
+    font-size: 1.2rem;
+    padding: 0;
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    transition: all 0.2s ease;
+    font-weight: bold;
+    line-height: 1;
+    position: relative;
+    z-index: 10;
+}
+
+.toast-close:hover {
+    background-color: rgba(255, 255, 255, 0.2) !important;
+    transform: scale(1.1);
 }
 
 /* Mobile Responsive Toast */

@@ -499,6 +499,18 @@ function setupProductForm() {
   if (editProductForm) {
     editProductForm.addEventListener('submit', handleEditProductSubmit);
   }
+  
+  // Setup image upload for edit product form
+  const editProductImage = document.getElementById('editProductImage');
+  if (editProductImage) {
+    editProductImage.addEventListener('change', handleEditImageChange);
+  }
+  
+  // Setup image upload for add product form
+  const productImage = document.getElementById('productImage');
+  if (productImage) {
+    productImage.addEventListener('change', handleImageChange);
+  }
 }
 
 function addVariant() {
@@ -552,6 +564,43 @@ function addExtraField() {
   container.insertAdjacentHTML('beforeend', html);
 }
 
+function addEditVariant() {
+  const container = document.getElementById('editVariantsContainer');
+  if (!container) return;
+  
+  const variantHTML = `
+    <div class="variant-item">
+      <div class="variant-grid">
+        <input type="text" class="variant-label" placeholder="Variant name (e.g., 100 Diamonds)" required>
+        <input type="number" class="variant-price" placeholder="Price" step="0.01" required>
+        <button type="button" class="remove-variant" onclick="removeVariant(this)">×</button>
+      </div>
+    </div>
+  `;
+  
+  container.insertAdjacentHTML('beforeend', variantHTML);
+}
+
+function addEditExtraField() {
+  const container = document.getElementById('editExtraFieldsContainer');
+  if (!container) return;
+  
+  const html = `
+    <div class="extra-item">
+      <div class="variant-grid">
+        <input type="text" class="extra-label" placeholder="Field label (e.g., Game ID)" required>
+        <input type="text" class="extra-placeholder" placeholder="Placeholder text">
+        <select class="extra-required">
+          <option value="true">Required</option>
+          <option value="false">Optional</option>
+        </select>
+        <button type="button" class="remove-variant" onclick="removeExtraField(this)">×</button>
+      </div>
+    </div>`;
+  
+  container.insertAdjacentHTML('beforeend', html);
+}
+
 function removeVariant(element) {
   element.parentElement.remove();
 }
@@ -560,9 +609,47 @@ function removeExtraField(element) {
   element.parentElement.remove();
 }
 
+// Image handling functions
+function handleImageChange(e) {
+  const file = e.target.files[0];
+  if (file) {
+    const reader = new FileReader();
+    reader.onload = function(e) {
+      const imagePreview = document.getElementById('imagePreview');
+      const previewImg = document.getElementById('previewImg');
+      if (imagePreview && previewImg) {
+        previewImg.src = e.target.result;
+        imagePreview.style.display = 'block';
+      }
+    };
+    reader.readAsDataURL(file);
+  }
+}
+
+function handleEditImageChange(e) {
+  const file = e.target.files[0];
+  if (file) {
+    const reader = new FileReader();
+    reader.onload = function(e) {
+      const editImagePreview = document.getElementById('editImagePreview');
+      const editPreviewImg = document.getElementById('editPreviewImg');
+      if (editImagePreview && editPreviewImg) {
+        editPreviewImg.src = e.target.result;
+        editImagePreview.style.display = 'block';
+      }
+    };
+    reader.readAsDataURL(file);
+  }
+}
+
 // Make these functions globally available
 window.removeVariant = removeVariant;
 window.removeExtraField = removeExtraField;
+window.handleImageChange = handleImageChange;
+window.handleEditImageChange = handleEditImageChange;
+window.removeEditImagePreview = removeEditImagePreview;
+window.addEditVariant = addEditVariant;
+window.addEditExtraField = addEditExtraField;
 function cancelAddProduct() {
   const addProductForm = document.getElementById('addProductForm');
   const addProductBtn = document.getElementById('addProductBtn');
@@ -637,6 +724,22 @@ async function editProduct(productId) {
     const metaDescField = document.getElementById('editProductMetaDescription');
     if (metaTitleField) metaTitleField.value = product.metaTitle || '';
     if (metaDescField) metaDescField.value = product.metaDescription || '';
+    
+    // Handle product image
+    const editProductImageUrl = document.getElementById('editProductImageUrl');
+    const editImagePreview = document.getElementById('editImagePreview');
+    const editPreviewImg = document.getElementById('editPreviewImg');
+    
+    if (editProductImageUrl) {
+      editProductImageUrl.value = product.imageUrl || '';
+    }
+    
+    if (editImagePreview && editPreviewImg && product.imageUrl) {
+      editPreviewImg.src = product.imageUrl;
+      editImagePreview.style.display = 'block';
+    } else if (editImagePreview) {
+      editImagePreview.style.display = 'none';
+    }
     
     // Populate variants
     const variantsContainer = document.getElementById('editVariantsContainer');
@@ -829,6 +932,26 @@ async function handleEditProductSubmit(e) {
     const featuredProduct = document.getElementById('editFeaturedProduct').checked;
     const productPriority = document.getElementById('editProductPriority').value;
     
+    // Handle image update
+    let imageUrl = document.getElementById('editProductImageUrl').value.trim();
+    const editProductImage = document.getElementById('editProductImage');
+    
+    if (editProductImage.files[0]) {
+      // New image uploaded
+      try {
+        const file = editProductImage.files[0];
+        if (file.size > 5 * 1024 * 1024) {
+          showToast('Image file size must be less than 5MB', 'error');
+          return;
+        }
+        imageUrl = await convertFileToBase64(file);
+      } catch (error) {
+        console.error('Error processing image:', error);
+        showToast('Error processing image', 'error');
+        return;
+      }
+    }
+    
     console.log('Form values collected:', {
       productName,
       productCategory,
@@ -884,6 +1007,7 @@ async function handleEditProductSubmit(e) {
       description: productDescription,
       tags: productTags.split(',').map(tag => tag.trim()).filter(tag => tag),
       status: productStatus,
+      imageUrl: imageUrl,
       features: features,
       variants: variants,
       extraFields: extras,
@@ -973,6 +1097,17 @@ function removeImagePreview() {
   if (uploadArea) uploadArea.style.display = 'block';
   if (fileInput) fileInput.value = '';
   if (urlInput) urlInput.value = '';
+}
+
+// Remove edit image preview
+function removeEditImagePreview() {
+  const editPreview = document.getElementById('editImagePreview');
+  const editFileInput = document.getElementById('editProductImage');
+  const editUrlInput = document.getElementById('editProductImageUrl');
+  
+  if (editPreview) editPreview.style.display = 'none';
+  if (editFileInput) editFileInput.value = '';
+  if (editUrlInput) editUrlInput.value = '';
 }
 
 // Validate URL

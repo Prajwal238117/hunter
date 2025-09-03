@@ -3,7 +3,7 @@
 .checkout-section {
     padding: 2rem;
     margin-top: 80px;
-    background: #f8f9fa;
+    background: linear-gradient(135deg, #1A1A2E 0%, #16213e 100%);
     min-height: calc(100vh - 80px);
 }
 
@@ -18,10 +18,11 @@
     align-items: center;
     justify-content: center;
     margin-bottom: 3rem;
-    background: white;
+    background: linear-gradient(135deg, #16213e 0%, #1A1A2E 100%);
     border-radius: 15px;
     padding: 2rem;
-    box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+    box-shadow: 0 5px 20px rgba(0,0,0,0.3);
+    border: 1px solid #334155;
 }
 
 .progress-step {
@@ -49,30 +50,30 @@
 }
 
 .progress-step.active .step-icon {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(135deg, #8b5cf6 0%, #6366f1 100%);
     color: white;
 }
 
 .progress-step:not(.completed):not(.active) .step-icon {
-    background: #e9ecef;
-    color: #999;
+    background: #334155;
+    color: #94a3b8;
 }
 
 .progress-step span {
     font-size: 0.9rem;
     font-weight: 500;
-    color: #666;
+    color: #cbd5e1;
 }
 
 .progress-step.completed span,
 .progress-step.active span {
-    color: #333;
+    color: #f1f5f9;
 }
 
 .progress-line {
     width: 100px;
     height: 2px;
-    background: #e9ecef;
+    background: #334155;
     margin: 0 1rem;
     position: relative;
     top: -25px;
@@ -84,7 +85,7 @@
     top: 0;
     left: 0;
     height: 100%;
-    background: #667eea;
+    background: #8b5cf6;
     width: 0%;
     transition: width 0.3s ease;
 }

@@ -333,7 +333,25 @@ document.addEventListener('DOMContentLoaded', () => {
   // Render cart items from localStorage
   try {
     const cart = JSON.parse(localStorage.getItem('cart') || '[]');
-    const appliedCoupon = JSON.parse(localStorage.getItem('appliedCoupon') || 'null');
+    const appliedCouponRaw = localStorage.getItem('appliedCoupon');
+    let appliedCoupon = null;
+    
+    // Safely parse coupon data
+    if (appliedCouponRaw && appliedCouponRaw !== 'null' && appliedCouponRaw !== 'undefined') {
+      try {
+        appliedCoupon = JSON.parse(appliedCouponRaw);
+        // Validate coupon structure
+        if (!appliedCoupon || typeof appliedCoupon !== 'object' || !appliedCoupon.code) {
+          appliedCoupon = null;
+          localStorage.removeItem('appliedCoupon'); // Clean up invalid data
+        }
+      } catch (e) {
+        console.warn('Invalid coupon data in localStorage, removing...');
+        appliedCoupon = null;
+        localStorage.removeItem('appliedCoupon');
+      }
+    }
+    
     currentCart = cart;
     
     const itemsEl = document.getElementById('summaryItems');
@@ -370,13 +388,17 @@ document.addEventListener('DOMContentLoaded', () => {
     let finalTotal = subtotal;
     
     // Check if coupon is applied
-    if (appliedCoupon && appliedCoupon.isActive !== false) {
+    console.log('Payment page - Coupon check:', { appliedCoupon, subtotal });
+    
+    if (appliedCoupon && appliedCoupon.isActive !== false && appliedCoupon.code) {
       if (appliedCoupon.type === 'percentage') {
         discount = (subtotal * appliedCoupon.value) / 100;
       } else {
         discount = Math.min(appliedCoupon.value, subtotal);
       }
       finalTotal = Math.max(0, subtotal - discount);
+      
+      console.log('Payment page - Coupon applied:', { discount, finalTotal });
       
       // Show discount row
       if (discountEl && discountAmountEl) {
@@ -388,6 +410,11 @@ document.addEventListener('DOMContentLoaded', () => {
       if (discountEl) {
         discountEl.style.display = 'none';
       }
+      // Ensure no discount is applied
+      discount = 0;
+      finalTotal = subtotal;
+      
+      console.log('Payment page - No coupon, final total:', finalTotal);
     }
     
     if (subtotalEl) subtotalEl.textContent = `Rs ${subtotal.toFixed(2)}`;
