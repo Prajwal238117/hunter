@@ -446,7 +446,8 @@ async function loadProducts() {
   if (!productsGrid) return;
   
   try {
-    const q = query(productsCol, orderBy('name'));
+    // Get all products and sort by priority and sales count
+    const q = query(productsCol);
     const snap = await getDocs(q);
     
     if (snap.empty) {
@@ -454,27 +455,45 @@ async function loadProducts() {
       return;
     }
     
-    const productsHTML = snap.docs.map(doc => {
-      const product = doc.data();
+    // Sort products by priority (high to low) and then by sales count (high to low)
+    const products = snap.docs.map(doc => ({
+      id: doc.id,
+      ...doc.data()
+    })).sort((a, b) => {
+      // First sort by priority (4 = Very High, 3 = High, 2 = Normal, 1 = Low)
+      const priorityDiff = (b.priority || 2) - (a.priority || 2);
+      if (priorityDiff !== 0) return priorityDiff;
+      
+      // Then sort by sales count (high to low)
+      const salesDiff = (b.salesCount || 0) - (a.salesCount || 0);
+      return salesDiff;
+    });
+    
+    const productsHTML = products.map(product => {
       const variants = product.variants || [];
       const basePrice = variants.length > 0 ? variants[0].price : 'N/A';
+      const priorityText = getPriorityText(product.priority || 2);
+      const salesCount = product.salesCount || 0;
       
-      return `
-        <div class="product-card" data-product-id="${doc.id}">
+              return `
+        <div class="product-card" data-product-id="${product.id}">
           <div class="product-image">
             ${ (product.imageUrl || product.imagePath) ? 
               `<img src="${product.imageUrl || product.imagePath}" alt="${product.name}" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">` :
               `<i class="fas fa-image" style="font-size: 3rem; color: #667eea;"></i>`
             }
+            ${product.featured ? '<div class="featured-badge">Featured</div>' : ''}
+            <div class="priority-badge priority-${product.priority || 2}">${priorityText}</div>
           </div>
           <div class="product-info">
             <h3>${product.name}</h3>
             <p class="muted">Digital Product</p>
             <p class="product-price">Rs ${basePrice}</p>
             <p class="muted">${variants.length} variant${variants.length !== 1 ? 's' : ''}</p>
+            <p class="sales-info">Sales: ${salesCount}</p>
             <div class="product-actions">
-              <button class="btn" onclick="editProduct('${doc.id}')">Edit</button>
-              <button class="btn" onclick="deleteProduct('${doc.id}')" style="background: #ff4757;">Delete</button>
+              <button class="btn" onclick="editProduct('${product.id}')">Edit</button>
+              <button class="btn" onclick="deleteProduct('${product.id}')" style="background: #ff4757;">Delete</button>
             </div>
           </div>
         </div>
@@ -485,6 +504,17 @@ async function loadProducts() {
   } catch (error) {
     console.error('Error loading products:', error);
     productsGrid.innerHTML = '<p class="muted">Error loading products.</p>';
+  }
+}
+
+// Helper function to get priority text
+function getPriorityText(priority) {
+  switch (priority) {
+    case 1: return 'Low';
+    case 2: return 'Normal';
+    case 3: return 'High';
+    case 4: return 'Very High';
+    default: return 'Normal';
   }
 }
 
@@ -719,11 +749,7 @@ async function editProduct(productId) {
     document.getElementById('editFeaturedProduct').checked = product.featured || false;
     document.getElementById('editProductPriority').value = product.priority || '2';
     
-    // Check if these fields exist before setting them
-    const metaTitleField = document.getElementById('editProductMetaTitle');
-    const metaDescField = document.getElementById('editProductMetaDescription');
-    if (metaTitleField) metaTitleField.value = product.metaTitle || '';
-    if (metaDescField) metaDescField.value = product.metaDescription || '';
+
     
     // Handle product image
     const editProductImageUrl = document.getElementById('editProductImageUrl');

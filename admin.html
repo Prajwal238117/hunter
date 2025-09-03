@@ -678,6 +678,57 @@
             display: flex;
             gap: 0.75rem;
         }
+        
+        /* Priority Badge Styles */
+        .priority-badge {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            padding: 0.3rem 0.6rem;
+            border-radius: 12px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            color: white;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+            z-index: 2;
+        }
+        
+        .priority-1 { background: linear-gradient(135deg, #6b7280, #4b5563); } /* Low */
+        .priority-2 { background: linear-gradient(135deg, #3b82f6, #1d4ed8); } /* Normal */
+        .priority-3 { background: linear-gradient(135deg, #f59e0b, #d97706); } /* High */
+        .priority-4 { background: linear-gradient(135deg, #ef4444, #dc2626); } /* Very High */
+        
+        /* Featured Badge */
+        .featured-badge {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            background: linear-gradient(135deg, #8b5cf6, #7c3aed);
+            color: white;
+            padding: 0.3rem 0.6rem;
+            border-radius: 12px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            box-shadow: 0 2px 8px rgba(139, 92, 246, 0.3);
+            z-index: 2;
+        }
+        
+        /* Sales Info */
+        .sales-info {
+            background: linear-gradient(135deg, #10b981, #059669);
+            color: white;
+            padding: 0.3rem 0.6rem;
+            border-radius: 8px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-align: center;
+            margin: 0.5rem 0;
+            box-shadow: 0 2px 6px rgba(16, 185, 129, 0.3);
+        }
 
         /* Enhanced Form Styling */
         .form-group input,
@@ -2078,15 +2129,7 @@
                         </button>
                     </div>
 
-                    <div class="form-group">
-                        <label for="productMetaTitle">SEO Meta Title</label>
-                        <input type="text" id="productMetaTitle" placeholder="SEO optimized title for search engines">
-                    </div>
 
-                    <div class="form-group">
-                        <label for="productMetaDescription">SEO Meta Description</label>
-                        <textarea id="productMetaDescription" rows="2" placeholder="Brief description for search engine results"></textarea>
-                    </div>
 
                     <div class="product-actions">
                         <button type="submit" class="btn btn-success">
@@ -2224,15 +2267,7 @@
                         </button>
         </div>
 
-                    <div class="form-group">
-                        <label for="editProductMetaTitle">SEO Meta Title</label>
-                        <input type="text" id="editProductMetaTitle" placeholder="SEO optimized title for search engines">
-                    </div>
 
-                    <div class="form-group">
-                        <label for="editProductMetaDescription">SEO Meta Description</label>
-                        <textarea id="editProductMetaDescription" rows="2" placeholder="Brief description for search engine results"></textarea>
-                    </div>
 
                     <div class="product-actions">
                         <button type="submit" class="btn btn-success">

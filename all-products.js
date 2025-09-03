@@ -56,7 +56,7 @@ class AllProducts {
     async loadAllProducts() {
         try {
             const productsRef = collection(db, 'products');
-            const q = query(productsRef, orderBy('createdAt', 'desc'));
+            const q = query(productsRef);
             const querySnapshot = await getDocs(q);
             
             this.allProducts = [];
@@ -68,8 +68,24 @@ class AllProducts {
                 });
             });
             
+            // Sort products by priority and sales count by default
+            this.allProducts.sort((a, b) => {
+                // First sort by priority (4 = Very High, 3 = High, 2 = Normal, 1 = Low)
+                const priorityDiff = (b.priority || 2) - (a.priority || 2);
+                if (priorityDiff !== 0) return priorityDiff;
+                
+                // Then sort by sales count (high to low)
+                const salesDiff = (b.salesCount || 0) - (a.salesCount || 0);
+                return salesDiff;
+            });
+            
             this.filteredProducts = [...this.allProducts];
             this.displayProducts();
+            
+            // Set default sort selection to priority
+            if (this.sortSelect) {
+                this.sortSelect.value = 'priority';
+            }
         } catch (error) {
             console.error('Error loading all products:', error);
             this.displayProducts([]);
@@ -93,6 +109,14 @@ class AllProducts {
 
     sortProducts(sortBy) {
         switch (sortBy) {
+            case 'priority':
+                // Sort by priority first, then by sales count
+                this.filteredProducts.sort((a, b) => {
+                    const priorityDiff = (b.priority || 2) - (a.priority || 2);
+                    if (priorityDiff !== 0) return priorityDiff;
+                    return (b.salesCount || 0) - (a.salesCount || 0);
+                });
+                break;
             case 'sales':
                 this.filteredProducts.sort((a, b) => (b.salesCount || 0) - (a.salesCount || 0));
                 break;

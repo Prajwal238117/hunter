@@ -35,7 +35,7 @@ class CategoryProducts {
             
             // Try to get products by category first
             try {
-                q = query(productsRef, where('category', '==', category), orderBy('createdAt', 'desc'), limit(6));
+                q = query(productsRef, where('category', '==', category), limit(20));
                 const querySnapshot = await getDocs(q);
                 
                 querySnapshot.forEach((doc) => {
@@ -47,6 +47,23 @@ class CategoryProducts {
                 console.log(`Found ${products.length} products with category '${category}'`);
             } catch (categoryError) {
                 console.log(`Error loading products with category ${category}:`, categoryError);
+            }
+            
+            // Sort products by priority and sales count
+            if (products.length > 0) {
+                products.sort((a, b) => {
+                    // First sort by priority (4 = Very High, 3 = High, 2 = Normal, 1 = Low)
+                    const priorityDiff = (b.priority || 2) - (a.priority || 2);
+                    if (priorityDiff !== 0) return priorityDiff;
+                    
+                    // Then sort by sales count (high to low)
+                    const salesDiff = (b.salesCount || 0) - (a.salesCount || 0);
+                    return salesDiff;
+                });
+                
+                // Limit to top 6 products after sorting
+                products = products.slice(0, 6);
+                console.log(`Sorted and limited to top 6 products for ${category}`);
             }
             
             // If no products found by category, try to get by tags or other fields
@@ -66,9 +83,22 @@ class CategoryProducts {
                         }
                     });
                     
-                    // Limit to 6 products per category
-                    products = products.slice(0, 6);
-                    console.log(`Found ${products.length} products through keyword matching`);
+                    // Sort products by priority and sales count
+                    if (products.length > 0) {
+                        products.sort((a, b) => {
+                            // First sort by priority (4 = Very High, 3 = High, 2 = Normal, 1 = Low)
+                            const priorityDiff = (b.priority || 2) - (a.priority || 2);
+                            if (priorityDiff !== 0) return priorityDiff;
+                            
+                            // Then sort by sales count (high to low)
+                            const salesDiff = (b.salesCount || 0) - (a.salesCount || 0);
+                            return salesDiff;
+                        });
+                        
+                        // Limit to top 6 products after sorting
+                        products = products.slice(0, 6);
+                        console.log(`Sorted and limited to top 6 products for ${category} (fallback)`);
+                    }
                 } catch (error) {
                     console.log('Error loading products:', error);
                 }
