@@ -2582,18 +2582,23 @@ html {
 
 /* Toast Notifications */
 .toast-container {
-    position: fixed;
-    top: 20px;
-    right: 20px;
-    z-index: 10000;
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
+    position: fixed !important;
+    top: 20px !important;
+    right: 20px !important;
+    z-index: 10000 !important;
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 10px !important;
+    pointer-events: none;
+}
+
+.toast-container .toast {
+    pointer-events: auto;
 }
 
 .toast {
-    background: #333;
-    color: white;
+    background: #333 !important;
+    color: white !important;
     padding: 0.85rem 1.25rem;
     border-radius: 6px;
     box-shadow: 0 6px 20px rgba(0,0,0,0.15);
@@ -2602,20 +2607,34 @@ html {
     transform: translateY(0);
     opacity: 1;
     transition: opacity 0.2s ease, transform 0.2s ease;
+    position: relative;
+    z-index: 10000;
 }
 
 .toast.hide { opacity: 0; transform: translateY(-8px); }
-.toast-success { background: #1e7e34; }
-.toast-error { background: #c82333; }
-.toast-info { background: #2b6cb0; }
+.toast-success { background: #1e7e34 !important; }
+.toast-error { background: #c82333 !important; }
+.toast-info { background: #2b6cb0 !important; }
 .toast-close {
     float: right;
     cursor: pointer;
     margin-left: 10px;
     background: transparent;
-    color: white;
+    color: white !important;
     border: none;
     font-size: 1rem;
+    padding: 0;
+    width: 20px;
+    height: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    transition: background-color 0.2s ease;
+}
+
+.toast-close:hover {
+    background-color: rgba(255, 255, 255, 0.2) !important;
 }
 
 /* Latest Purchases Section */
