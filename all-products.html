@@ -18,7 +18,7 @@
                 <li><a href="index.html" class="nav-link">Home</a></li>
                 <li><a href="all-products.html" class="nav-link">Products</a></li>
                 <li><a href="index.html#latest-purchases" class="nav-link">Recent</a></li>
-                <li><a href="index.html#features" class="nav-link">Features</a></li>
+                <li><a href="features.html" class="nav-link">Features</a></li>
             </ul>
             <div class="nav-cart">
                 <a href="cart.html">
@@ -49,13 +49,20 @@
         
         <div class="products-controls">
             <div class="search-container">
-                <i class="fas fa-search"></i>
-                <input type="text" id="productsSearch" placeholder="Search products..." class="products-search">
+                <div class="search-input-wrapper">
+                    <i class="fas fa-search search-icon"></i>
+                    <input type="text" id="productsSearch" placeholder="Search products by name, description, or category..." class="products-search">
+                    <button type="button" id="clearSearch" class="clear-search-btn" style="display: none;">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                <div class="search-suggestions" id="searchSuggestions"></div>
             </div>
             <div class="sort-container">
+                <label for="sortSelect" class="sort-label">Sort by:</label>
                 <select id="sortSelect" class="sort-select">
-                    <option value="sales">Sort by Sales</option>
-                    <option value="name">Sort by Name</option>
+                    <option value="sales">Most Popular</option>
+                    <option value="name">Name A-Z</option>
                     <option value="price-low">Price: Low to High</option>
                     <option value="price-high">Price: High to Low</option>
                     <option value="newest">Newest First</option>
@@ -66,8 +73,10 @@
         <div class="products-container">
             <div id="allProductsList" class="products-list">
                 <div class="loading-spinner">
-                    <i class="fas fa-spinner fa-spin"></i>
-                    <p>Loading products...</p>
+                    <div class="spinner-icon">
+                        <i class="fas fa-spinner fa-spin"></i>
+                    </div>
+                    
                 </div>
             </div>
         </div>

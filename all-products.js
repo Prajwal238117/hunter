@@ -24,15 +24,33 @@ class AllProducts {
     }
 
     setupEventListeners() {
-        // Search functionality
+        // Enhanced search functionality
         this.searchInput.addEventListener('input', (e) => {
-            this.filterProducts(e.target.value);
+            this.handleSearch(e.target.value);
         });
+
+        // Clear search button
+        const clearSearchBtn = document.getElementById('clearSearch');
+        if (clearSearchBtn) {
+            clearSearchBtn.addEventListener('click', () => {
+                this.clearSearch();
+            });
+        }
 
         // Sort functionality
         this.sortSelect.addEventListener('change', (e) => {
             this.sortProducts(e.target.value);
         });
+
+        // Close suggestions when clicking outside
+        document.addEventListener('click', (e) => {
+            if (!e.target.closest('.search-container')) {
+                this.hideSuggestions();
+            }
+        });
+
+        // Handle search from URL parameters
+        this.handleSearchFromURL();
     }
 
     async loadAllProducts() {
@@ -119,14 +137,134 @@ class AllProducts {
         return parseFloat(product.price || product.basePrice || 0) || 0;
     }
 
+    // Enhanced search methods
+    handleSearch(searchTerm) {
+        if (!searchTerm.trim()) {
+            this.clearSearch();
+            return;
+        }
+
+        // Show clear button
+        const clearSearchBtn = document.getElementById('clearSearch');
+        if (clearSearchBtn) {
+            clearSearchBtn.style.display = 'flex';
+        }
+
+        // Filter products
+        this.filterProducts(searchTerm);
+        
+        // Show search suggestions
+        this.showSearchSuggestions(searchTerm);
+        
+        // Update URL
+        this.updateSearchURL(searchTerm);
+    }
+
+    clearSearch() {
+        this.searchInput.value = '';
+        this.filteredProducts = [...this.allProducts];
+        this.displayProducts();
+        
+        // Hide clear button
+        const clearSearchBtn = document.getElementById('clearSearch');
+        if (clearSearchBtn) {
+            clearSearchBtn.style.display = 'none';
+        }
+        
+        // Hide suggestions
+        this.hideSuggestions();
+        
+        // Clear URL
+        this.updateSearchURL('');
+    }
+
+    showSearchSuggestions(searchTerm) {
+        const suggestionsContainer = document.getElementById('searchSuggestions');
+        if (!suggestionsContainer) return;
+
+        const suggestions = this.getSearchSuggestions(searchTerm);
+        
+        if (suggestions.length === 0) {
+            suggestionsContainer.style.display = 'none';
+            return;
+        }
+
+        const suggestionsHTML = suggestions.map(suggestion => `
+            <div class="search-suggestion-item" onclick="this.parentElement.parentElement.querySelector('#productsSearch').value = '${suggestion.text}'; this.parentElement.parentElement.querySelector('#productsSearch').dispatchEvent(new Event('input')); this.parentElement.style.display = 'none';">
+                <i class="fas fa-search suggestion-icon"></i>
+                <div class="suggestion-text">${suggestion.text}</div>
+                <div class="suggestion-category">${suggestion.category}</div>
+            </div>
+        `).join('');
+
+        suggestionsContainer.innerHTML = suggestionsHTML;
+        suggestionsContainer.style.display = 'block';
+    }
+
+    getSearchSuggestions(searchTerm) {
+        const term = searchTerm.toLowerCase();
+        const suggestions = [];
+        const seen = new Set();
+
+        // Get product names
+        this.allProducts.forEach(product => {
+            const name = product.name || product.productName || '';
+            if (name.toLowerCase().includes(term) && !seen.has(name)) {
+                suggestions.push({ text: name, category: 'Product' });
+                seen.add(name);
+            }
+        });
+
+        // Get categories
+        const categories = ['Game Top-up', 'Gift Card', 'Subscription'];
+        categories.forEach(category => {
+            if (category.toLowerCase().includes(term)) {
+                suggestions.push({ text: category, category: 'Category' });
+            }
+        });
+
+        return suggestions.slice(0, 5); // Limit to 5 suggestions
+    }
+
+    hideSuggestions() {
+        const suggestionsContainer = document.getElementById('searchSuggestions');
+        if (suggestionsContainer) {
+            suggestionsContainer.style.display = 'none';
+        }
+    }
+
+    updateSearchURL(searchTerm) {
+        const url = new URL(window.location);
+        if (searchTerm.trim()) {
+            url.searchParams.set('search', searchTerm);
+        } else {
+            url.searchParams.delete('search');
+        }
+        window.history.replaceState({}, '', url);
+    }
+
     displayProducts() {
         if (!this.productsList) return;
         
+        // Show search results summary if searching
+        const searchTerm = this.searchInput.value.trim();
+        let summaryHTML = '';
+        
+        if (searchTerm) {
+            summaryHTML = `
+                <div class="search-results-summary">
+                    <h3>Search Results</h3>
+                    <p>Found ${this.filteredProducts.length} product${this.filteredProducts.length !== 1 ? 's' : ''} for "${searchTerm}"</p>
+                </div>
+            `;
+        }
+        
         if (this.filteredProducts.length === 0) {
             this.productsList.innerHTML = `
+                ${summaryHTML}
                 <div class="no-products">
                     <i class="fas fa-search"></i>
-                    <p>No products found matching your search.</p>
+                    <p>No products found matching "${searchTerm}".</p>
                     <button onclick="this.parentElement.parentElement.parentElement.querySelector('#productsSearch').value = ''; this.parentElement.parentElement.parentElement.querySelector('#productsSearch').dispatchEvent(new Event('input'));" class="clear-search-btn">
                         Clear Search
                     </button>
@@ -136,7 +274,8 @@ class AllProducts {
         }
 
         const productsHTML = `
-            <div class="products-grid">
+            ${summaryHTML}
+            <div class="products-grid compact">
                 ${this.filteredProducts.map(product => this.createProductCard(product)).join('')}
             </div>
         `;
@@ -148,28 +287,13 @@ class AllProducts {
         // Check for multiple possible image field names
         const imageUrl = product.imageUrl || product.image || product.imagePath || product.photo || product.thumbnail || '';
         const name = product.name || product.productName || 'Product';
-        const description = product.description || product.shortDescription || '';
-        const price = product.price || product.basePrice || 'N/A';
         const salesCount = product.salesCount || 0;
-        const isHot = salesCount > 10;
+        const isHot = salesCount > 10; // Mark as hot if more than 10 sales
         
-        // Get the lowest price from variants if available
-        let displayPrice = price;
-        if (product.variants && product.variants.length > 0) {
-            const prices = product.variants.map(v => parseFloat(v.price)).filter(p => !isNaN(p));
-            if (prices.length > 0) {
-                const minPrice = Math.min(...prices);
-                displayPrice = `Rs ${minPrice.toFixed(2)}`;
-            }
-        } else if (typeof price === 'number') {
-            displayPrice = `Rs ${price.toFixed(2)}`;
-        }
-
-        // Debug log to see what image data we have
-        console.log('Product:', name, 'Image URL:', imageUrl);
+        // Variants removed from index page display - showing compact style like index page
 
         return `
-            <div class="product-card" onclick="window.location.href='product-details.html?id=${product.id}'">
+            <div class="product-card compact" onclick="window.location.href='product-details.html?id=${product.id}'">
                 ${isHot ? '<div class="hot-badge">HOT</div>' : ''}
                 <div class="product-image">
                     ${imageUrl ? 
@@ -182,17 +306,6 @@ class AllProducts {
                 </div>
                 <div class="product-info">
                     <h3 class="product-name">${name}</h3>
-                    <p class="product-description">${description}</p>
-                    <div class="product-meta">
-                        <span class="product-price">${displayPrice}</span>
-                        ${salesCount > 0 ? `<span class="sales-count">${salesCount} sold</span>` : ''}
-                    </div>
-                </div>
-                <div class="product-overlay">
-                    <button class="view-details-btn">
-                        <i class="fas fa-eye"></i>
-                        View Details
-                    </button>
                 </div>
             </div>
         `;
