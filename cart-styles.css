@@ -871,6 +871,267 @@ body {
     display: none !important;
 }
 
+/* Responsive Cart Layout */
+@media (max-width: 768px) {
+    .cart-section {
+        padding: 1rem;
+        margin-top: 70px;
+    }
+    
+    .cart-container {
+        padding: 1rem;
+    }
+    
+    .cart-header {
+        margin-bottom: 1.5rem;
+        padding-bottom: 0.8rem;
+    }
+    
+    .cart-header h1 {
+        font-size: 2rem;
+    }
+    
+    .cart-header p {
+        font-size: 1rem;
+    }
+    
+    .cart-content {
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+    }
+    
+    .cart-items {
+        padding: 1.5rem;
+    }
+    
+    .cart-item {
+        padding: 1rem;
+        margin-bottom: 0.8rem;
+    }
+    
+    .cart-item-image {
+        width: 60px;
+        height: 60px;
+        margin-right: 1rem;
+    }
+    
+    .cart-item-details {
+        margin-right: 1rem;
+    }
+    
+    .cart-item-title {
+        font-size: 1rem;
+    }
+    
+    .cart-item-description {
+        font-size: 0.8rem;
+    }
+    
+    .cart-item-price {
+        font-size: 1.1rem;
+    }
+    
+    .cart-summary {
+        padding: 1.5rem;
+    }
+    
+    .summary-card {
+        padding: 1.5rem;
+    }
+    
+    .summary-card h3 {
+        font-size: 1.3rem;
+    }
+    
+    .summary-row {
+        padding: 0.8rem 0;
+        font-size: 0.95rem;
+    }
+    
+    .coupon-input-group {
+        flex-direction: column;
+        gap: 0.8rem;
+    }
+    
+    .coupon-input {
+        padding: 0.8rem;
+        font-size: 0.9rem;
+    }
+    
+    .apply-coupon-btn {
+        padding: 0.8rem;
+        font-size: 0.9rem;
+    }
+    
+    .checkout-btn {
+        padding: 1rem;
+        font-size: 1rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .cart-section {
+        padding: 0.8rem;
+    }
+    
+    .cart-container {
+        padding: 0.8rem;
+    }
+    
+    .cart-header h1 {
+        font-size: 1.8rem;
+    }
+    
+    .cart-header p {
+        font-size: 0.9rem;
+    }
+    
+    .cart-items {
+        padding: 1.2rem;
+    }
+    
+    .cart-item {
+        padding: 0.8rem;
+        margin-bottom: 0.6rem;
+    }
+    
+    .cart-item-image {
+        width: 50px;
+        height: 50px;
+        margin-right: 0.8rem;
+    }
+    
+    .cart-item-title {
+        font-size: 0.95rem;
+    }
+    
+    .cart-item-description {
+        font-size: 0.75rem;
+    }
+    
+    .cart-item-price {
+        font-size: 1rem;
+    }
+    
+    .cart-summary {
+        padding: 1.2rem;
+    }
+    
+    .summary-card {
+        padding: 1.2rem;
+    }
+    
+    .summary-card h3 {
+        font-size: 1.2rem;
+    }
+    
+    .summary-row {
+        padding: 0.6rem 0;
+        font-size: 0.9rem;
+    }
+    
+    .coupon-input {
+        padding: 0.7rem;
+        font-size: 0.85rem;
+    }
+    
+    .apply-coupon-btn {
+        padding: 0.7rem;
+        font-size: 0.85rem;
+    }
+    
+    .checkout-btn {
+        padding: 0.9rem;
+        font-size: 0.95rem;
+    }
+}
+
+@media (max-width: 360px) {
+    .cart-section {
+        padding: 0.6rem;
+    }
+    
+    .cart-container {
+        padding: 0.6rem;
+    }
+    
+    .cart-header h1 {
+        font-size: 1.6rem;
+    }
+    
+    .cart-header p {
+        font-size: 0.85rem;
+    }
+    
+    .cart-items {
+        padding: 1rem;
+    }
+    
+    .cart-item {
+        padding: 0.7rem;
+        margin-bottom: 0.5rem;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.8rem;
+    }
+    
+    .cart-item-image {
+        width: 45px;
+        height: 45px;
+        margin-right: 0;
+        margin-bottom: 0.5rem;
+    }
+    
+    .cart-item-details {
+        margin-right: 0;
+        width: 100%;
+    }
+    
+    .cart-item-title {
+        font-size: 0.9rem;
+    }
+    
+    .cart-item-description {
+        font-size: 0.7rem;
+    }
+    
+    .cart-item-price {
+        font-size: 0.95rem;
+    }
+    
+    .cart-summary {
+        padding: 1rem;
+    }
+    
+    .summary-card {
+        padding: 1rem;
+    }
+    
+    .summary-card h3 {
+        font-size: 1.1rem;
+    }
+    
+    .summary-row {
+        padding: 0.5rem 0;
+        font-size: 0.85rem;
+    }
+    
+    .coupon-input {
+        padding: 0.6rem;
+        font-size: 0.8rem;
+    }
+    
+    .apply-coupon-btn {
+        padding: 0.6rem;
+        font-size: 0.8rem;
+    }
+    
+    .checkout-btn {
+        padding: 0.8rem;
+        font-size: 0.9rem;
+    }
+}
+
 /* Responsive Footer */
 @media (max-width: 768px) {
     .footer-content {
