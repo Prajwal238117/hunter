@@ -1344,8 +1344,12 @@ body {
     /* See More button removed */
     
     .products-grid.compact {
-        gap: 0.8rem;
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 1rem;
         padding: 1rem 0;
+        overflow: visible;
     }
 }
 
@@ -1719,6 +1723,10 @@ body {
             overflow: hidden;
             text-overflow: ellipsis;
             white-space: nowrap;
+            /* Force narrow width to enable marquee */
+            width: 80px !important;
+            max-width: 80px !important;
+            min-width: 80px !important;
         }
         
 
@@ -2226,93 +2234,29 @@ body {
         font-size: 1.5rem;
     }
     
-    .hero {
-
-
-        padding: 6rem 1rem 3rem;
+    .nav-search {
+        margin-left: 0.05rem;
     }
     
-    .hero-content h1 {
-        font-size: 2.5rem;
-    }
-    
-    .hero-image {
-
-
-        display: none;
-    }
-    
-    .categories, .products, .gift-cards, .features {
-        padding: 3rem 1rem;
-    }
-    
-
-
-    .product-grid, .gift-card-grid, .features-grid {
-        grid-template-columns: 1fr;
-
-
-        gap: 1.5rem;
-    }
-    
-    .gift-card-options {
-
-
-        flex-direction: column;
-    }
-    
-    /* Mobile Hero Animations */
-    .hero-title {
-        font-size: 2.5rem;
-    }
-    
-    .hero-subtitle {
+    .search-toggle {
         font-size: 1.1rem;
+        padding: 0.4rem;
     }
     
-    .cta-button {
-        padding: 1rem 2rem;
+    .nav-link {
+        padding: 0.5rem 1rem;
         font-size: 1.1rem;
+        margin: 0;
+        background: none;
+        border: none;
+        color: white;
     }
     
-    .floating-icon {
-        font-size: 1.5rem;
-    }
-    
-    /* Hide icons on mobile for better space usage */
-    .feature i,
-    .gift-card-image i {
-        font-size: 2rem;
-    }
-    
-    /* Improve search overlay on mobile */
-    .search-overlay-content {
-        width: 95%;
-        padding: 1.5rem;
-        margin: 1rem;
-        max-height: 90vh;
-    }
-    
-    .search-overlay-header h2 {
-        font-size: 1.5rem;
-    }
-    
-    .overlay-search-input {
-        font-size: 1rem;
-        padding: 0.8rem;
-    }
-    
-    /* Improve footer on mobile */
-    .footer-content {
-        grid-template-columns: 1fr;
-
-
-        gap: 2rem;
-        text-align: center;
-    }
-    
-    .social-links {
-        justify-content: center;
+    .nav-link:hover {
+        background: none;
+        transform: none;
+        box-shadow: none;
+        opacity: 0.8;
     }
 }
 
@@ -3141,8 +3085,12 @@ html {
     }
     
     .products-grid.compact {
-        gap: 0.8rem;
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 1rem;
         padding: 1rem 0;
+        overflow: visible;
     }
     
     .products-grid.compact .product-card.compact {
@@ -3175,8 +3123,12 @@ html {
     }
     
     .products-grid.compact {
-        gap: 0.8rem;
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 1rem;
         padding: 1rem 0;
+        overflow: visible;
     }
     
     .products-grid.compact .product-card.compact {
@@ -3206,8 +3158,12 @@ html {
     }
     
     .products-grid.compact {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
         gap: 0.5rem;
         padding: 0.6rem 0;
+        overflow: visible;
     }
     
     .products-grid.compact .product-card.compact {
@@ -3309,10 +3265,10 @@ html {
     color: var(--dark);
     margin-bottom: 0.5rem;
     line-height: 1.4;
-    display: -webkit-box;
-    -webkit-line-clamp: 2;
-    -webkit-box-orient: vertical;
+    display: block;
     overflow: hidden;
+    white-space: nowrap;
+    width: 100%;
 }
 
 .product-description {
@@ -4588,28 +4544,36 @@ html {
     width: 100%;
     overflow-x: auto;
     background: linear-gradient(135deg, #1A1A2E 0%, #16213e 100%);
-    border-radius: 20px;
+    
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
-    padding: 1.5rem;
-    border: 1px solid #334155;
+    padding: 1rem;
+    /* Mobile optimization */
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: thin;
+    scrollbar-color: #8b5cf6 #334155;
 }
 
 .purchases-table {
     width: 100%;
     border-collapse: collapse;
     font-size: 0.95rem;
+    /* Mobile table optimization */
+    min-width: 600px; /* Ensure table doesn't get too compressed */
 }
 
 .purchases-table th {
     background: linear-gradient(135deg, #16213e 0%, #1A1A2E 100%);
     color: #f1f5f9;
-    padding: 1.25rem 1rem;
+    padding: 1rem 0.8rem;
     text-align: left;
     font-weight: 700;
     font-size: 0.9rem;
     text-transform: uppercase;
     letter-spacing: 0.5px;
-    border-bottom: 2px solid #475569;
+    /* Ensure consistent alignment */
+    vertical-align: middle;
+    line-height: 1.2;
+    height: auto;
     position: relative;
 }
 
@@ -4633,11 +4597,14 @@ html {
 }
 
 .purchases-table td {
-    padding: 1.25rem 1rem;
-    border-bottom: 1px solid #334155;
+    padding: 1rem 0.8rem;
+    
     vertical-align: middle;
     transition: all 0.2s ease;
     color: #cbd5e1;
+    /* Ensure consistent text alignment */
+    line-height: 1.2;
+    height: auto;
 }
 
 .purchases-table tr:last-child td {
@@ -4647,7 +4614,35 @@ html {
 .purchases-table tr:hover {
     background: linear-gradient(135deg, rgba(139, 92, 246, 0.1), rgba(99, 102, 241, 0.1));
     transform: translateY(-1px);
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+    
+}
+
+/* Ensure consistent row heights and alignment */
+.purchases-table tr {
+    height: auto;
+    min-height: 3rem;
+}
+
+.purchases-table tr td {
+    height: inherit;
+    min-height: inherit;
+}
+
+/* Mobile touch optimization */
+@media (max-width: 768px) {
+    .purchases-table tr {
+        /* Remove hover effects on mobile for better performance */
+        transition: none;
+    }
+    
+    .purchases-table tr:hover {
+        transform: none;
+        box-shadow: none;
+    }
+    
+    .purchases-table tr:active {
+        background: linear-gradient(135deg, rgba(139, 92, 246, 0.15), rgba(99, 102, 241, 0.15));
+    }
 }
 
 .purchase-row .customer-name {
@@ -4657,10 +4652,20 @@ html {
 
 .purchase-row .product-name {
     color: #cbd5e1;
-    max-width: 200px;
+    max-width: 140px;
     overflow: hidden;
-    text-overflow: ellipsis;
     white-space: nowrap;
+    position: relative;
+    /* Ensure consistent vertical alignment */
+    vertical-align: middle;
+    line-height: 1.2;
+    font-size: 0.8rem;
+    /* Force consistent height and alignment */
+    height: 1.2em;
+    display: flex;
+    align-items: center;
+    /* Enable marquee for long text */
+    cursor: pointer;
 }
 
 .purchase-row .amount {
@@ -4678,6 +4683,41 @@ html {
 .purchase-row .payment-method i {
     color: #667eea;
     font-size: 1.1rem;
+}
+
+/* Purchase row product name marquee */
+.purchase-row .product-name.marquee {
+    /* Container stays still, only text moves */
+    transform: none;
+}
+
+.purchase-row .product-name.marquee .marquee-text {
+    animation: marquee 8s linear infinite;
+    display: inline-block;
+    white-space: nowrap;
+    /* Ensure proper text display */
+    color: #cbd5e1;
+    font-size: 0.8rem;
+    line-height: 1.2;
+}
+
+/* Mobile marquee optimization */
+@media (max-width: 768px) {
+    .purchase-row .product-name.marquee .marquee-text {
+        animation-duration: 6s;
+    }
+}
+
+@media (max-width: 480px) {
+    .purchase-row .product-name.marquee .marquee-text {
+        animation-duration: 5s;
+    }
+}
+
+@media (max-width: 360px) {
+    .purchase-row .product-name.marquee .marquee-text {
+        animation-duration: 4s;
+    }
 }
 
 .purchase-row .status {
@@ -4728,6 +4768,148 @@ html {
     
     .purchase-row .product-name {
         max-width: 180px;
+    }
+}
+
+@media (max-width: 768px) {
+    .purchases-table-container {
+        padding: 0.8rem;
+        border-radius: 16px;
+    }
+    
+    .purchases-table {
+        font-size: 0.8rem;
+    }
+    
+    .purchases-table th {
+        padding: 0.6rem 0.5rem;
+        font-size: 0.75rem;
+        letter-spacing: 0.2px;
+    }
+    
+    .purchases-table td {
+        padding: 0.6rem 0.5rem;
+    }
+    
+    .purchase-row .product-name {
+        max-width: 100px;
+    }
+    
+    .purchase-row .customer-name {
+        font-size: 0.8rem;
+    }
+    
+    .purchase-row .amount {
+        font-size: 0.8rem;
+    }
+    
+    .purchase-row .payment-method {
+        font-size: 0.75rem;
+    }
+    
+    .purchase-row .status {
+        font-size: 0.75rem;
+    }
+    
+    .status-badge {
+        padding: 0.3rem 0.6rem;
+        font-size: 0.7rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .purchases-table-container {
+        padding: 0.6rem;
+        border-radius: 12px;
+        margin: 0 0.3rem;
+    }
+    
+    .purchases-table {
+        font-size: 0.7rem;
+    }
+    
+    .purchases-table th {
+        padding: 0.4rem 0.3rem;
+        font-size: 0.7rem;
+        letter-spacing: 0.1px;
+    }
+    
+    .purchases-table td {
+        padding: 0.4rem 0.3rem;
+    }
+    
+    .purchase-row .product-name {
+        max-width: 70px;
+    }
+    
+    .purchase-row .customer-name {
+        font-size: 0.75rem;
+    }
+    
+    .purchase-row .amount {
+        font-size: 0.75rem;
+    }
+    
+    .purchase-row .payment-method {
+        font-size: 0.7rem;
+    }
+    
+    .purchase-row .status {
+        font-size: 0.7rem;
+    }
+    
+    .status-badge {
+        padding: 0.25rem 0.5rem;
+        font-size: 0.65rem;
+        border-radius: 14px;
+    }
+}
+
+@media (max-width: 360px) {
+    .purchases-table-container {
+        padding: 0.5rem;
+        border-radius: 10px;
+        margin: 0 0.2rem;
+    }
+    
+    .purchases-table {
+        font-size: 0.65rem;
+    }
+    
+    .purchases-table th {
+        padding: 0.3rem 0.2rem;
+        font-size: 0.65rem;
+        letter-spacing: 0.05px;
+    }
+    
+    .purchases-table td {
+        padding: 0.3rem 0.2rem;
+    }
+    
+    .purchase-row .product-name {
+        max-width: 50px;
+    }
+    
+    .purchase-row .customer-name {
+        font-size: 0.7rem;
+    }
+    
+    .purchase-row .amount {
+        font-size: 0.7rem;
+    }
+    
+    .purchase-row .payment-method {
+        font-size: 0.65rem;
+    }
+    
+    .purchase-row .status {
+        font-size: 0.65rem;
+    }
+    
+    .status-badge {
+        padding: 0.2rem 0.4rem;
+        font-size: 0.6rem;
+        border-radius: 12px;
     }
 }
 
@@ -5050,6 +5232,13 @@ html {
         font-size: 0.85rem;
         line-height: 1.2;
         margin-bottom: 0.4rem;
+        overflow: hidden;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+        /* Force narrow width to enable marquee */
+        width: 80px !important;
+        max-width: 80px !important;
+        min-width: 80px !important;
     }
     
     .product-card .product-price {
@@ -5138,6 +5327,13 @@ html {
     .product-card .product-name {
         font-size: 0.75rem;
         margin-bottom: 0.3rem;
+        overflow: hidden;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+        /* Force narrow width to enable marquee */
+        width: 80px !important;
+        max-width: 80px !important;
+        min-width: 80px !important;
     }
     
     .product-card .product-price {
@@ -5163,4 +5359,206 @@ html {
     .footer-section li {
         font-size: 0.75rem;
     }
+}
+
+/* Marquee Animation for Product Names */
+@keyframes marquee {
+    0% {
+        transform: translateX(0%);
+    }
+    100% {
+        transform: translateX(-100%);
+    }
+}
+
+/* Ensure keyframes are working */
+@keyframes marquee-test {
+    0% { transform: translateX(0px); }
+    100% { transform: translateX(-100px); }
+}
+
+@keyframes marquee-reverse {
+    0% {
+        transform: translateX(-100%);
+    }
+    100% {
+        transform: translateX(0%);
+    }
+}
+
+/* Product Name with Marquee Effect */
+.product-card.compact .product-name {
+    position: relative;
+    overflow: hidden;
+    white-space: nowrap;
+    max-width: 100%;
+    line-height: 1.2;
+    display: block;
+    width: 100%;
+    /* Force text to be wider than container for testing */
+    min-width: 0;
+    /* Debug: Force some width to test marquee */
+    /* min-width: 200px; */
+    /* Force narrow width to enable marquee */
+    width: 80px !important;
+    max-width: 80px !important;
+    min-width: 80px !important;
+}
+
+.product-card.compact .product-name.marquee {
+    /* Container stays still, only text moves */
+    transform: none;
+}
+
+.product-card.compact .product-name.marquee .marquee-text {
+    animation: marquee 8s linear infinite !important;
+    display: inline-block !important;
+    white-space: nowrap !important;
+}
+
+.product-card.compact .product-name.marquee:hover .marquee-text {
+    animation-play-state: paused;
+}
+
+.product-card.compact .product-name.marquee-reverse {
+    animation: marquee-reverse 8s linear infinite;
+}
+
+.product-card.compact .product-name.marquee-reverse:hover .marquee-text {
+    animation-play-state: paused;
+}
+
+/* Main product name marquee */
+.product-name.marquee {
+    /* Container stays still, only text moves */
+    transform: none;
+}
+
+.product-name.marquee .marquee-text {
+    animation: marquee 10s linear infinite !important;
+    display: inline-block !important;
+    white-space: nowrap !important;
+}
+
+/* Regular product card name marquee */
+.product-card .product-name.marquee {
+    /* Container stays still, only text moves */
+    transform: none;
+}
+
+.product-card .product-name.marquee .marquee-text {
+    animation: marquee 10s linear infinite !important;
+    display: inline-block !important;
+    white-space: nowrap !important;
+}
+
+.product-name.marquee:hover .marquee-text {
+    animation-play-state: paused;
+}
+
+.product-name.marquee-reverse {
+    animation: marquee-reverse 10s linear infinite;
+}
+
+.product-name.marquee-reverse:hover .marquee-text {
+    animation-play-state: paused;
+}
+
+/* Cart item title marquee */
+.cart-item-title.marquee {
+    /* Container stays still, only text moves */
+    transform: none;
+}
+
+.cart-item-title.marquee .marquee-text {
+    animation: marquee 6s linear infinite !important;
+    display: inline-block !important;
+    white-space: nowrap !important;
+}
+
+.cart-item-title.marquee:hover .marquee-text {
+    animation-play-state: paused;
+}
+
+.cart-item-title.marquee-reverse {
+    /* Container stays still, only text moves */
+    transform: none;
+}
+
+.cart-item-title.marquee-reverse .marquee-text {
+    animation: marquee-reverse 6s linear infinite !important;
+    display: inline-block !important;
+    white-space: nowrap !important;
+}
+
+.cart-item-title.marquee-reverse:hover .marquee-text {
+    animation-play-state: paused;
+}
+
+/* Enhanced marquee effects */
+.product-name.marquee,
+.product-card.compact .product-name.marquee,
+.cart-item-title.marquee {
+    cursor: pointer;
+    position: relative;
+}
+
+/* Gradient effect removed for clean marquee display */
+
+/* Smooth marquee transitions */
+.product-name,
+.product-card.compact .product-name,
+.cart-item-title {
+    transition: all 0.3s ease;
+}
+
+/* Marquee container styling */
+.marquee-container {
+    position: relative;
+    overflow: hidden;
+    width: 100%;
+}
+
+/* Responsive marquee speeds */
+@media (max-width: 768px) {
+    .product-name.marquee .marquee-text {
+        animation-duration: 8s;
+    }
+    
+    .product-card.compact .product-name.marquee .marquee-text {
+        animation-duration: 6s;
+    }
+    
+    .product-card .product-name.marquee .marquee-text {
+        animation-duration: 8s;
+    }
+    
+    .cart-item-title.marquee .marquee-text {
+        animation-duration: 5s;
+    }
+}
+
+@media (max-width: 480px) {
+    .product-name.marquee .marquee-text {
+        animation-duration: 7s;
+    }
+    
+    .product-card.compact .product-name.marquee .marquee-text {
+        animation-duration: 5s;
+    }
+    
+    .product-card .product-name.marquee .marquee-text {
+        animation-duration: 7s;
+    }
+    
+    .cart-item-title.marquee .marquee-text {
+        animation-duration: 4s;
+    }
+}
+
+/* Performance optimizations for marquee */
+.marquee-text {
+    will-change: transform;
+    backface-visibility: hidden;
+    transform: translateZ(0);
 }

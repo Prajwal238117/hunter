@@ -1,112 +1,403 @@
-/* CSS Variables */
+/* CSS Variables - Updated for Dark Theme */
+
 :root {
-    --primary: #667eea;
-    --secondary: #764ba2;
-    --dark: #333;
-    --light: #f8f9fa;
+    --primary: #8b5cf6;
+    --secondary: #6366f1;
+    --dark: #1A1A2E;
+    --light: #334155;
 }
 
-/* CRITICAL: Force rectangular shape on ALL option buttons across ALL screen sizes */
-.option-btn,
-.option-btn:hover,
-.option-btn:focus,
-.option-btn:active,
-.option-btn.selected {
-    /* Override any conflicting CSS with maximum priority */
-    width: var(--btn-width, 180px) !important;
-    height: var(--btn-height, 60px) !important;
-    min-width: var(--btn-min-width, 120px) !important;
-    min-height: var(--btn-min-height, 40px) !important;
-    max-width: var(--btn-max-width, 200px) !important;
-    max-height: var(--btn-max-height, 67px) !important;
-    
-    /* Ensure rectangular layout */
-    display: flex !important;
-    flex-direction: row !important;
-    align-items: center !important;
-    justify-content: space-between !important;
-    
-    /* Prevent content from changing shape */
-    box-sizing: border-box !important;
-    flex-shrink: 0 !important;
-    flex-grow: 0 !important;
-    overflow: hidden !important;
-    
-    /* Additional enforcement for rectangular shape */
-    aspect-ratio: 3/1 !important;
-    border-radius: 8px !important;
+/* ===== NEW VARIANT SELECTOR STYLES ===== */
+
+/* Modern Select Dropdown */
+.variant-selector {
+    margin: 20px 0;
 }
 
-/* CSS Custom Properties for different screen sizes */
-@media (max-width: 1200px) {
-    .option-btn {
-        --btn-width: 160px;
-        --btn-height: 53px;
-        --btn-min-width: 100px;
-        --btn-min-height: 33px;
-        --btn-max-width: 180px;
-        --btn-max-height: 60px;
+.select-wrapper {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border: 2px solid #667eea;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+}
+
+.select-wrapper:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+    border-color: #8b5cf6;
+}
+
+.select-display {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 18px;
+    color: white;
+    font-weight: 600;
+    font-size: 1rem;
+}
+
+.select-text {
+    color: white;
+    font-size: 0.95rem;
+    line-height: 1.2;
+    max-width: 200px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.select-arrow {
+    font-size: 1.2rem;
+    transition: transform 0.3s ease;
+}
+
+.select-wrapper:hover .select-arrow {
+    transform: rotate(180deg);
+}
+
+/* Variant Modal */
+.variant-modal {
+    display: none;
+    position: fixed;
+    z-index: 10000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.8);
+    backdrop-filter: blur(5px);
+}
+
+.variant-modal-content {
+    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+    margin: 5% auto;
+    padding: 0;
+    border-radius: 20px;
+    width: 90%;
+    max-width: 600px;
+    max-height: 80vh;
+    overflow: hidden;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+    border: 2px solid #8b5cf6;
+    animation: modalSlideIn 0.3s ease-out;
+}
+
+@keyframes modalSlideIn {
+    from {
+        opacity: 0;
+        transform: translateY(-50px) scale(0.9);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
     }
 }
 
+.modal-header {
+    background: linear-gradient(135deg, #8b5cf6 0%, #6366f1 100%);
+    padding: 20px 25px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 2px solid #6366f1;
+}
+
+.modal-header h3 {
+    color: white;
+    margin: 0;
+    font-size: 1.5rem;
+    font-weight: 700;
+}
+
+.modal-close {
+    background: rgba(255, 255, 255, 0.2);
+    border: none;
+    color: white;
+    width: 35px;
+    height: 35px;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+    font-size: 1.2rem;
+}
+
+.modal-close:hover {
+    background: rgba(255, 255, 255, 0.3);
+    transform: scale(1.1);
+}
+
+.modal-body {
+    padding: 25px;
+    max-height: 60vh;
+    overflow-y: auto;
+}
+
+/* Modal Variant Grid */
+.variant-grid-modal {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 12px;
+    padding: 8px 0;
+}
+
+/* Modal Variant Cards */
+.variant-card-modal {
+    background: linear-gradient(135deg, #2d3748 0%, #4a5568 100%);
+    border: 2px solid #4a5568;
+    border-radius: 12px;
+    padding: 16px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+}
+
+.variant-card-modal::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(139, 92, 246, 0.3), transparent);
+    transition: left 0.5s ease;
+}
+
+.variant-card-modal:hover::before {
+    left: 100%;
+}
+
+.variant-card-modal:hover {
+    transform: translateY(-5px);
+    border-color: #8b5cf6;
+    box-shadow: 0 10px 30px rgba(139, 92, 246, 0.3);
+}
+
+.variant-card-modal.selected {
+    border-color: #8b5cf6;
+    background: linear-gradient(135deg, #8b5cf6 0%, #6366f1 100%);
+    box-shadow: 0 10px 30px rgba(139, 92, 246, 0.4);
+}
+
+.variant-card-modal.selected::before {
+    display: none;
+}
+
+.variant-icon-modal {
+    font-size: 2rem;
+    color: #fbbf24;
+    margin-bottom: 12px;
+    text-shadow: 0 2px 8px rgba(251, 191, 36, 0.5);
+}
+
+.variant-label-modal {
+    font-size: 1rem;
+    font-weight: 600;
+    color: white;
+    margin-bottom: 8px;
+    line-height: 1.2;
+}
+
+.variant-price-modal {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #10b981;
+    text-shadow: 0 2px 4px rgba(16, 185, 129, 0.3);
+}
+
+/* Responsive Modal */
 @media (max-width: 768px) {
-    .option-btn {
-        --btn-width: 140px;
-        --btn-height: 47px;
-        --btn-min-width: 90px;
-        --btn-min-height: 30px;
-        --btn-max-width: 160px;
-        --btn-max-height: 53px;
+    .variant-modal-content {
+        margin: 8% auto;
+        width: 95%;
+        max-height: 80vh;
+    }
+    
+    .modal-header {
+        padding: 12px 18px;
+    }
+    
+    .modal-header h3 {
+        font-size: 1.2rem;
+    }
+    
+    .modal-body {
+        padding: 15px;
+    }
+    
+    .variant-grid-modal {
+        grid-template-columns: 1fr;
+        gap: 10px;
+    }
+    
+    .variant-card-modal {
+        padding: 14px;
+    }
+    
+    .variant-icon-modal {
+        font-size: 1.8rem;
+        margin-bottom: 10px;
+    }
+    
+    .variant-label-modal {
+        font-size: 0.95rem;
+        margin-bottom: 6px;
+    }
+    
+    .variant-price-modal {
+        font-size: 1rem;
+    }
+    
+    /* Compact select dropdown for 768px */
+    .select-display {
+        padding: 13px 17px;
+        font-size: 0.98rem;
+    }
+    
+    .select-text {
+        font-size: 0.93rem;
+        max-width: 190px;
+    }
+    
+    .select-arrow {
+        font-size: 1.15rem;
     }
 }
 
 @media (max-width: 480px) {
-    .option-btn {
-        --btn-width: 120px;
-        --btn-height: 40px;
-        --btn-min-width: 80px;
-        --btn-min-height: 27px;
-        --btn-max-width: 140px;
-        --btn-max-height: 47px;
+    .variant-modal-content {
+        margin: 3% auto;
+        width: 98%;
+        max-height: 85vh;
+    }
+    
+    .modal-header {
+        padding: 10px 12px;
+    }
+    
+    .modal-header h3 {
+        font-size: 1.1rem;
+    }
+    
+    .modal-body {
+        padding: 12px;
+    }
+    
+    .variant-grid-modal {
+        gap: 8px;
+    }
+    
+    .variant-card-modal {
+        padding: 12px;
+        border-radius: 10px;
+    }
+    
+    .variant-icon-modal {
+        font-size: 1.6rem;
+        margin-bottom: 8px;
+    }
+    
+    .variant-label-modal {
+        font-size: 0.9rem;
+        margin-bottom: 5px;
+    }
+    
+    .variant-price-modal {
+        font-size: 0.95rem;
+    }
+    
+    /* Compact select dropdown for 480px */
+    .select-display {
+        padding: 12px 16px;
+        font-size: 0.95rem;
+    }
+    
+    .select-text {
+        font-size: 0.9rem;
+        max-width: 180px;
+    }
+    
+    .select-arrow {
+        font-size: 1.1rem;
     }
 }
 
+/* Ultra-compact for very small screens */
 @media (max-width: 360px) {
-    .option-btn {
-        --btn-width: 100px;
-        --btn-height: 33px;
-        --btn-min-width: 70px;
-        --btn-min-height: 23px;
-        --btn-max-width: 120px;
-        --btn-max-height: 40px;
+    .variant-modal-content {
+        margin: 2% auto;
+        width: 99%;
+        max-height: 80vh;
+    }
+    
+    .modal-header {
+        padding: 8px 10px;
+    }
+    
+    .modal-header h3 {
+        font-size: 1rem;
+    }
+    
+    .modal-body {
+        padding: 10px;
+    }
+    
+    .variant-grid-modal {
+        gap: 6px;
+    }
+    
+    .variant-card-modal {
+        padding: 10px;
+        border-radius: 8px;
+    }
+    
+    .variant-icon-modal {
+        font-size: 1.4rem;
+        margin-bottom: 6px;
+    }
+    
+    .variant-label-modal {
+        font-size: 0.85rem;
+        margin-bottom: 4px;
+    }
+    
+    .variant-price-modal {
+        font-size: 0.9rem;
+    }
+    
+    /* Ultra-compact select dropdown */
+    .select-display {
+        padding: 10px 14px;
+        font-size: 0.9rem;
+    }
+    
+    .select-text {
+        font-size: 0.85rem;
+        max-width: 150px;
+    }
+    
+    .select-arrow {
+        font-size: 1rem;
     }
 }
 
-@media (max-width: 320px) {
-    .option-btn {
-        --btn-width: 80px;
-        --btn-height: 27px;
-        --btn-min-width: 60px;
-        --btn-min-height: 20px;
-        --btn-max-width: 100px;
-        --btn-max-height: 33px;
-    }
-}
+/* ===== OLD VARIANT STYLES - REMOVED ===== */
+/* Replaced with modern select dropdown + modal system */
 
-/* Maximum specificity override for rectangular shape */
-.option-btn.option-btn.option-btn {
-    width: var(--btn-width, 180px) !important;
-    height: var(--btn-height, 60px) !important;
-    min-width: var(--btn-min-width, 120px) !important;
-    min-height: var(--btn-min-height, 40px) !important;
-    max-width: var(--btn-max-width, 200px) !important;
-    max-height: var(--btn-max-height, 67px) !important;
-    aspect-ratio: 3/1 !important;
-}
+/* ===== OLD VARIANT CSS COMPLETELY REMOVED ===== */
+
+/* ===== ALL OLD VARIANT CSS COMPLETELY REMOVED ===== */
 
 /* Product Details Page Styles */
 .product-details-section {
-    padding: 2rem;
+    padding: 1rem;
     margin-top: 80px;
     background: linear-gradient(135deg, #1A1A2E 0%, #16213e 100%);
     min-height: calc(100vh - 80px);
@@ -122,7 +413,7 @@
     display: flex;
     align-items: center;
     gap: 0.5rem;
-    margin-bottom: 2rem;
+    margin-bottom: 1rem;
     font-size: 0.9rem;
     color: #cbd5e1;
 }
@@ -145,13 +436,26 @@
 .product-main {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 3rem;
-    margin-bottom: 3rem;
+    gap: 2rem;
+    margin-bottom: 2rem;
     background: linear-gradient(135deg, #16213e 0%, #1A1A2E 100%);
     border-radius: 15px;
-    padding: 2rem;
-    box-shadow: 0 5px 20px rgba(0,0,0,0.3);
-    border: 1px solid #334155;
+    padding: 1.5rem;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.4);
+    border: 2px solid #334155;
+    position: relative;
+}
+
+.product-main::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(135deg, rgba(139, 92, 246, 0.05) 0%, rgba(99, 102, 241, 0.05) 100%);
+    border-radius: 15px;
+    pointer-events: none;
 }
 
 /* Product Image */
@@ -193,13 +497,13 @@
 .product-info-section {
     display: flex;
     flex-direction: column;
-    gap: 1.5rem;
+    gap: 1rem;
 }
 
 .product-header h1 {
     font-size: 2.5rem;
     color: #f1f5f9;
-    margin-bottom: 1rem;
+    margin-bottom: 0.8rem;
     line-height: 1.2;
 }
 
@@ -207,7 +511,7 @@
     display: flex;
     align-items: center;
     gap: 1rem;
-    margin-bottom: 1rem;
+    margin-bottom: 0.8rem;
 }
 
 .stars {
@@ -229,15 +533,15 @@
     color: #cbd5e1;
     line-height: 1.6;
     font-size: 1rem;
-    margin-bottom: 1.5rem;
+    margin-bottom: 1rem;
 }
 
 /* Product Options */
 .product-options {
     display: flex;
     flex-direction: column;
-    gap: 1rem;
-    margin-bottom: 2rem;
+    gap: 0.8rem;
+    margin-bottom: 1.5rem;
 }
 
 .product-options h3 {
@@ -332,141 +636,9 @@
     color: white;
 }
 
-.option-btn {
-    padding: 0.5rem 0.7rem;
-    border: 2px solid var(--light);
-    background: white;
-    border-radius: 6px;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    font-weight: 600;
-    color: var(--dark);
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    justify-content: space-between;
-    gap: 0.6rem;
-    position: relative;
-    overflow: hidden;
-    min-height: 45px;
-    min-width: 100px;
-    max-width: 180px;
-}
+/* ===== ALL OLD VARIANT STYLES COMPLETELY REMOVED ===== */
 
-.option-btn::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    opacity: 0;
-    transition: opacity 0.3s ease;
-    z-index: 0;
-}
-
-.option-btn > * {
-    position: relative;
-    z-index: 1;
-}
-
-.option-btn:hover {
-    border-color: var(--primary);
-    transform: translateY(-3px);
-    box-shadow: 0 8px 25px rgba(102, 126, 234, 0.15);
-}
-
-.option-btn:hover::before {
-    opacity: 0.05;
-}
-
-.option-btn.selected {
-    border-color: var(--primary);
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    color: white;
-    transform: translateY(-3px);
-    box-shadow: 0 12px 35px rgba(102, 126, 234, 0.3);
-}
-
-.option-btn.selected::before {
-    opacity: 0;
-}
-
-/* Enhanced compact rectangular variant styles */
-.option-btn {
-    aspect-ratio: 3/1;
-    max-width: 200px;
-    min-width: 120px;
-}
-
-.option-btn:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(102, 126, 234, 0.15);
-}
-
-.option-btn.selected {
-    transform: translateY(-2px);
-    box-shadow: 0 8px 25px rgba(102, 126, 234, 0.25);
-}
-
-/* Ensure text doesn't overflow in rectangular layout */
-.option-content {
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
-
-.option-amount {
-    max-width: 100%;
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
-
-.option-label {
-    font-size: 1rem;
-    font-weight: 600;
-    color: inherit;
-}
-
-.option-price {
-    font-weight: bold;
-    font-size: 1.2rem;
-    color: var(--primary);
-}
-
-.option-btn.selected .option-price {
-    color: white;
-}
-
-.option-description {
-    font-size: 0.85rem;
-    color: #666;
-    margin-top: 0.25rem;
-}
-
-.option-btn.selected .option-description {
-    color: rgba(255, 255, 255, 0.8);
-}
-
-.option-badge {
-    position: absolute;
-    top: 0.5rem;
-    right: 0.5rem;
-    background: var(--primary);
-    color: white;
-    padding: 0.25rem 0.5rem;
-    border-radius: 12px;
-    font-size: 0.7rem;
-    font-weight: 600;
-    opacity: 0;
-    transform: scale(0.8);
-    transition: all 0.3s ease;
-}
-
-.option-btn.selected .option-badge {
-    opacity: 1;
-    transform: scale(1);
-}
+/* ===== OLD VARIANT STYLES REMOVED ===== */
 
 /* Quantity Controls */
 .quantity-controls {
@@ -479,13 +651,13 @@
 .quantity-btn {
     width: 40px;
     height: 40px;
-    border: 2px solid var(--light);
-    background: white;
+    border: 2px solid #475569;
+    background: linear-gradient(135deg, #334155 0%, #475569 100%);
     border-radius: 8px;
     cursor: pointer;
     font-size: 1.2rem;
     font-weight: bold;
-    color: var(--dark);
+    color: #f1f5f9;
     transition: all 0.3s ease;
     display: flex;
     align-items: center;
@@ -493,10 +665,11 @@
 }
 
 .quantity-btn:hover {
-    border-color: var(--primary);
-    background: var(--primary);
+    border-color: #8b5cf6;
+    background: linear-gradient(135deg, #8b5cf6 0%, #6366f1 100%);
     color: white;
     transform: scale(1.1);
+    box-shadow: 0 4px 15px rgba(139, 92, 246, 0.3);
 }
 
 .quantity-display {
@@ -504,18 +677,21 @@
     text-align: center;
     font-size: 1.2rem;
     font-weight: bold;
-    color: var(--dark);
+    color: #f1f5f9;
     padding: 0.5rem;
-    background: #f8f9fa;
+    background: linear-gradient(135deg, #334155 0%, #475569 100%);
     border-radius: 8px;
+    border: 2px solid #475569;
 }
 
 /* Purchase Section */
 .purchase-section {
-    background: #f8f9fa;
+    background: linear-gradient(135deg, #16213e 0%, #1A1A2E 100%);
     border-radius: 15px;
-    padding: 1.5rem;
-    margin-bottom: 2rem;
+    padding: 1.2rem;
+    margin-bottom: 1.5rem;
+    border: 1px solid #334155;
+    box-shadow: 0 5px 20px rgba(0,0,0,0.3);
 }
 
 .selected-option {
@@ -524,18 +700,18 @@
     align-items: center;
     margin-bottom: 1rem;
     padding-bottom: 1rem;
-    border-bottom: 1px solid #e9ecef;
+    border-bottom: 1px solid #475569;
 }
 
 .selected-amount {
     font-weight: 600;
-    color: var(--dark);
+    color: #f1f5f9;
 }
 
 .selected-price {
     font-size: 1.5rem;
     font-weight: bold;
-    color: var(--primary);
+    color: #8b5cf6;
 }
 
 .purchase-actions {
@@ -560,38 +736,43 @@
 }
 
 .btn-add-cart {
-    background: var(--primary);
+    background: linear-gradient(135deg, #8b5cf6 0%, #6366f1 100%);
     color: white;
+    border: 2px solid #8b5cf6;
 }
 
 .btn-add-cart:hover {
-    background: var(--secondary);
+    background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
     transform: translateY(-2px);
-    box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+    box-shadow: 0 8px 25px rgba(139, 92, 246, 0.4), 0 0 20px rgba(139, 92, 246, 0.2);
+    border-color: #6366f1;
 }
 
 .btn-buy-now {
-    background: #28a745;
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
     color: white;
+    border: 2px solid #10b981;
 }
 
 .btn-buy-now:hover {
-    background: #218838;
+    background: linear-gradient(135deg, #059669 0%, #10b981 100%);
     transform: translateY(-2px);
-    box-shadow: 0 8px 25px rgba(40, 167, 69, 0.3);
+    box-shadow: 0 8px 25px rgba(16, 185, 129, 0.4), 0 0 20px rgba(16, 185, 129, 0.2);
+    border-color: #059669;
 }
 
 /* Extra Fields Section */
 #extraFieldsSection {
-    background: white;
+    background: linear-gradient(135deg, #16213e 0%, #1A1A2E 100%);
     border-radius: 15px;
     padding: 1.5rem;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    box-shadow: 0 5px 20px rgba(0,0,0,0.3);
     margin-bottom: 1.5rem;
+    border: 1px solid #334155;
 }
 
 #extraFieldsSection h3 {
-    color: var(--dark);
+    color: #f1f5f9;
     margin-bottom: 1rem;
     font-size: 1.3rem;
 }
@@ -602,7 +783,7 @@
 
 .extra-field label {
     display: block;
-    color: #374151;
+    color: #f1f5f9;
     font-weight: 500;
     margin-bottom: 0.5rem;
     font-size: 0.9rem;
@@ -611,16 +792,18 @@
 .extra-field input {
     width: 100%;
     padding: 0.75rem;
-    border: 2px solid #e5e7eb;
+    border: 2px solid #475569;
     border-radius: 8px;
     font-size: 0.9rem;
     transition: border-color 0.3s ease;
+    background: linear-gradient(135deg, #334155 0%, #475569 100%);
+    color: #f1f5f9;
 }
 
 .extra-field input:focus {
     outline: none;
-    border-color: #667eea;
-    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    border-color: #8b5cf6;
+    box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.2);
 }
 
 .extra-field input:invalid {
@@ -629,14 +812,16 @@
 
 /* Product Features */
 .product-features {
-    background: white;
+    background: linear-gradient(135deg, #16213e 0%, #1A1A2E 100%);
     border-radius: 15px;
-    padding: 1.5rem;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    padding: 1.2rem;
+    box-shadow: 0 5px 20px rgba(0,0,0,0.3);
+    border: 1px solid #334155;
+    margin-bottom: 1.5rem;
 }
 
 .product-features h3 {
-    color: var(--dark);
+    color: #f1f5f9;
     margin-bottom: 1rem;
     font-size: 1.3rem;
 }
@@ -653,27 +838,28 @@
     display: flex;
     align-items: center;
     gap: 0.8rem;
-    color: #666;
+    color: #cbd5e1;
     font-size: 0.95rem;
 }
 
 .features-list i {
-    color: #28a745;
+    color: #10b981;
     font-size: 1rem;
 }
 
 /* Product Tabs */
 .product-tabs {
-    background: white;
+    background: linear-gradient(135deg, #16213e 0%, #1A1A2E 100%);
     border-radius: 15px;
-    padding: 2rem;
-    box-shadow: 0 5px 20px rgba(0,0,0,0.1);
-    margin-bottom: 3rem;
+    padding: 1.5rem;
+    box-shadow: 0 5px 20px rgba(0,0,0,0.3);
+    margin-bottom: 2rem;
+    border: 1px solid #334155;
 }
 
 .tab-navigation {
     display: flex;
-    border-bottom: 2px solid var(--light);
+    border-bottom: 2px solid #475569;
     margin-bottom: 2rem;
 }
 
@@ -683,20 +869,20 @@
     background: none;
     cursor: pointer;
     font-weight: 600;
-    color: #666;
+    color: #cbd5e1;
     border-bottom: 3px solid transparent;
     transition: all 0.3s ease;
     font-size: 1rem;
 }
 
 .tab-btn.active {
-    color: var(--primary);
-    border-bottom-color: var(--primary);
+    color: #8b5cf6;
+    border-bottom-color: #8b5cf6;
 }
 
 .tab-btn:hover {
-    color: var(--primary);
-    background: rgba(102, 126, 234, 0.1);
+    color: #8b5cf6;
+    background: rgba(139, 92, 246, 0.1);
 }
 
 /* Reviews Section */
@@ -717,21 +903,22 @@
 .overall-rating {
     text-align: center;
     padding: 1.5rem;
-    background: #f8f9fa;
+    background: linear-gradient(135deg, #334155 0%, #475569 100%);
     border-radius: 15px;
     min-width: 150px;
+    border: 1px solid #475569;
 }
 
 .rating-number {
     font-size: 2.5rem;
     font-weight: bold;
-    color: var(--primary);
+    color: #8b5cf6;
     display: block;
     line-height: 1;
 }
 
 .total-reviews {
-    color: #666;
+    color: #cbd5e1;
     font-size: 0.9rem;
     margin-top: 0.5rem;
     display: block;
@@ -778,7 +965,7 @@
 }
 
 .btn-write-review {
-    background: var(--primary);
+    background: linear-gradient(135deg, #8b5cf6 0%, #6366f1 100%);
     color: white;
     border: none;
     padding: 0.8rem 1.5rem;
@@ -790,9 +977,9 @@
 }
 
 .btn-write-review:hover {
-    background: var(--secondary);
+    background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
     transform: translateY(-2px);
-    box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+    box-shadow: 0 5px 15px rgba(139, 92, 246, 0.3);
 }
 
 /* Reviews List */
@@ -803,10 +990,11 @@
 }
 
 .review-item {
-    background: #f8f9fa;
+    background: linear-gradient(135deg, #334155 0%, #475569 100%);
     border-radius: 12px;
     padding: 1.5rem;
-    border-left: 4px solid var(--primary);
+    border-left: 4px solid #8b5cf6;
+    border: 1px solid #475569;
 }
 
 .review-header {
@@ -819,12 +1007,12 @@
 
 .review-author {
     font-weight: 600;
-    color: var(--dark);
+    color: #f1f5f9;
     font-size: 1rem;
 }
 
 .review-date {
-    color: #666;
+    color: #cbd5e1;
     font-size: 0.85rem;
 }
 
@@ -839,22 +1027,22 @@
 }
 
 .review-text {
-    color: #666;
+    color: #cbd5e1;
     line-height: 1.6;
     font-size: 0.95rem;
 }
 
 /* Review Form */
 .admin-card {
-    background: white;
+    background: linear-gradient(135deg, #16213e 0%, #1A1A2E 100%);
     border-radius: 15px;
     padding: 2rem;
-    box-shadow: 0 5px 20px rgba(0,0,0,0.1);
-    border: 2px solid var(--light);
+    box-shadow: 0 5px 20px rgba(0,0,0,0.3);
+    border: 2px solid #334155;
 }
 
 .admin-card h3 {
-    color: var(--dark);
+    color: #f1f5f9;
     margin-bottom: 1.5rem;
     font-size: 1.3rem;
 }
@@ -874,26 +1062,26 @@
 
 #reviewForm label {
     font-weight: 600;
-    color: var(--dark);
+    color: #f1f5f9;
     font-size: 0.95rem;
 }
 
 #reviewForm select,
 #reviewForm textarea {
     padding: 0.8rem 1rem;
-    border: 2px solid #e9ecef;
+    border: 2px solid #475569;
     border-radius: 8px;
     font-size: 0.95rem;
     transition: all 0.3s ease;
-    background: white;
-    color: var(--dark);
+    background: linear-gradient(135deg, #334155 0%, #475569 100%);
+    color: #f1f5f9;
 }
 
 #reviewForm select:focus,
 #reviewForm textarea:focus {
     outline: none;
-    border-color: var(--primary);
-    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    border-color: #8b5cf6;
+    box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.2);
 }
 
 #reviewForm textarea {

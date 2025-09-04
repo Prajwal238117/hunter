@@ -272,6 +272,15 @@ function handleSubmit() {
       // Clear safety timeout
       clearTimeout(safetyTimeout);
       
+      // Clear coupon data when order is completed successfully
+      if (typeof window.clearCouponData === 'function') {
+        window.clearCouponData();
+      } else {
+        // Fallback: clear coupon data directly
+        localStorage.removeItem('appliedCoupon');
+        localStorage.removeItem('tempCouponData');
+      }
+      
       // Redirect to success page with order details
       const successUrl = `order-success.html?orderId=${orderId}&total=${orderTotal.replace('Rs ', '')}&method=${paymentMethod}`;
       window.location.href = successUrl;
@@ -333,22 +342,58 @@ document.addEventListener('DOMContentLoaded', () => {
   // Render cart items from localStorage
   try {
     const cart = JSON.parse(localStorage.getItem('cart') || '[]');
-    const appliedCouponRaw = localStorage.getItem('appliedCoupon');
+    
+    // Try to get coupon data from multiple sources
     let appliedCoupon = null;
     
-    // Safely parse coupon data
-    if (appliedCouponRaw && appliedCouponRaw !== 'null' && appliedCouponRaw !== 'undefined') {
+    // First, try to get from checkoutData
+    const checkoutData = localStorage.getItem('checkoutData');
+    if (checkoutData) {
       try {
-        appliedCoupon = JSON.parse(appliedCouponRaw);
-        // Validate coupon structure
-        if (!appliedCoupon || typeof appliedCoupon !== 'object' || !appliedCoupon.code) {
-          appliedCoupon = null;
-          localStorage.removeItem('appliedCoupon'); // Clean up invalid data
+        const parsed = JSON.parse(checkoutData);
+        if (parsed.appliedCoupon && parsed.appliedCoupon.code) {
+          appliedCoupon = parsed.appliedCoupon;
         }
       } catch (e) {
-        console.warn('Invalid coupon data in localStorage, removing...');
-        appliedCoupon = null;
-        localStorage.removeItem('appliedCoupon');
+        console.warn('Invalid checkout data, trying alternative sources...');
+      }
+    }
+    
+    // If not found in checkoutData, try tempCouponData
+    if (!appliedCoupon) {
+      const tempCouponRaw = localStorage.getItem('tempCouponData');
+      if (tempCouponRaw && tempCouponRaw !== 'null' && tempCouponRaw !== 'undefined') {
+        try {
+          appliedCoupon = JSON.parse(tempCouponRaw);
+          // Validate coupon structure
+          if (!appliedCoupon || typeof appliedCoupon !== 'object' || !appliedCoupon.code) {
+            appliedCoupon = null;
+            localStorage.removeItem('tempCouponData'); // Clean up invalid data
+          }
+        } catch (e) {
+          console.warn('Invalid temp coupon data, removing...');
+          appliedCoupon = null;
+          localStorage.removeItem('tempCouponData');
+        }
+      }
+    }
+    
+    // Fallback: try the old appliedCoupon location
+    if (!appliedCoupon) {
+      const appliedCouponRaw = localStorage.getItem('appliedCoupon');
+      if (appliedCouponRaw && appliedCouponRaw !== 'null' && appliedCouponRaw !== 'undefined') {
+        try {
+          appliedCoupon = JSON.parse(appliedCouponRaw);
+          // Validate coupon structure
+          if (!appliedCoupon || typeof appliedCoupon !== 'object' || !appliedCoupon.code) {
+            appliedCoupon = null;
+            localStorage.removeItem('appliedCoupon'); // Clean up invalid data
+          }
+        } catch (e) {
+          console.warn('Invalid coupon data in localStorage, removing...');
+          appliedCoupon = null;
+          localStorage.removeItem('appliedCoupon');
+        }
       }
     }
     
@@ -388,7 +433,13 @@ document.addEventListener('DOMContentLoaded', () => {
     let finalTotal = subtotal;
     
     // Check if coupon is applied
-    console.log('Payment page - Coupon check:', { appliedCoupon, subtotal });
+    console.log('Payment page - Coupon check:', { 
+      appliedCoupon, 
+      subtotal,
+      checkoutData: localStorage.getItem('checkoutData') ? 'exists' : 'not found',
+      tempCouponData: localStorage.getItem('tempCouponData') ? 'exists' : 'not found',
+      oldAppliedCoupon: localStorage.getItem('appliedCoupon') ? 'exists' : 'not found'
+    });
     
     if (appliedCoupon && appliedCoupon.isActive !== false && appliedCoupon.code) {
       if (appliedCoupon.type === 'percentage') {

@@ -299,12 +299,19 @@ class AllProducts {
 
         const productsHTML = `
             ${summaryHTML}
-            <div class="products-grid compact">
+            <div class="products-grid compact" style="display: flex; flex-wrap: wrap; justify-content: center; gap: 1rem; overflow: visible;">
                 ${this.filteredProducts.map(product => this.createProductCard(product)).join('')}
             </div>
         `;
         
         this.productsList.innerHTML = productsHTML;
+        
+        // Trigger marquee after content is loaded
+        setTimeout(() => {
+            if (window.triggerMarquee) {
+                window.triggerMarquee();
+            }
+        }, 200);
     }
 
     createProductCard(product) {

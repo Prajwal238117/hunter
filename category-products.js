@@ -180,6 +180,16 @@ class CategoryProducts {
         `;
         
         productsList.innerHTML = productsHTML;
+        
+        // Trigger marquee after content is loaded
+        setTimeout(() => {
+            console.log('Category products loaded, triggering marquee...');
+            if (window.triggerMarquee) {
+                window.triggerMarquee();
+            } else {
+                console.log('triggerMarquee function not found!');
+            }
+        }, 200);
     }
 
     createProductCard(product) {

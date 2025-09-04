@@ -177,9 +177,31 @@
 
                         <h3>Select Amount</h3>
 
-                        <div class="option-grid">
+                        <!-- Modern Select Dropdown -->
+                        <div class="variant-selector">
+                            <div class="select-wrapper" onclick="openVariantModal()">
+                                <div class="select-display">
+                                    <span class="select-text">Choose your amount</span>
+                                    <i class="fas fa-chevron-down select-arrow"></i>
+                                </div>
+                            </div>
+                        </div>
 
-                            <!-- Product variants will be loaded here -->
+                        <!-- Variant Selection Modal -->
+                        <div id="variantModal" class="variant-modal">
+                            <div class="variant-modal-content">
+                                <div class="modal-header">
+                                    <h3>Select Amount</h3>
+                                    <button class="modal-close" onclick="closeVariantModal()">
+                                        <i class="fas fa-times"></i>
+                                    </button>
+                                </div>
+                                <div class="modal-body">
+                                    <div class="variant-grid-modal">
+                                        <!-- Product variants will be loaded here -->
+                                    </div>
+                                </div>
+                            </div>
                         </div>
 
                     </div>
@@ -408,6 +430,35 @@
     <script type="module" src="./cart.js"></script>
     <script type="module" src="./products.js"></script>
     <script type="module" src="./loading.js"></script>
+    
+    <!-- Modal Control Scripts -->
+    <script>
+        // Modal Control Functions
+        function openVariantModal() {
+            document.getElementById('variantModal').style.display = 'block';
+            document.body.style.overflow = 'hidden'; // Prevent background scrolling
+        }
+        
+        function closeVariantModal() {
+            document.getElementById('variantModal').style.display = 'none';
+            document.body.style.overflow = 'auto'; // Restore scrolling
+        }
+        
+        // Close modal when clicking outside
+        window.onclick = function(event) {
+            const modal = document.getElementById('variantModal');
+            if (event.target === modal) {
+                closeVariantModal();
+            }
+        }
+        
+        // Close modal with Escape key
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'Escape') {
+                closeVariantModal();
+            }
+        });
+    </script>
 </body>
 
 </html>

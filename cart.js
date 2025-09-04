@@ -11,6 +11,11 @@ class Cart {
         this.init();
     }
 
+    // Make coupon clearing function globally accessible
+    static clearCouponDataGlobal() {
+        localStorage.removeItem('appliedCoupon');
+    }
+
     loadCart() {
         const cart = localStorage.getItem('cart');
         return cart ? JSON.parse(cart) : [];
@@ -45,11 +50,13 @@ class Cart {
         if (this.items.length === 0) {
             this.appliedCoupon = null;
             localStorage.removeItem('appliedCoupon');
+            this.clearCouponTimer(); // Clear the auto-clear timer
         } else if (this.appliedCoupon) {
             const subtotal = this.getTotal();
             if (subtotal < this.appliedCoupon.minAmount) {
                 this.appliedCoupon = null;
                 localStorage.removeItem('appliedCoupon');
+                this.clearCouponTimer(); // Clear the auto-clear timer
                 showToast('Coupon removed - minimum order amount not met', 'info');
             }
         }
@@ -73,6 +80,7 @@ class Cart {
                     if (subtotal < this.appliedCoupon.minAmount) {
                         this.appliedCoupon = null;
                         localStorage.removeItem('appliedCoupon');
+                        this.clearCouponTimer(); // Clear the auto-clear timer
                         showToast('Coupon removed - minimum order amount not met', 'info');
                     }
                 }
@@ -248,10 +256,18 @@ class Cart {
             items: this.items,
             subtotal: this.getTotal(),
             tax: this.getTax(),
-            total: this.getGrandTotal()
+            total: this.getGrandTotal(),
+            appliedCoupon: this.appliedCoupon
         };
 
         localStorage.setItem('checkoutData', JSON.stringify(cartData));
+        
+        // Store coupon data temporarily for payment page
+        // We'll clear it after the order is completed
+        if (this.appliedCoupon) {
+            localStorage.setItem('tempCouponData', JSON.stringify(this.appliedCoupon));
+        }
+        
         window.location.href = 'payment.html';
     }
 
@@ -259,6 +275,33 @@ class Cart {
         this.renderCart();
         this.setupEventListeners();
         this.setupHeaderNavigation();
+        
+        // Clear coupon data if user leaves without proceeding
+        this.setupPageUnloadHandler();
+        
+        // Clear coupon data if user navigates back from payment page
+        this.checkIfReturningFromPayment();
+    }
+
+    setupPageUnloadHandler() {
+        // Clear coupon data when user leaves the page without proceeding
+        window.addEventListener('beforeunload', () => {
+            if (this.appliedCoupon) {
+                // Only clear if user hasn't proceeded to payment
+                // This prevents clearing if they're going to payment page
+                if (!window.location.href.includes('payment.html')) {
+                    this.clearCouponTimer();
+                }
+            }
+        });
+
+        // Also clear coupon data when user navigates away (for single-page navigation)
+        window.addEventListener('pagehide', () => {
+            if (this.appliedCoupon) {
+                // Clear coupon data when leaving cart page
+                this.clearCouponData();
+            }
+        });
     }
 
     setupEventListeners() {
@@ -399,6 +442,9 @@ class Cart {
             // Store coupon in localStorage for payment page
             localStorage.setItem('appliedCoupon', JSON.stringify(coupon));
             
+            // Set up auto-clear timer for coupon
+            this.setupCouponAutoClear();
+            
             return { success: true, message: 'Coupon applied successfully!' };
             
         } catch (error) {
@@ -453,6 +499,49 @@ class Cart {
     removeCoupon() {
         this.appliedCoupon = null;
         localStorage.removeItem('appliedCoupon');
+        this.clearCouponTimer(); // Clear the auto-clear timer
+        this.renderCart(); // Re-render to update display
+    }
+
+    // Auto-clear coupon after inactivity (5 minutes)
+    setupCouponAutoClear() {
+        if (this.appliedCoupon) {
+            // Clear any existing timer
+            if (this.couponTimer) {
+                clearTimeout(this.couponTimer);
+            }
+            
+            // Set new timer to clear coupon after 5 minutes
+            this.couponTimer = setTimeout(() => {
+                if (this.appliedCoupon) {
+                    this.appliedCoupon = null;
+                    localStorage.removeItem('appliedCoupon');
+                    this.renderCart();
+                    showToast('Coupon expired due to inactivity', 'info');
+                }
+            }, 5 * 60 * 1000); // 5 minutes
+        }
+    }
+
+    // Clear coupon timer when coupon is removed
+    clearCouponTimer() {
+        if (this.couponTimer) {
+            clearTimeout(this.couponTimer);
+            this.couponTimer = null;
+        }
+    }
+
+    // Clear coupon data completely (called when order is completed)
+    clearCouponData() {
+        this.appliedCoupon = null;
+        localStorage.removeItem('appliedCoupon');
+        this.clearCouponTimer();
+        this.renderCart();
+    }
+
+    // Make this function globally accessible for payment page
+    static clearCouponDataGlobal() {
+        localStorage.removeItem('appliedCoupon');
     }
 
     getDiscountAmount() {
@@ -497,3 +586,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
 // Export for use in other modules
 export { Cart };
+
+// Global function to clear coupon data (can be called from payment page)
+window.clearCouponData = () => {
+    localStorage.removeItem('appliedCoupon');
+    if (window.cart && window.cart.appliedCoupon) {
+        window.cart.appliedCoupon = null;
+        window.cart.clearCouponTimer();
+    }
+};

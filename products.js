@@ -152,6 +152,11 @@ class ProductManager {
 
         // Update product variants
         this.displayVariants(product.variants || []);
+        
+        // Auto-select first variant if available
+        if (product.variants && product.variants.length > 0) {
+            this.selectVariant(0);
+        }
 
         // Update selected option display
         this.updateSelectedOption();
@@ -310,43 +315,43 @@ class ProductManager {
     }
 
     displayVariants(variants) {
-        const optionsGrid = document.querySelector('.option-grid');
-        if (!optionsGrid) return;
+        // Load variants in the modal grid instead of the old option-grid
+        const modalGrid = document.querySelector('.variant-grid-modal');
+        if (!modalGrid) return;
 
         // Display variants in the order they were added (no sorting)
         const variantsHTML = variants.map((variant, index) => `
-            <div class="option-card" data-price="${variant.price}" data-variant-index="${index}">
-                <div class="option-icon">
+            <div class="variant-card-modal" data-price="${variant.price}" data-variant-index="${index}">
+                <div class="variant-icon-modal">
                     <i class="fas fa-coins"></i>
                 </div>
-                <div class="option-content">
-                    <div class="option-amount">${variant.label || 'Option'}</div>
-                    <div class="option-price">Rs ${variant.price}</div>
-                </div>
+                <div class="variant-label-modal">${variant.label || 'Option'}</div>
+                <div class="variant-price-modal">Rs ${variant.price}</div>
             </div>
         `).join('');
 
-        optionsGrid.innerHTML = variantsHTML;
+        modalGrid.innerHTML = variantsHTML;
 
-        // Add click event listeners to variant options
-        const optionCards = optionsGrid.querySelectorAll('.option-card');
-        optionCards.forEach(card => {
+        // Add click event listeners to variant options in modal
+        const variantCards = modalGrid.querySelectorAll('.variant-card-modal');
+        variantCards.forEach(card => {
             card.addEventListener('click', () => {
                 this.selectVariant(parseInt(card.dataset.variantIndex));
+                closeVariantModal(); // Close modal after selection
             });
         });
     }
 
     selectVariant(variantIndex) {
-        // Remove active class from all options
-        document.querySelectorAll('.option-card').forEach(card => {
-            card.classList.remove('active');
+        // Remove active class from all options in modal
+        document.querySelectorAll('.variant-card-modal').forEach(card => {
+            card.classList.remove('selected');
         });
 
-        // Add active class to selected option
+        // Add active class to selected option in modal
         const selectedCard = document.querySelector(`[data-variant-index="${variantIndex}"]`);
         if (selectedCard) {
-            selectedCard.classList.add('active');
+            selectedCard.classList.add('selected');
         }
 
         // Use the variant index directly since we're not sorting anymore
@@ -359,11 +364,14 @@ class ProductManager {
 
         const selectedAmount = document.querySelector('.selected-amount');
         const selectedPrice = document.querySelector('.selected-price');
+        const selectText = document.querySelector('.select-text');
 
         if (selectedAmount) selectedAmount.textContent = `${this.selectedVariant.label || 'Option'}`;
-
-        if (selectedPrice) {
-            selectedPrice.textContent = `Rs ${this.selectedVariant.price}`;
+        if (selectedPrice) selectedPrice.textContent = `Rs ${this.selectedVariant.price}`;
+        
+        // Update the select dropdown text
+        if (selectText) {
+            selectText.textContent = `${this.selectedVariant.label || 'Option'} - Rs ${this.selectedVariant.price}`;
         }
     }
 

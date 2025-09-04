@@ -75,6 +75,13 @@ class TopProducts {
         `;
         
         this.productsList.innerHTML = productsHTML;
+        
+        // Trigger marquee after content is loaded
+        setTimeout(() => {
+            if (window.triggerMarquee) {
+                window.triggerMarquee();
+            }
+        }, 200);
     }
 
     createProductCard(product) {

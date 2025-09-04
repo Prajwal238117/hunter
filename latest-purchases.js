@@ -111,6 +111,13 @@ class LatestPurchases {
         `;
         
         this.purchasesList.innerHTML = tableHTML;
+        
+        // Trigger marquee after content is loaded
+        setTimeout(() => {
+            if (window.triggerMarquee) {
+                window.triggerMarquee();
+            }
+        }, 200);
     }
 
     createPurchaseRow(purchase) {
