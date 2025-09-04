@@ -138,25 +138,32 @@
     overflow-y: auto;
 }
 
-/* Modal Variant Grid */
+/* Modal Variant Grid - Compact Design */
 .variant-grid-modal {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 12px;
-    padding: 8px 0;
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    gap: 8px;
+    padding: 6px 0;
+    max-height: 60vh;
+    overflow-y: auto;
 }
 
-/* Modal Variant Cards */
+/* Modal Variant Cards - Compact */
 .variant-card-modal {
     background: linear-gradient(135deg, #2d3748 0%, #4a5568 100%);
-    border: 2px solid #4a5568;
-    border-radius: 12px;
-    padding: 16px;
+    border: 1px solid #4a5568;
+    border-radius: 8px;
+    padding: 8px 6px;
     cursor: pointer;
-    transition: all 0.3s ease;
+    transition: all 0.2s ease;
     text-align: center;
     position: relative;
     overflow: hidden;
+    min-height: 60px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
 }
 
 .variant-card-modal::before {
@@ -167,7 +174,7 @@
     width: 100%;
     height: 100%;
     background: linear-gradient(90deg, transparent, rgba(139, 92, 246, 0.3), transparent);
-    transition: left 0.5s ease;
+    transition: left 0.3s ease;
 }
 
 .variant-card-modal:hover::before {
@@ -175,15 +182,15 @@
 }
 
 .variant-card-modal:hover {
-    transform: translateY(-5px);
+    transform: translateY(-2px);
     border-color: #8b5cf6;
-    box-shadow: 0 10px 30px rgba(139, 92, 246, 0.3);
+    box-shadow: 0 4px 15px rgba(139, 92, 246, 0.3);
 }
 
 .variant-card-modal.selected {
     border-color: #8b5cf6;
     background: linear-gradient(135deg, #8b5cf6 0%, #6366f1 100%);
-    box-shadow: 0 10px 30px rgba(139, 92, 246, 0.4);
+    box-shadow: 0 4px 15px rgba(139, 92, 246, 0.4);
 }
 
 .variant-card-modal.selected::before {
@@ -191,83 +198,74 @@
 }
 
 .variant-icon-modal {
-    font-size: 2rem;
+    font-size: 1.2rem;
     color: #fbbf24;
-    margin-bottom: 12px;
-    text-shadow: 0 2px 8px rgba(251, 191, 36, 0.5);
+    margin-bottom: 4px;
+    text-shadow: 0 1px 4px rgba(251, 191, 36, 0.5);
 }
 
 .variant-label-modal {
-    font-size: 1rem;
+    font-size: 0.8rem;
     font-weight: 600;
     color: white;
-    margin-bottom: 8px;
-    line-height: 1.2;
+    margin-bottom: 3px;
+    line-height: 1.1;
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
 .variant-price-modal {
-    font-size: 1.1rem;
+    font-size: 0.9rem;
     font-weight: 700;
     color: #10b981;
-    text-shadow: 0 2px 4px rgba(16, 185, 129, 0.3);
+    text-shadow: 0 1px 2px rgba(16, 185, 129, 0.3);
 }
 
-/* Responsive Modal */
+/* Responsive Modal - Compact */
 @media (max-width: 768px) {
     .variant-modal-content {
-        margin: 8% auto;
+        margin: 5% auto;
         width: 95%;
-        max-height: 80vh;
+        max-height: 85vh;
     }
     
     .modal-header {
-        padding: 12px 18px;
+        padding: 10px 15px;
     }
     
     .modal-header h3 {
-        font-size: 1.2rem;
+        font-size: 1.1rem;
     }
     
     .modal-body {
-        padding: 15px;
+        padding: 12px;
     }
     
     .variant-grid-modal {
-        grid-template-columns: 1fr;
-        gap: 10px;
+        grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+        gap: 6px;
+        padding: 4px 0;
     }
     
     .variant-card-modal {
-        padding: 14px;
+        padding: 6px 4px;
+        min-height: 50px;
     }
     
     .variant-icon-modal {
-        font-size: 1.8rem;
-        margin-bottom: 10px;
+        font-size: 1rem;
+        margin-bottom: 3px;
     }
     
     .variant-label-modal {
-        font-size: 0.95rem;
-        margin-bottom: 6px;
+        font-size: 0.75rem;
+        margin-bottom: 2px;
     }
     
     .variant-price-modal {
-        font-size: 1rem;
-    }
-    
-    /* Compact select dropdown for 768px */
-    .select-display {
-        padding: 13px 17px;
-        font-size: 0.98rem;
-    }
-    
-    .select-text {
-        font-size: 0.93rem;
-        max-width: 190px;
-    }
-    
-    .select-arrow {
-        font-size: 1.15rem;
+        font-size: 0.8rem;
     }
 }
 
@@ -275,116 +273,253 @@
     .variant-modal-content {
         margin: 3% auto;
         width: 98%;
-        max-height: 85vh;
-    }
-    
-    .modal-header {
-        padding: 10px 12px;
-    }
-    
-    .modal-header h3 {
-        font-size: 1.1rem;
-    }
-    
-    .modal-body {
-        padding: 12px;
+        max-height: 90vh;
     }
     
     .variant-grid-modal {
-        gap: 8px;
+        grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
+        gap: 4px;
+        padding: 3px 0;
     }
     
     .variant-card-modal {
-        padding: 12px;
-        border-radius: 10px;
+        padding: 5px 3px;
+        min-height: 45px;
     }
     
     .variant-icon-modal {
-        font-size: 1.6rem;
-        margin-bottom: 8px;
+        font-size: 0.9rem;
+        margin-bottom: 2px;
     }
     
     .variant-label-modal {
-        font-size: 0.9rem;
-        margin-bottom: 5px;
+        font-size: 0.7rem;
+        margin-bottom: 1px;
     }
     
     .variant-price-modal {
-        font-size: 0.95rem;
-    }
-    
-    /* Compact select dropdown for 480px */
-    .select-display {
-        padding: 12px 16px;
-        font-size: 0.95rem;
-    }
-    
-    .select-text {
-        font-size: 0.9rem;
-        max-width: 180px;
-    }
-    
-    .select-arrow {
-        font-size: 1.1rem;
+        font-size: 0.75rem;
     }
 }
 
-/* Ultra-compact for very small screens */
 @media (max-width: 360px) {
-    .variant-modal-content {
-        margin: 2% auto;
-        width: 99%;
-        max-height: 80vh;
-    }
-    
-    .modal-header {
-        padding: 8px 10px;
-    }
-    
-    .modal-header h3 {
-        font-size: 1rem;
-    }
-    
-    .modal-body {
-        padding: 10px;
-    }
-    
     .variant-grid-modal {
-        gap: 6px;
+        grid-template-columns: repeat(auto-fit, minmax(70px, 1fr));
+        gap: 3px;
     }
     
     .variant-card-modal {
-        padding: 10px;
-        border-radius: 8px;
+        padding: 4px 2px;
+        min-height: 40px;
     }
     
     .variant-icon-modal {
-        font-size: 1.4rem;
-        margin-bottom: 6px;
+        font-size: 0.8rem;
+        margin-bottom: 1px;
     }
     
     .variant-label-modal {
-        font-size: 0.85rem;
-        margin-bottom: 4px;
+        font-size: 0.65rem;
     }
     
     .variant-price-modal {
-        font-size: 0.9rem;
+        font-size: 0.7rem;
+    }
+}
+
+/* Direct Variant Grid (No Modal) */
+.variant-grid-direct {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    gap: 8px;
+    padding: 6px 0;
+    margin: 15px 0;
+}
+
+/* Force grid to work properly */
+.variant-grid-direct {
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)) !important;
+    grid-auto-flow: row !important;
+    grid-auto-rows: auto !important;
+    width: 100% !important;
+    min-width: 100% !important;
+    max-width: 100% !important;
+    flex: none !important;
+}
+
+.variant-card-direct {
+    background: linear-gradient(135deg, #2d3748 0%, #4a5568 100%);
+    border: 1px solid #4a5568;
+    border-radius: 8px;
+    padding: 8px 6px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+    min-height: 60px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.variant-card-direct::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(139, 92, 246, 0.3), transparent);
+    transition: left 0.3s ease;
+}
+
+.variant-card-direct:hover::before {
+    left: 100%;
+}
+
+.variant-card-direct:hover {
+    transform: translateY(-2px);
+    border-color: #8b5cf6;
+    box-shadow: 0 4px 15px rgba(139, 92, 246, 0.3);
+}
+
+.variant-card-direct.selected {
+    border-color: #8b5cf6;
+    background: linear-gradient(135deg, #8b5cf6 0%, #6366f1 100%);
+    box-shadow: 0 4px 15px rgba(139, 92, 246, 0.4);
+}
+
+.variant-card-direct.selected::before {
+    display: none;
+}
+
+.variant-icon-direct {
+    font-size: 1.2rem;
+    color: #fbbf24;
+    margin-bottom: 4px;
+    text-shadow: 0 1px 4px rgba(251, 191, 36, 0.5);
+}
+
+.variant-label-direct {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: white;
+    margin-bottom: 3px;
+    line-height: 1.1;
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    position: relative;
+}
+
+/* Marquee for long variant names */
+.variant-label-direct.marquee {
+    white-space: nowrap;
+    overflow: hidden;
+    animation: marquee 8s linear infinite;
+    text-overflow: clip !important; /* Remove ellipsis */
+    max-width: none !important; /* Allow full width */
+}
+
+.variant-label-direct.marquee:hover {
+    animation-play-state: paused;
+}
+
+@keyframes marquee {
+    0% { transform: translateX(100%); }
+    100% { transform: translateX(-100%); }
+}
+
+.variant-price-direct {
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: #10b981;
+    text-shadow: 0 1px 2px rgba(16, 185, 129, 0.3);
+}
+
+/* Responsive Direct Variant Grid */
+@media (max-width: 768px) {
+    .variant-grid-direct {
+        grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
+        gap: 8px;
+        padding: 4px 0;
     }
     
-    /* Ultra-compact select dropdown */
-    .select-display {
-        padding: 10px 14px;
-        font-size: 0.9rem;
+    .variant-card-direct {
+        padding: 10px 6px;
+        min-height: 65px;
     }
     
-    .select-text {
+    .variant-icon-direct {
+        font-size: 1.2rem;
+        margin-bottom: 5px;
+    }
+    
+    .variant-label-direct {
+        font-size: 0.8rem;
+        margin-bottom: 3px;
+    }
+    
+    .variant-price-direct {
         font-size: 0.85rem;
-        max-width: 150px;
+        padding: 1px 4px;
+    }
+}
+
+@media (max-width: 480px) {
+    .variant-grid-direct {
+        grid-template-columns: repeat(auto-fit, minmax(90px, 1fr));
+        gap: 6px;
+        padding: 3px 0;
     }
     
-    .select-arrow {
+    .variant-card-direct {
+        padding: 8px 4px;
+        min-height: 60px;
+    }
+    
+    .variant-icon-direct {
+        font-size: 1.1rem;
+        margin-bottom: 4px;
+    }
+    
+    .variant-label-direct {
+        font-size: 0.75rem;
+        margin-bottom: 2px;
+    }
+    
+    .variant-price-direct {
+        font-size: 0.8rem;
+        padding: 1px 3px;
+    }
+}
+
+@media (max-width: 360px) {
+    .variant-grid-direct {
+        grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
+        gap: 4px;
+    }
+    
+    .variant-card-direct {
+        padding: 6px 3px;
+        min-height: 55px;
+    }
+    
+    .variant-icon-direct {
         font-size: 1rem;
+        margin-bottom: 3px;
+    }
+    
+    .variant-label-direct {
+        font-size: 0.7rem;
+    }
+    
+    .variant-price-direct {
+        font-size: 0.75rem;
+        padding: 1px 2px;
     }
 }
 
@@ -398,7 +533,7 @@
 /* Product Details Page Styles */
 .product-details-section {
     padding: 1rem;
-    margin-top: 80px;
+    margin-top: 4px;
     background: linear-gradient(135deg, #1A1A2E 0%, #16213e 100%);
     min-height: calc(100vh - 80px);
 }
@@ -536,19 +671,22 @@
     margin-bottom: 1rem;
 }
 
-/* Product Options */
+/* Product Options Section */
 .product-options {
-    display: flex;
-    flex-direction: column;
-    gap: 0.8rem;
-    margin-bottom: 1.5rem;
+    margin: 20px 0;
+    padding: 20px;
+    background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
+    border-radius: 12px;
+    border: 1px solid #475569;
 }
 
 .product-options h3 {
-    color: #f1f5f9;
-    margin-bottom: 1rem;
+    color: white;
     font-size: 1.3rem;
     font-weight: 600;
+    margin-bottom: 15px;
+    text-align: center;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
 }
 
 .option-grid {
@@ -694,24 +832,29 @@
     box-shadow: 0 5px 20px rgba(0,0,0,0.3);
 }
 
+/* Selected Option Display */
 .selected-option {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 1rem;
-    padding-bottom: 1rem;
-    border-bottom: 1px solid #475569;
+    padding: 10px 15px;
+    background: linear-gradient(135deg, #8b5cf6 0%, #6366f1 100%);
+    border-radius: 8px;
+    margin-bottom: 15px;
+    box-shadow: 0 3px 10px rgba(139, 92, 246, 0.3);
 }
 
 .selected-amount {
+    color: white;
     font-weight: 600;
-    color: #f1f5f9;
+    font-size: 1rem;
 }
 
 .selected-price {
-    font-size: 1.5rem;
-    font-weight: bold;
-    color: #8b5cf6;
+    color: white;
+    font-weight: 700;
+    font-size: 1.1rem;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
 }
 
 .purchase-actions {

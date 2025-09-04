@@ -20,7 +20,6 @@ function wireEmailPasswordLogin() {
       showToast('Signed in successfully', 'success');
       window.location.href = 'index.html';
     } catch (err) {
-      console.error(err);
       showToast(authErrorMessage(err, 'login'), 'error');
     } finally {
       if (button) { button.disabled = false; button.textContent = originalText || 'Sign In'; }
@@ -39,7 +38,6 @@ function wireGoogleLogin() {
       showToast('Signed in with Google', 'success');
       window.location.href = 'index.html';
     } catch (err) {
-      console.error(err);
       showToast(authErrorMessage(err, 'login'), 'error');
     }
   });
@@ -56,7 +54,6 @@ function wirePasswordReset() {
       await sendPasswordResetEmail(auth, email);
       showToast('Password reset email sent.', 'success');
     } catch (err) {
-      console.error(err);
       showToast(authErrorMessage(err, 'reset'), 'error');
     }
   });

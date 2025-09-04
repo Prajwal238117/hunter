@@ -164,7 +164,7 @@ function setQrByMethod(method) {
   const map = {
     esewa: 'esewa.jpg',
     khalti: 'khalti.jpg',
-    imepay: 'imepay.jpg'
+    imepay: 'khalti.jpg'
   };
   img.src = map[method] || map.esewa;
 }

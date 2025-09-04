@@ -1,130 +1,289 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Privacy Policy - CGAPH</title>
-  <link rel="stylesheet" href="styles.css" />
-  <link rel="stylesheet" href="pages-styles.css" />
-  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Privacy Policy - CGAPH</title>
+    <meta name="description" content="Privacy Policy for CGAPH - Learn how we protect your personal information and data.">
+    <link rel="icon" type="image/png" sizes="32x32" href="logo.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="logo.png">
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        .privacy-section {
+            padding: 2rem;
+            margin-top: 80px;
+            background: linear-gradient(135deg, #1A1A2E 0%, #16213e 100%);
+            min-height: calc(100vh - 80px);
+        }
+        
+        .privacy-container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: linear-gradient(135deg, #16213e 0%, #1A1A2E 100%);
+            border-radius: 20px;
+            padding: 2rem;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+            border: 2px solid #334155;
+        }
+        
+        .privacy-header {
+            text-align: center;
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid #475569;
+        }
+        
+        .privacy-header h1 {
+            color: #8b5cf6;
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            text-shadow: 0 4px 8px rgba(139, 92, 246, 0.3);
+        }
+        
+        .privacy-header p {
+            color: #cbd5e1;
+            font-size: 1.1rem;
+        }
+        
+        .privacy-content {
+            color: #e2e8f0;
+            line-height: 1.8;
+        }
+        
+        .privacy-content h2 {
+            color: #8b5cf6;
+            font-size: 1.8rem;
+            margin: 2rem 0 1rem 0;
+            border-left: 4px solid #8b5cf6;
+            padding-left: 1rem;
+        }
+        
+        .privacy-content h3 {
+            color: #6366f1;
+            font-size: 1.4rem;
+            margin: 1.5rem 0 0.8rem 0;
+        }
+        
+        .privacy-content p {
+            margin-bottom: 1rem;
+            text-align: justify;
+        }
+        
+        .privacy-content ul {
+            margin: 1rem 0;
+            padding-left: 2rem;
+        }
+        
+        .privacy-content li {
+            margin-bottom: 0.5rem;
+        }
+        
+        .privacy-content strong {
+            color: #fbbf24;
+        }
+        
+        .last-updated {
+            background: linear-gradient(135deg, #8b5cf6 0%, #6366f1 100%);
+            color: white;
+            padding: 1rem;
+            border-radius: 10px;
+            margin-top: 2rem;
+            text-align: center;
+            font-weight: 600;
+        }
+        
+        @media (max-width: 768px) {
+            .privacy-section {
+                padding: 1rem;
+                margin-top: 70px;
+            }
+            
+            .privacy-container {
+                padding: 1.5rem;
+            }
+            
+            .privacy-header h1 {
+                font-size: 2rem;
+            }
+            
+            .privacy-content h2 {
+                font-size: 1.5rem;
+            }
+            
+            .privacy-content h3 {
+                font-size: 1.2rem;
+            }
+        }
+    </style>
 </head>
 <body>
-  <header class="header">
-    <nav class="navbar">
-      <div class="nav-brand">
-        <i class="fas fa-gamepad"></i>
-         <span>CGAPH</span>
-      </div>
-      <ul class="nav-menu">
-        <li><a href="index.html" class="nav-link">Home</a></li>
-        <li><a href="all-products.html" class="nav-link">Products</a></li>
-        <li><a href="index.html#latest-purchases" class="nav-link">Recent</a></li>
-        <li><a href="features.html" class="nav-link">Features</a></li>
-      </ul>
-      <div class="nav-cart">
-        <a href="cart.html">
-          <i class="fas fa-shopping-cart"></i>
-          <span class="cart-count">0</span>
-        </a>
-      </div>
-      <div class="nav-auth">
-        <a href="login.html" class="nav-link">Login</a>
-        <a href="register.html" class="nav-link">Register</a>
-      </div>
-      <div class="hamburger">
-        <span class="bar"></span>
-        <span class="bar"></span>
-        <span class="bar"></span>
-      </div>
-    </nav>
-  </header>
+    <!-- Header -->
+    <header class="header">
+        <nav class="navbar">
+            <div class="nav-brand">
+                <img src="logo.png" alt="CGAPH Logo" class="nav-logo">
+            </div>
+            <ul class="nav-menu">
+                <li><a href="index.html" class="nav-link">Home</a></li>
+                <li><a href="all-products.html" class="nav-link">Products</a></li>
+                <li><a href="index.html#latest-purchases" class="nav-link">Recent</a></li>
+                <li><a href="features.html" class="nav-link">Features</a></li>
+            </ul>
+            <div class="nav-cart">
+                <a href="cart.html">
+                    <i class="fas fa-shopping-cart"></i>
+                    <span class="cart-count">0</span>
+                </a>
+            </div>
+            <div class="nav-auth">
+                <a href="login.html" class="nav-link">Login</a>
+                <a href="register.html" class="nav-link">Register</a>
+            </div>
+            <div class="hamburger" aria-label="Menu" role="button" tabindex="0">
+                <span class="bar"></span>
+                <span class="bar"></span>
+                <span class="bar"></span>
+            </div>
+        </nav>
+    </header>
 
-  <section class="page-hero">
-    <div class="page-hero-inner">
-      <h1>Privacy Policy</h1>
-      <p>Last updated: April 2025</p>
-    </div>
-  </section>
-
-  <main class="page-container">
-    <article class="content-card policy-section">
-      <h2>1. Information We Collect</h2>
-      <p>We collect information you provide directly (such as name, email, and phone) and information collected automatically (such as device, browser, and usage data).</p>
-
-      <h2>2. How We Use Information</h2>
-      <ul>
-        <li>To process orders and deliver digital items</li>
-        <li>To provide customer support</li>
-        <li>To improve our website, products, and services</li>
-        <li>To prevent fraud and enhance security</li>
-      </ul>
-
-      <h2>3. Sharing of Information</h2>
-      <p>We do not sell your personal information. We may share information with trusted service providers who assist in payment processing, email delivery, and analytics.</p>
-
-      <h2>4. Cookies & Tracking</h2>
-      <p>We use cookies and similar technologies to enable essential functionality and improve user experience. You can control cookies through your browser settings.</p>
-
-      <h2>5. Data Security</h2>
-      <p>We use industry-standard measures to protect your data, including encryption and access controls.</p>
-
-      <h2>6. Your Rights</h2>
-                  <p>You may request access, correction, or deletion of your personal information. Contact <a href="mailto:support@cgaph.com">support@cgaph.com</a>.</p>
-
-      <h2>7. Children's Privacy</h2>
-      <p>Our services are not directed to children under 13. We do not knowingly collect information from children.</p>
-
-      <h2>8. Changes to this Policy</h2>
-      <p>We may update this privacy policy. We encourage you to review it periodically.</p>
-
-      <h2>9. Contact Us</h2>
-                              <p>For questions about this policy, contact <a href="mailto:support@cgaph.com">support@cgaph.com</a>.</p>
-    </article>
-  </main>
-
-    <footer class="footer">
-    <div class="footer-content">
-      <div class="footer-section">
-        <h3>CGAPH</h3>
-        <p>Your trusted source for digital gaming and entertainment content.</p>
-        <div class="social-links">
-          <a href="https://www.facebook.com/profile.php?id=61579288196935" target="_blank" rel="noopener" aria-label="Facebook"><i class="fab fa-facebook"></i></a>
-          <a href="#" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
-          <a href="#" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
-          <a href="#" aria-label="Discord"><i class="fab fa-discord"></i></a>
+    <!-- Privacy Policy Section -->
+    <section class="privacy-section">
+        <div class="privacy-container">
+            <div class="privacy-header">
+                <h1><i class="fas fa-shield-alt"></i> Privacy Policy</h1>
+                <p>Your privacy is important to us. Learn how we protect your information.</p>
+            </div>
+            
+            <div class="privacy-content">
+                <h2>Information We Collect</h2>
+                <p>We collect information you provide directly to us, such as when you create an account, make a purchase, or contact us for support.</p>
+                
+                <h3>Personal Information</h3>
+                <ul>
+                    <li><strong>Account Information:</strong> Name, email address, phone number</li>
+                    <li><strong>Payment Information:</strong> Credit card details, billing address</li>
+                    <li><strong>Transaction History:</strong> Purchase records and order details</li>
+                    <li><strong>Communication:</strong> Support tickets and customer service interactions</li>
+                </ul>
+                
+                <h3>Automatically Collected Information</h3>
+                <ul>
+                    <li><strong>Device Information:</strong> IP address, browser type, operating system</li>
+                    <li><strong>Usage Data:</strong> Pages visited, time spent, links clicked</li>
+                    <li><strong>Cookies:</strong> Small data files stored on your device</li>
+                </ul>
+                
+                <h2>How We Use Your Information</h2>
+                <p>We use the collected information to:</p>
+                <ul>
+                    <li>Process your orders and payments</li>
+                    <li>Provide customer support and respond to inquiries</li>
+                    <li>Send order confirmations and updates</li>
+                    <li>Improve our services and user experience</li>
+                    <li>Comply with legal obligations</li>
+                </ul>
+                
+                <h2>Information Sharing</h2>
+                <p>We do not sell, trade, or rent your personal information to third parties. We may share information only in the following circumstances:</p>
+                <ul>
+                    <li><strong>Service Providers:</strong> With trusted partners who help us operate our business</li>
+                    <li><strong>Legal Requirements:</strong> When required by law or to protect our rights</li>
+                    <li><strong>Business Transfers:</strong> In connection with a merger or acquisition</li>
+                </ul>
+                
+                <h2>Data Security</h2>
+                <p>We implement appropriate security measures to protect your personal information:</p>
+                <ul>
+                    <li>Encryption of sensitive data</li>
+                    <li>Secure payment processing</li>
+                    <li>Regular security audits</li>
+                    <li>Access controls and authentication</li>
+                </ul>
+                
+                <h2>Your Rights</h2>
+                <p>You have the right to:</p>
+                <ul>
+                    <li>Access your personal information</li>
+                    <li>Correct inaccurate information</li>
+                    <li>Request deletion of your data</li>
+                    <li>Opt-out of marketing communications</li>
+                    <li>Data portability</li>
+                </ul>
+                
+                <h2>Cookies and Tracking</h2>
+                <p>We use cookies and similar technologies to enhance your browsing experience and analyze website usage. You can control cookie settings through your browser preferences.</p>
+                
+                <h2>Third-Party Links</h2>
+                <p>Our website may contain links to third-party websites. We are not responsible for the privacy practices of these external sites.</p>
+                
+                <h2>Children's Privacy</h2>
+                <p>Our services are not intended for children under 13. We do not knowingly collect personal information from children under 13.</p>
+                
+                <h2>Changes to This Policy</h2>
+                <p>We may update this Privacy Policy from time to time. We will notify you of any changes by posting the new policy on this page and updating the "Last Updated" date.</p>
+                
+                <h2>Contact Us</h2>
+                <p>If you have any questions about this Privacy Policy or our data practices, please contact us:</p>
+                <ul>
+                    <li><strong>Email:</strong> privacy@cgaph.com</li>
+                    <li><strong>Phone:</strong> +977 9800745053</li>
+                    <li><strong>Address:</strong> Kathmandu, Nepal</li>
+                </ul>
+                
+                <div class="last-updated">
+                    <i class="fas fa-calendar-alt"></i>
+                    Last Updated: January 2024
+                </div>
+            </div>
         </div>
-      </div>
-      <div class="footer-section">
-        <h4>Quick Links</h4>
-        <ul>
-          <li><a href="index.html">Home</a></li>
-          <li><a href="all-products.html">Products</a></li>
-          <li><a href="about.html">About Us</a></li>
-          <li><a href="contact.html">Contact</a></li>
-        </ul>
-      </div>
-      <div class="footer-section">
-        <h4>Support</h4>
-        <ul>
-          <li><a href="privacy.html">Privacy Policy</a></li>
-          <li><a href="terms.html">Terms of Service</a></li>
-          <li><a href="refund.html">Refund Policy</a></li>
-          <li><a href="contact.html">Help Center</a></li>
-        </ul>
-      </div>
-      <div class="footer-section">
-        <h4>Contact Info</h4>
-        <p><i class="fas fa-envelope"></i> support@cgaph.com</p>
-        <p><i class="fas fa-phone"></i> +977 9800745053</p>
-        <p><i class="fas fa-map-marker-alt"></i> Kathmandu, Nepal</p>
-      </div>
-    </div>
-    <div class="footer-bottom">
-      <p>&copy; 2024 CGAPH. All rights reserved.</p>
-    </div>
-  </footer>
+    </section>
 
-  <script type="module" src="./cart.js"></script>
-  <script type="module" src="./loading.js"></script>
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-section">
+                <h4>CGAPH</h4>
+                <p>Your trusted partner for digital products and gaming solutions in Nepal.</p>
+                <div class="social-links">
+                    <a href="https://www.facebook.com/profile.php?id=61579288196935" target="_blank" rel="noopener" aria-label="Facebook"><i class="fab fa-facebook"></i></a>
+                    <a href="https://www.youtube.com/@cgaph" target="_blank" rel="noopener" aria-label="YouTube"><i class="fab fa-youtube"></i></a>
+                    <a href="https://www.tiktok.com/@cgaph?is_from_webapp=1&sender_device=pc" target="_blank" rel="noopener" aria-label="TikTok"><i class="fab fa-tiktok"></i></a>
+                    <a href="https://discord.gg/xfYVjDW3Bc" target="_blank" rel="noopener" aria-label="Discord"><i class="fab fa-discord"></i></a>
+                </div>
+            </div>
+            <div class="footer-section">
+                <h4>Quick Links</h4>
+                <ul>
+                    <li><a href="index.html">Home</a></li>
+                    <li><a href="all-products.html">Products</a></li>
+                    <li><a href="about.html">About Us</a></li>
+                    <li><a href="contact.html">Contact</a></li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h4>Support</h4>
+                <ul>
+                    <li><a href="privacy.html">Privacy Policy</a></li>
+                    <li><a href="terms.html">Terms of Service</a></li>
+                    <li><a href="refund.html">Refund Policy</a></li>
+                    <li><a href="contact.html">Help Center</a></li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h4>Contact Info</h4>
+                <p><i class="fas fa-envelope"></i> support@cgaph.com</p>
+                <p><i class="fas fa-phone"></i> +977 9800745053</p>
+                <p><i class="fas fa-map-marker-alt"></i> Kathmandu, Nepal</p>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2024 CGAPH. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script type="module" src="./cart.js"></script>
+   
 </body>
 </html>

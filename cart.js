@@ -143,6 +143,17 @@ class Cart {
         if (cartContent) cartContent.style.display = 'grid';
         if (emptyCart) emptyCart.style.display = 'none';
 
+        // Add refresh button for product data
+        const cartHeader = document.querySelector('.cart-header');
+        if (cartHeader && !document.getElementById('refreshProductsBtn')) {
+            const refreshBtn = document.createElement('button');
+            refreshBtn.id = 'refreshProductsBtn';
+            refreshBtn.className = 'refresh-products-btn';
+            refreshBtn.innerHTML = '<i class="fas fa-sync-alt"></i> Refresh Products';
+            refreshBtn.onclick = () => this.refreshProductData();
+            cartHeader.appendChild(refreshBtn);
+        }
+
         // Render cart items
         if (cartItems) {
             cartItems.innerHTML = this.items.map(item => `
@@ -251,6 +262,10 @@ class Cart {
             return;
         }
 
+        // Clean up any old data before storing new data
+        localStorage.removeItem('checkoutData');
+        localStorage.removeItem('tempCouponData');
+
         // Redirect to payment page with cart data
         const cartData = {
             items: this.items,
@@ -268,6 +283,7 @@ class Cart {
             localStorage.setItem('tempCouponData', JSON.stringify(this.appliedCoupon));
         }
         
+
         window.location.href = 'payment.html';
     }
 
@@ -448,7 +464,6 @@ class Cart {
             return { success: true, message: 'Coupon applied successfully!' };
             
         } catch (error) {
-            console.error('Error applying coupon:', error);
             return { success: false, message: 'Error applying coupon' };
         }
     }
@@ -561,6 +576,86 @@ class Cart {
         const discount = this.getDiscountAmount();
         return Math.max(0, subtotal + tax - discount);
     }
+
+    checkIfReturningFromPayment() {
+        // Check if user is returning from payment page
+        const referrer = document.referrer;
+        const currentUrl = window.location.href;
+        
+
+        
+        // Only clear if we're actually returning from payment.html
+        // This prevents clearing when going TO payment page
+        // Also check that referrer is not empty (prevents clearing on initial page load)
+        if (referrer && referrer.includes('payment.html') && referrer !== currentUrl) {
+
+            
+            // Clear all coupon data
+            this.clearCouponData();
+            
+            // Clear all payment-related localStorage data
+            localStorage.removeItem('tempCouponData');
+            localStorage.removeItem('checkoutData');
+            
+            // Also clear any other payment-related data that might exist
+            localStorage.removeItem('paymentData');
+            localStorage.removeItem('orderData');
+            
+
+        } else {
+
+        }
+    }
+
+    // Debug function to show current coupon state
+    debugCouponState() {
+        // Debug function removed - no console logging
+    }
+
+    // Refresh product data from database to get updated images and prices
+    async refreshProductData() {
+        try {
+            // Get fresh product data for all cart items
+            const updatedItems = [];
+            
+            for (const cartItem of this.items) {
+                try {
+                    // Get fresh product data from Firebase
+                    const productRef = doc(db, 'products', cartItem.id);
+                    const productDoc = await getDoc(productRef);
+                    
+                    if (productDoc.exists()) {
+                        const freshProduct = productDoc.data();
+                        
+                        // Update cart item with fresh data
+                        const updatedItem = {
+                            ...cartItem,
+                            name: freshProduct.name || cartItem.name,
+                            image: freshProduct.image || cartItem.image,
+                            price: freshProduct.price || cartItem.price,
+                            description: freshProduct.description || cartItem.description
+                        };
+                        
+                        updatedItems.push(updatedItem);
+                    } else {
+                        // Product no longer exists, keep old data
+                        updatedItems.push(cartItem);
+                    }
+                } catch (error) {
+                    // If error fetching product, keep old data
+                    updatedItems.push(cartItem);
+                }
+            }
+            
+            // Update cart with fresh data
+            this.items = updatedItems;
+            this.saveCart();
+            this.renderCart();
+            
+        } catch (error) {
+            // If error refreshing, keep current cart as is
+        }
+    }
 }
 
 // Initialize cart when DOM is loaded
@@ -578,6 +673,19 @@ document.addEventListener('DOMContentLoaded', () => {
     document.addEventListener('visibilitychange', () => {
         if (!document.hidden) {
             cart.updateCartCount();
+            // Also check if user is returning from payment page
+            cart.checkIfReturningFromPayment();
+            // Refresh product data to get updated images and prices
+            cart.refreshProductData();
+        }
+    });
+
+    // Also check when page is shown (more reliable for navigation back)
+    window.addEventListener('pageshow', (event) => {
+        if (event.persisted) {
+            // Page was loaded from back-forward cache
+
+            cart.checkIfReturningFromPayment();
         }
     });
     
@@ -593,5 +701,14 @@ window.clearCouponData = () => {
     if (window.cart && window.cart.appliedCoupon) {
         window.cart.appliedCoupon = null;
         window.cart.clearCouponTimer();
+    }
+};
+
+// Global function to debug coupon state (can be called from console)
+window.debugCouponState = () => {
+    if (window.cart && typeof window.cart.debugCouponState === 'function') {
+        window.cart.debugCouponState();
+    } else {
+        // Debug function not available
     }
 };

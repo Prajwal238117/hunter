@@ -3,9 +3,341 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Features - CGAPH</title>
+    <title>Features - CGAPH Digital Gaming Platform</title>
+    <meta name="description" content="Explore CGAPH's powerful features - instant delivery, secure payments, 24/7 support, and more for the ultimate digital gaming experience.">
+    <link rel="icon" type="image/png" sizes="32x32" href="logo.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="logo.png">
     <link rel="stylesheet" href="styles.css">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        .features-section {
+            padding: 2rem;
+            margin-top: 80px;
+            background: linear-gradient(135deg, #1A1A2E 0%, #16213e 100%);
+            min-height: calc(100vh - 80px);
+        }
+        
+        .features-container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .features-hero {
+            text-align: center;
+            margin-bottom: 3rem;
+            padding: 2rem;
+            background: linear-gradient(135deg, #16213e 0%, #1A1A2E 100%);
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+            border: 2px solid #334155;
+        }
+        
+        .features-hero h1 {
+            color: #8b5cf6;
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            text-shadow: 0 4px 8px rgba(139, 92, 246, 0.3);
+        }
+        
+        .features-hero p {
+            color: #cbd5e1;
+            font-size: 1.2rem;
+            line-height: 1.6;
+            max-width: 700px;
+            margin: 0 auto;
+        }
+        
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 2rem;
+            margin-bottom: 3rem;
+        }
+        
+        .feature-card {
+            background: linear-gradient(135deg, #16213e 0%, #1A1A2E 100%);
+            border-radius: 20px;
+            padding: 2rem;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+            border: 2px solid #334155;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .feature-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #8b5cf6, #6366f1, #8b5cf6);
+            background-size: 200% 100%;
+            animation: shimmer 3s ease-in-out infinite;
+        }
+        
+        @keyframes shimmer {
+            0% { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
+        }
+        
+        .feature-card:hover {
+            transform: translateY(-8px);
+            border-color: #8b5cf6;
+            box-shadow: 0 30px 80px rgba(139, 92, 246, 0.3);
+        }
+        
+        .feature-card h3 {
+            color: #8b5cf6;
+            font-size: 1.6rem;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+        }
+        
+        .feature-card h3 i {
+            margin-right: 0.8rem;
+            font-size: 1.8rem;
+            background: linear-gradient(135deg, #8b5cf6, #6366f1);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .feature-card p {
+            color: #e2e8f0;
+            line-height: 1.7;
+            margin-bottom: 1rem;
+        }
+        
+        .feature-card ul {
+            color: #cbd5e1;
+            line-height: 1.6;
+            padding-left: 1.5rem;
+        }
+        
+        .feature-card li {
+            margin-bottom: 0.5rem;
+        }
+        
+        .feature-card .feature-badge {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            background: linear-gradient(135deg, #8b5cf6, #6366f1);
+            color: white;
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+        
+        .platforms-section {
+            background: linear-gradient(135deg, #16213e 0%, #1A1A2E 100%);
+            border-radius: 20px;
+            padding: 2rem;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+            border: 2px solid #334155;
+            margin-bottom: 3rem;
+        }
+        
+        .platforms-section h2 {
+            color: #8b5cf6;
+            font-size: 2.2rem;
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+        
+        .platforms-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+        }
+        
+        .platform-item {
+            text-align: center;
+            padding: 1.5rem;
+            background: linear-gradient(135deg, #334155 0%, #475569 100%);
+            border-radius: 15px;
+            border: 1px solid #475569;
+            transition: all 0.3s ease;
+        }
+        
+        .platform-item:hover {
+            transform: translateY(-3px);
+            border-color: #8b5cf6;
+            box-shadow: 0 10px 30px rgba(139, 92, 246, 0.2);
+        }
+        
+        .platform-item i {
+            font-size: 2.5rem;
+            color: #8b5cf6;
+            margin-bottom: 1rem;
+        }
+        
+        .platform-item h4 {
+            color: #f1f5f9;
+            font-size: 1.2rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .platform-item p {
+            color: #cbd5e1;
+            font-size: 0.9rem;
+        }
+        
+        .security-section {
+            background: linear-gradient(135deg, #16213e 0%, #1A1A2E 100%);
+            border-radius: 20px;
+            padding: 2rem;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+            border: 2px solid #334155;
+            margin-bottom: 3rem;
+        }
+        
+        .security-section h2 {
+            color: #8b5cf6;
+            font-size: 2.2rem;
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+        
+        .security-features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+        }
+        
+        .security-item {
+            display: flex;
+            align-items: center;
+            padding: 1rem;
+            background: linear-gradient(135deg, #334155 0%, #475569 100%);
+            border-radius: 12px;
+            border: 1px solid #475569;
+        }
+        
+        .security-item i {
+            font-size: 1.5rem;
+            color: #10b981;
+            margin-right: 1rem;
+            width: 30px;
+            text-align: center;
+        }
+        
+        .security-item span {
+            color: #e2e8f0;
+            font-weight: 500;
+        }
+        
+        .cta-section {
+            text-align: center;
+            background: linear-gradient(135deg, #8b5cf6 0%, #6366f1 100%);
+            border-radius: 20px;
+            padding: 3rem 2rem;
+            box-shadow: 0 20px 60px rgba(139, 92, 246, 0.4);
+            border: 2px solid #8b5cf6;
+        }
+        
+        .cta-section h2 {
+            color: white;
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        }
+        
+        .cta-section p {
+            color: #e2e8f0;
+            font-size: 1.2rem;
+            margin-bottom: 2rem;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        
+        .cta-buttons {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        
+        .cta-btn {
+            padding: 1rem 2rem;
+            background: white;
+            color: #8b5cf6;
+            text-decoration: none;
+            border-radius: 10px;
+            font-weight: 600;
+            font-size: 1.1rem;
+            transition: all 0.3s ease;
+            border: 2px solid white;
+        }
+        
+        .cta-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+        
+        .cta-btn.outline {
+            background: transparent;
+            color: white;
+            border-color: white;
+        }
+        
+        .cta-btn.outline:hover {
+            background: white;
+            color: #8b5cf6;
+        }
+        
+        @media (max-width: 768px) {
+            .features-section {
+                padding: 1rem;
+                margin-top: 70px;
+            }
+            
+            .features-hero h1 {
+                font-size: 2.5rem;
+            }
+            
+            .features-grid {
+                grid-template-columns: 1fr;
+                gap: 1.5rem;
+            }
+            
+            .platforms-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .security-features {
+                grid-template-columns: 1fr;
+            }
+            
+            .cta-section h2 {
+                font-size: 2rem;
+            }
+            
+            .cta-buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .features-hero h1 {
+                font-size: 2rem;
+            }
+            
+            .platforms-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .cta-section h2 {
+                font-size: 1.8rem;
+            }
+        }
+    </style>
 </head>
 <body>
     <!-- Header -->
@@ -18,15 +350,19 @@
                 <li><a href="index.html" class="nav-link">Home</a></li>
                 <li><a href="all-products.html" class="nav-link">Products</a></li>
                 <li><a href="index.html#latest-purchases" class="nav-link">Recent</a></li>
-                <li><a href="features.html" class="nav-link active">Features</a></li>
+                <li><a href="features.html" class="nav-link">Features</a></li>
             </ul>
             <div class="nav-cart">
                 <a href="cart.html">
-                <i class="fas fa-shopping-cart"></i>
-                <span class="cart-count">0</span>
+                    <i class="fas fa-shopping-cart"></i>
+                    <span class="cart-count">0</span>
                 </a>
             </div>
-            <div class="hamburger">
+            <div class="nav-auth">
+                <a href="login.html" class="nav-link">Login</a>
+                <a href="register.html" class="nav-link">Register</a>
+            </div>
+            <div class="hamburger" aria-label="Menu" role="button" tabindex="0">
                 <span class="bar"></span>
                 <span class="bar"></span>
                 <span class="bar"></span>
@@ -34,92 +370,195 @@
         </nav>
     </header>
 
-    <!-- Features Hero Section -->
-    <section class="features-hero">
-        <div class="features-hero-content">
-            <h1 class="features-hero-title">Why Choose CGAPH?</h1>
-            <p class="features-hero-subtitle">Discover what makes us the preferred choice for digital gaming and entertainment services</p>
-        </div>
-    </section>
-
     <!-- Features Section -->
-    <section id="features" class="features">
+    <section class="features-section">
         <div class="features-container">
+            <!-- Hero Section -->
+            <div class="features-hero">
+                <h1><i class="fas fa-star"></i> Platform Features</h1>
+                <p>Discover the powerful features that make CGAPH the ultimate digital gaming platform. From instant delivery to enterprise-grade security, we've got everything you need.</p>
+            </div>
+            
+            <!-- Core Features Grid -->
             <div class="features-grid">
-                <div class="feature">
-                    <div class="feature-icon">
-                        <i class="fas fa-bolt"></i>
-                    </div>
-                    <h3>Instant Delivery</h3>
-                    <p>Get your codes instantly via email. No waiting, no delays - your digital content is delivered immediately after payment confirmation.</p>
+                <div class="feature-card">
+                    <div class="feature-badge">Core</div>
+                    <h3><i class="fas fa-bolt"></i> Instant Digital Delivery</h3>
+                    <p>Experience lightning-fast delivery of all digital products. No more waiting - get your gaming top-ups, gift cards, and subscriptions instantly.</p>
+                    <ul>
+                        <li>Email delivery within seconds</li>
+                        <li>Automated processing system</li>
+                        <li>24/7 availability</li>
+                        <li>Real-time order tracking</li>
+                    </ul>
                 </div>
                 
-                <div class="feature">
-                    <div class="feature-icon">
-                        <i class="fas fa-shield-alt"></i>
-                    </div>
-                    <h3>Secure Payment</h3>
-                    <p>100% secure payment processing with multiple payment options including eSewa, Khalti, and IME Pay. Your financial information is always protected.</p>
+                <div class="feature-card">
+                    <div class="feature-badge">Core</div>
+                    <h3><i class="fas fa-shield-alt"></i> Enterprise Security</h3>
+                    <p>Your security is our top priority. We implement industry-leading security measures to protect your data and transactions.</p>
+                    <ul>
+                        <li>SSL encryption (256-bit)</li>
+                        <li>PCI DSS compliance</li>
+                        <li>Secure payment gateways</li>
+                        <li>Regular security audits</li>
+                    </ul>
                 </div>
                 
-                <div class="feature">
-                    <div class="feature-icon">
-                        <i class="fas fa-headset"></i>
-                    </div>
-                    <h3>24/7 Support</h3>
-                    <p>Round the clock customer support. Our dedicated team is always available to help you with any questions or issues.</p>
+                <div class="feature-card">
+                    <div class="feature-badge">Core</div>
+                    <h3><i class="fas fa-headset"></i> 24/7 Customer Support</h3>
+                    <p>Our dedicated support team is available around the clock to assist you with any questions or issues.</p>
+                    <ul>
+                        <li>Live chat support</li>
+                        <li>Email assistance</li>
+                        <li>Phone support</li>
+                        <li>Social media help</li>
+                    </ul>
                 </div>
                 
-                <div class="feature">
-                    <div class="feature-icon">
-                        <i class="fas fa-globe"></i>
-                    </div>
-                    <h3>Global Service</h3>
-                    <p>Available worldwide. We serve customers from all corners of the globe with our comprehensive digital services.</p>
+                <div class="feature-card">
+                    <div class="feature-badge">Core</div>
+                    <h3><i class="fas fa-credit-card"></i> Multiple Payment Options</h3>
+                    <p>We offer a wide range of payment methods to suit your preferences and ensure convenient transactions.</p>
+                    <ul>
+                        <li>Credit/Debit cards</li>
+                        <li>Digital wallets</li>
+                        <li>Bank transfers</li>
+                        <li>Mobile payments</li>
+                    </ul>
                 </div>
                 
-                <div class="feature">
-                    <div class="feature-icon">
-                        <i class="fas fa-mobile-alt"></i>
-                    </div>
-                    <h3>Mobile Friendly</h3>
-                    <p>Fully responsive design that works perfectly on all devices. Shop from your phone, tablet, or desktop with ease.</p>
+                <div class="feature-card">
+                    <div class="feature-badge">Premium</div>
+                    <h3><i class="fas fa-globe"></i> Global Product Access</h3>
+                    <p>Access digital products from around the world, all available in one convenient platform with localized pricing.</p>
+                    <ul>
+                        <li>International gaming top-ups</li>
+                        <li>Global gift cards</li>
+                        <li>Multi-region support</li>
+                        <li>Localized pricing</li>
+                    </ul>
                 </div>
                 
-                <div class="feature">
-                    <div class="feature-icon">
-                        <i class="fas fa-tags"></i>
-                    </div>
-                    <h3>Best Prices</h3>
-                    <p>Competitive pricing on all our services. We offer the best value for your money without compromising on quality.</p>
+                <div class="feature-card">
+                    <div class="feature-badge">Premium</div>
+                    <h3><i class="fas fa-chart-line"></i> Advanced Analytics</h3>
+                    <p>Track your gaming spending, analyze patterns, and manage your digital entertainment budget effectively.</p>
+                    <ul>
+                        <li>Purchase history</li>
+                        <li>Spending analytics</li>
+                        <li>Budget tracking</li>
+                        <li>Usage reports</li>
+                    </ul>
                 </div>
             </div>
-        </div>
-    </section>
-
-    <!-- CTA Section -->
-    <section class="features-cta">
-        <div class="cta-content">
-            <h2>Ready to Experience CGAPH?</h2>
-            <p>Join thousands of satisfied customers who trust us for their digital gaming and entertainment needs.</p>
-            <div class="cta-buttons">
-                <a href="all-products.html" class="cta-btn primary">Shop Now</a>
-                <a href="register.html" class="cta-btn secondary">Create Account</a>
+            
+            <!-- Supported Platforms -->
+            <div class="platforms-section">
+                <h2><i class="fas fa-gamepad"></i> Supported Gaming Platforms</h2>
+                <div class="platforms-grid">
+                    <div class="platform-item">
+                        <i class="fas fa-mobile-alt"></i>
+                        <h4>Mobile Games</h4>
+                        <p>Free Fire, PUBG Mobile, Mobile Legends, and more</p>
+                    </div>
+                    <div class="platform-item">
+                        <i class="fas fa-desktop"></i>
+                        <h4>PC Games</h4>
+                        <p>Steam, Epic Games, Origin, and other PC platforms</p>
+                    </div>
+                    <div class="platform-item">
+                        <i class="fas fa-tv"></i>
+                        <h4>Console Games</h4>
+                        <p>PlayStation, Xbox, Nintendo Switch</p>
+                    </div>
+                    <div class="platform-item">
+                        <i class="fas fa-gift"></i>
+                        <h4>Gift Cards</h4>
+                        <p>Google Play, Apple App Store, Amazon, and more</p>
+                    </div>
+                    <div class="platform-item">
+                        <i class="fas fa-play"></i>
+                        <h4>Streaming Services</h4>
+                        <p>Netflix, Spotify, YouTube Premium, and others</p>
+                    </div>
+                    <div class="platform-item">
+                        <i class="fas fa-download"></i>
+                        <h4>Software & Apps</h4>
+                        <p>Microsoft Office, Adobe Creative Suite, and more</p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Security Features -->
+            <div class="security-section">
+                <h2><i class="fas fa-lock"></i> Security & Trust Features</h2>
+                <div class="security-features">
+                    <div class="security-item">
+                        <i class="fas fa-check-circle"></i>
+                        <span>SSL/TLS Encryption</span>
+                    </div>
+                    <div class="security-item">
+                        <i class="fas fa-check-circle"></i>
+                        <span>PCI DSS Compliance</span>
+                    </div>
+                    <div class="security-item">
+                        <i class="fas fa-check-circle"></i>
+                        <span>Two-Factor Authentication</span>
+                    </div>
+                    <div class="security-item">
+                        <i class="fas fa-check-circle"></i>
+                        <span>Secure Payment Processing</span>
+                    </div>
+                    <div class="security-item">
+                        <i class="fas fa-check-circle"></i>
+                        <span>Data Encryption at Rest</span>
+                    </div>
+                    <div class="security-item">
+                        <i class="fas fa-check-circle"></i>
+                        <span>Regular Security Audits</span>
+                    </div>
+                    <div class="security-item">
+                        <i class="fas fa-check-circle"></i>
+                        <span>Fraud Detection System</span>
+                    </div>
+                    <div class="security-item">
+                        <i class="fas fa-check-circle"></i>
+                        <span>Secure API Access</span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Call to Action -->
+            <div class="cta-section">
+                <h2>Ready to Experience These Features?</h2>
+                <p>Join thousands of satisfied customers who are already enjoying the benefits of our advanced platform features.</p>
+                <div class="cta-buttons">
+                    <a href="all-products.html" class="cta-btn">
+                        <i class="fas fa-shopping-cart"></i>
+                        Start Shopping
+                    </a>
+                    <a href="contact.html" class="cta-btn outline">
+                        <i class="fas fa-envelope"></i>
+                        Get Support
+                    </a>
+                </div>
             </div>
         </div>
     </section>
 
     <!-- Footer -->
-    <footer id="contact" class="footer">
+    <footer class="footer">
         <div class="footer-content">
             <div class="footer-section">
-                <h3>CGAPH</h3>
-                <p>Your trusted source for digital gaming and entertainment content.</p>
+                <h4>CGAPH</h4>
+                <p>Your trusted partner for digital products and gaming solutions in Nepal.</p>
                 <div class="social-links">
                     <a href="https://www.facebook.com/profile.php?id=61579288196935" target="_blank" rel="noopener" aria-label="Facebook"><i class="fab fa-facebook"></i></a>
-                    <a href="#" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
-                    <a href="#" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
-                    <a href="#" aria-label="Discord"><i class="fab fa-discord"></i></a>
+                    <a href="https://www.youtube.com/@cgaph" target="_blank" rel="noopener" aria-label="YouTube"><i class="fab fa-youtube"></i></a>
+                    <a href="https://www.tiktok.com/@cgaph?is_from_webapp=1&sender_device=pc" target="_blank" rel="noopener" aria-label="TikTok"><i class="fab fa-tiktok"></i></a>
+                    <a href="https://discord.gg/xfYVjDW3Bc" target="_blank" rel="noopener" aria-label="Discord"><i class="fab fa-discord"></i></a>
                 </div>
             </div>
             <div class="footer-section">
@@ -152,9 +591,7 @@
         </div>
     </footer>
 
-    <script type="module" src="./toast.js"></script>
+    
     <script type="module" src="./cart.js"></script>
-    <script type="module" src="./scroll-animations.js"></script>
-    <script type="module" src="./loading.js"></script>
 </body>
 </html>

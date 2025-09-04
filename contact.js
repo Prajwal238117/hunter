@@ -29,7 +29,6 @@ document.addEventListener('DOMContentLoaded', function() {
         contactForm.reset();
         
       } catch (error) {
-        console.error('Error sending message:', error);
         showToast('Sorry, there was an error sending your message. Please try again.', 'error');
       }
     });

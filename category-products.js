@@ -17,7 +17,6 @@ class CategoryProducts {
                 this.loadCategoryProducts('subscription', this.subscriptionList)
             ]);
         } catch (error) {
-            console.error('Error initializing category products:', error);
             this.showError();
         }
     }
@@ -31,7 +30,7 @@ class CategoryProducts {
             const productsRef = collection(db, 'products');
             let q;
             
-            console.log(`Loading products for category: ${category}`);
+    
             
             // Try to get products by category first
             try {
@@ -41,13 +40,12 @@ class CategoryProducts {
                 querySnapshot.forEach((doc) => {
                     const productData = { id: doc.id, ...doc.data() };
                     products.push(productData);
-                    console.log(`Found product: ${productData.name} (${productData.category})`);
+    
                 });
                 
-                console.log(`Found ${products.length} products with category '${category}'`);
-            } catch (categoryError) {
-                console.log(`Error loading products with category ${category}:`, categoryError);
-            }
+                        } catch (categoryError) {
+            // Error loading products with category
+        }
             
             // Sort products by priority and sales count
             if (products.length > 0) {
@@ -63,23 +61,21 @@ class CategoryProducts {
                 
                 // Limit to top 6 products after sorting
                 products = products.slice(0, 6);
-                console.log(`Sorted and limited to top 6 products for ${category}`);
+    
             }
             
             // If no products found by category, try to get by tags or other fields
             if (products.length === 0) {
-                console.log(`No products found with category '${category}', trying keyword matching...`);
+    
                 try {
                     q = query(productsRef, orderBy('createdAt', 'desc'), limit(20));
                     const querySnapshot = await getDocs(q);
                     
                     querySnapshot.forEach((doc) => {
                         const productData = { id: doc.id, ...doc.data() };
-                        console.log(`Checking product: ${productData.name}`, productData);
                         // Filter by category-related keywords
                         if (this.matchesCategory(productData, category)) {
                             products.push(productData);
-                            console.log(`Matched product: ${productData.name} (${productData.category})`);
                         }
                     });
                     
@@ -97,16 +93,15 @@ class CategoryProducts {
                         
                         // Limit to top 6 products after sorting
                         products = products.slice(0, 6);
-                        console.log(`Sorted and limited to top 6 products for ${category} (fallback)`);
-                    }
-                } catch (error) {
-                    console.log('Error loading products:', error);
-                }
+                                        // Sorted and limited to top 6 products for category (fallback)
+            }
+        } catch (error) {
+            // Error loading products
+        }
             }
             
             this.displayCategoryProducts(products, productsList, category);
         } catch (error) {
-            console.error(`Error loading ${category} products:`, error);
             this.displayCategoryProducts([], productsList, category);
         }
     }
@@ -183,11 +178,8 @@ class CategoryProducts {
         
         // Trigger marquee after content is loaded
         setTimeout(() => {
-            console.log('Category products loaded, triggering marquee...');
             if (window.triggerMarquee) {
                 window.triggerMarquee();
-            } else {
-                console.log('triggerMarquee function not found!');
             }
         }, 200);
     }

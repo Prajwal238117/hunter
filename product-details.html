@@ -93,18 +93,15 @@
     </header>
 
 
+<!-- Breadcrumb -->
 
+            
 
 
     <!-- Product Details Section -->
 
     <section class="product-details-section">
-
-        <div class="product-container">
-
-            <!-- Breadcrumb -->
-
-            <div class="breadcrumb">
+<div class="breadcrumb">
 
                 <a href="index.html">Home</a>
 
@@ -115,6 +112,9 @@
 
                 <span>Product</span>
             </div>
+        <div class="product-container">
+
+            
 
 
 
@@ -177,31 +177,9 @@
 
                         <h3>Select Amount</h3>
 
-                        <!-- Modern Select Dropdown -->
-                        <div class="variant-selector">
-                            <div class="select-wrapper" onclick="openVariantModal()">
-                                <div class="select-display">
-                                    <span class="select-text">Choose your amount</span>
-                                    <i class="fas fa-chevron-down select-arrow"></i>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Variant Selection Modal -->
-                        <div id="variantModal" class="variant-modal">
-                            <div class="variant-modal-content">
-                                <div class="modal-header">
-                                    <h3>Select Amount</h3>
-                                    <button class="modal-close" onclick="closeVariantModal()">
-                                        <i class="fas fa-times"></i>
-                                    </button>
-                                </div>
-                                <div class="modal-body">
-                                    <div class="variant-grid-modal">
-                                        <!-- Product variants will be loaded here -->
-                                    </div>
-                                </div>
-                            </div>
+                        <!-- Direct Variant Grid (No Modal) -->
+                        <div class="variant-grid-direct">
+                            <!-- Product variants will be loaded here directly -->
                         </div>
 
                     </div>
@@ -365,9 +343,9 @@
                 <p>Your trusted source for digital gaming and entertainment content.</p>
                 <div class="social-links">
                     <a href="https://www.facebook.com/profile.php?id=61579288196935" target="_blank" rel="noopener" aria-label="Facebook"><i class="fab fa-facebook"></i></a>
-                    <a href="#" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
-                    <a href="#" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
-                    <a href="#" aria-label="Discord"><i class="fab fa-discord"></i></a>
+                    <a href="https://www.youtube.com/@cgaph" target="_blank" rel="noopener" aria-label="YouTube"><i class="fab fa-youtube"></i></a>
+                    <a href="https://www.tiktok.com/@cgaph?is_from_webapp=1&sender_device=pc" target="_blank" rel="noopener" aria-label="TikTok"><i class="fab fa-tiktok"></i></a>
+                    <a href="https://discord.gg/xfYVjDW3Bc" target="_blank" rel="noopener" aria-label="Discord"><i class="fab fa-discord"></i></a>
                 </div>
             </div>
             <div class="footer-section">
@@ -431,34 +409,6 @@
     <script type="module" src="./products.js"></script>
     <script type="module" src="./loading.js"></script>
     
-    <!-- Modal Control Scripts -->
-    <script>
-        // Modal Control Functions
-        function openVariantModal() {
-            document.getElementById('variantModal').style.display = 'block';
-            document.body.style.overflow = 'hidden'; // Prevent background scrolling
-        }
-        
-        function closeVariantModal() {
-            document.getElementById('variantModal').style.display = 'none';
-            document.body.style.overflow = 'auto'; // Restore scrolling
-        }
-        
-        // Close modal when clicking outside
-        window.onclick = function(event) {
-            const modal = document.getElementById('variantModal');
-            if (event.target === modal) {
-                closeVariantModal();
-            }
-        }
-        
-        // Close modal with Escape key
-        document.addEventListener('keydown', function(event) {
-            if (event.key === 'Escape') {
-                closeVariantModal();
-            }
-        });
-    </script>
 </body>
 
 </html>

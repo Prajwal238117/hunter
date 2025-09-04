@@ -1,132 +1,301 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Terms of Service - CGAPH</title>
-  <link rel="stylesheet" href="styles.css" />
-  <link rel="stylesheet" href="pages-styles.css" />
-  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Terms of Service - CGAPH</title>
+    <meta name="description" content="Terms of Service for CGAPH - Read our terms and conditions for using our services.">
+    <link rel="icon" type="image/png" sizes="32x32" href="logo.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="logo.png">
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        .terms-section {
+            padding: 2rem;
+            margin-top: 80px;
+            background: linear-gradient(135deg, #1A1A2E 0%, #16213e 100%);
+            min-height: calc(100vh - 80px);
+        }
+        
+        .terms-container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: linear-gradient(135deg, #16213e 0%, #1A1A2E 100%);
+            border-radius: 20px;
+            padding: 2rem;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+            border: 2px solid #334155;
+        }
+        
+        .terms-header {
+            text-align: center;
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid #475569;
+        }
+        
+        .terms-header h1 {
+            color: #8b5cf6;
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            text-shadow: 0 4px 8px rgba(139, 92, 246, 0.3);
+        }
+        
+        .terms-header p {
+            color: #cbd5e1;
+            font-size: 1.1rem;
+        }
+        
+        .terms-content {
+            color: #e2e8f0;
+            line-height: 1.8;
+        }
+        
+        .terms-content h2 {
+            color: #8b5cf6;
+            font-size: 1.8rem;
+            margin: 2rem 0 1rem 0;
+            border-left: 4px solid #8b5cf6;
+            padding-left: 1rem;
+        }
+        
+        .terms-content h3 {
+            color: #6366f1;
+            font-size: 1.4rem;
+            margin: 1.5rem 0 0.8rem 0;
+        }
+        
+        .terms-content p {
+            margin-bottom: 1rem;
+            text-align: justify;
+        }
+        
+        .terms-content ul {
+            margin: 1rem 0;
+            padding-left: 2rem;
+        }
+        
+        .terms-content li {
+            margin-bottom: 0.5rem;
+        }
+        
+        .terms-content strong {
+            color: #fbbf24;
+        }
+        
+        .terms-content a {
+            color: #8b5cf6;
+            text-decoration: none;
+            border-bottom: 1px solid #8b5cf6;
+        }
+        
+        .terms-content a:hover {
+            color: #6366f1;
+            border-bottom-color: #6366f1;
+        }
+        
+        .last-updated {
+            background: linear-gradient(135deg, #8b5cf6 0%, #6366f1 100%);
+            color: white;
+            padding: 1rem;
+            border-radius: 10px;
+            margin-top: 2rem;
+            text-align: center;
+            font-weight: 600;
+        }
+        
+        @media (max-width: 768px) {
+            .terms-section {
+                padding: 1rem;
+                margin-top: 70px;
+            }
+            
+            .terms-container {
+                padding: 1.5rem;
+            }
+            
+            .terms-header h1 {
+                font-size: 2rem;
+            }
+            
+            .terms-content h2 {
+                font-size: 1.5rem;
+            }
+            
+            .terms-content h3 {
+                font-size: 1.2rem;
+            }
+        }
+    </style>
 </head>
 <body>
-  <header class="header">
-    <nav class="navbar">
-      <div class="nav-brand">
-        <i class="fas fa-gamepad"></i>
-         <span>CGAPH</span>
-      </div>
-      <ul class="nav-menu">
-        <li><a href="index.html" class="nav-link">Home</a></li>
-        <li><a href="all-products.html" class="nav-link">Products</a></li>
-        <li><a href="index.html#latest-purchases" class="nav-link">Recent</a></li>
-        <li><a href="features.html" class="nav-link">Features</a></li>
-      </ul>
-      <div class="nav-cart">
-        <a href="cart.html">
-          <i class="fas fa-shopping-cart"></i>
-          <span class="cart-count">0</span>
-        </a>
-      </div>
-      <div class="nav-auth">
-        <a href="login.html" class="nav-link">Login</a>
-        <a href="register.html" class="nav-link">Register</a>
-      </div>
-      <div class="hamburger">
-        <span class="bar"></span>
-        <span class="bar"></span>
-        <span class="bar"></span>
-      </div>
-    </nav>
-  </header>
+    <!-- Header -->
+    <header class="header">
+        <nav class="navbar">
+            <div class="nav-brand">
+                <img src="logo.png" alt="CGAPH Logo" class="nav-logo">
+            </div>
+            <ul class="nav-menu">
+                <li><a href="index.html" class="nav-link">Home</a></li>
+                <li><a href="all-products.html" class="nav-link">Products</a></li>
+                <li><a href="index.html#latest-purchases" class="nav-link">Recent</a></li>
+                <li><a href="features.html" class="nav-link">Features</a></li>
+            </ul>
+            <div class="nav-cart">
+                <a href="cart.html">
+                    <i class="fas fa-shopping-cart"></i>
+                    <span class="cart-count">0</span>
+                </a>
+            </div>
+            <div class="nav-auth">
+                <a href="login.html" class="nav-link">Login</a>
+                <a href="register.html" class="nav-link">Register</a>
+            </div>
+            <div class="hamburger" aria-label="Menu" role="button" tabindex="0">
+                <span class="bar"></span>
+                <span class="bar"></span>
+                <span class="bar"></span>
+            </div>
+        </nav>
+    </header>
 
-  <section class="page-hero">
-    <div class="page-hero-inner">
-      <h1>Terms of Service</h1>
-      <p>Last updated: April 2025</p>
-    </div>
-  </section>
-
-  <main class="page-container">
-    <article class="content-card policy-section">
-      <h2>1. Introduction</h2>
-       <p>Welcome to CGAPH. These Terms of Service ("Terms") govern your access to and use of our website, products, and services. By using CGAPH, you agree to these Terms.</p>
-
-      <h2>2. Accounts</h2>
-      <p>You are responsible for safeguarding your account credentials and for any activities under your account. You must notify us immediately of any unauthorized use.</p>
-
-      <h2>3. Digital Items</h2>
-      <p>All products sold are digital goods. Delivery is typically instant via email. Some purchases may require additional verification to protect against fraud.</p>
-
-      <h2>4. Payments</h2>
-      <p>By submitting a payment, you represent that you are authorized to use the selected payment method. All prices are displayed in USD unless otherwise stated.</p>
-
-      <h2>5. Refunds</h2>
-      <p>Refunds are governed by our <a href="refund.html">Refund Policy</a>. Certain products may not be eligible for refunds once a code is revealed or redeemed.</p>
-
-      <h2>6. Acceptable Use</h2>
-      <ul>
-        <li>Do not attempt to access other users' accounts</li>
-        <li>Do not interfere with the operation of our website</li>
-        <li>Do not engage in fraudulent or illegal activities</li>
-      </ul>
-
-      <h2>7. Intellectual Property</h2>
-       <p>All content, trademarks, and logos on CGAPH are owned by CGAPH or its licensors and are protected by applicable laws.</p>
-
-      <h2>8. Limitation of Liability</h2>
-       <p>CGAPH is not liable for any indirect, incidental, special, or consequential damages arising from your use of the site or products.</p>
-
-      <h2>9. Changes to Terms</h2>
-       <p>We may update these Terms from time to time. Your continued use of CGAPH after changes indicates acceptance of the updated Terms.</p>
-
-      <h2>10. Contact Us</h2>
-                              <p>If you have any questions about these Terms, please contact us at <a href="mailto:support@cgaph.com">support@cgaph.com</a>.</p>
-    </article>
-  </main>
-
-    <footer class="footer">
-    <div class="footer-content">
-      <div class="footer-section">
-        <h3>CGAPH</h3>
-        <p>Your trusted source for digital gaming and entertainment content.</p>
-        <div class="social-links">
-          <a href="https://www.facebook.com/profile.php?id=61579288196935" target="_blank" rel="noopener" aria-label="Facebook"><i class="fab fa-facebook"></i></a>
-          <a href="#" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
-          <a href="#" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
-          <a href="#" aria-label="Discord"><i class="fab fa-discord"></i></a>
+    <!-- Terms of Service Section -->
+    <section class="terms-section">
+        <div class="terms-container">
+            <div class="terms-header">
+                <h1><i class="fas fa-gavel"></i> Terms of Service</h1>
+                <p>Please read these terms carefully before using our services.</p>
+            </div>
+            
+            <div class="terms-content">
+                <h2>1. Acceptance of Terms</h2>
+                <p>By accessing and using CGAPH's website and services, you accept and agree to be bound by the terms and provision of this agreement. If you do not agree to abide by the above, please do not use this service.</p>
+                
+                <h2>2. Description of Service</h2>
+                <p>CGAPH provides digital gaming products, gift cards, and subscription services. Our platform facilitates the purchase and delivery of digital content to customers in Nepal and other supported regions.</p>
+                
+                <h3>Services Include:</h3>
+                <ul>
+                    <li><strong>Digital Products:</strong> Game top-ups, gift cards, and subscriptions</li>
+                    <li><strong>Payment Processing:</strong> Secure payment gateway integration</li>
+                    <li><strong>Customer Support:</strong> 24/7 assistance and technical help</li>
+                    <li><strong>Instant Delivery:</strong> Email-based digital product delivery</li>
+                </ul>
+                
+                <h2>3. User Accounts</h2>
+                <p>To access certain features of our service, you may be required to create an account. You are responsible for:</p>
+                <ul>
+                    <li>Maintaining the confidentiality of your account credentials</li>
+                    <li>All activities that occur under your account</li>
+                    <li>Providing accurate and current information</li>
+                    <li>Notifying us immediately of any unauthorized use</li>
+                </ul>
+                
+                <h2>4. Payment Terms</h2>
+                <p>All purchases are final and non-refundable unless otherwise specified in our <a href="refund.html">Refund Policy</a>. Payment must be made in full at the time of purchase.</p>
+                
+                <h3>Payment Methods:</h3>
+                <ul>
+                    <li>Credit/Debit cards</li>
+                    <li>Digital wallets</li>
+                    <li>Bank transfers</li>
+                    <li>Mobile payment solutions</li>
+                </ul>
+                
+                <h2>5. Product Delivery</h2>
+                <p>Digital products are delivered instantly via email upon successful payment confirmation. Physical products (if any) will be shipped according to our shipping policy.</p>
+                
+                <h2>6. Prohibited Activities</h2>
+                <p>You agree not to:</p>
+                <ul>
+                    <li>Use our services for any illegal or unauthorized purpose</li>
+                    <li>Attempt to gain unauthorized access to our systems</li>
+                    <li>Interfere with or disrupt our services</li>
+                    <li>Use our services to harm others or their property</li>
+                    <li>Violate any applicable laws or regulations</li>
+                </ul>
+                
+                <h2>7. Intellectual Property</h2>
+                <p>All content on this website, including text, graphics, logos, and software, is the property of CGAPH and is protected by copyright and other intellectual property laws.</p>
+                
+                <h2>8. Privacy and Data Protection</h2>
+                <p>Your privacy is important to us. Please review our <a href="privacy.html">Privacy Policy</a>, which also governs your use of the service, to understand our practices.</p>
+                
+                <h2>9. Limitation of Liability</h2>
+                <p>CGAPH shall not be liable for any indirect, incidental, special, consequential, or punitive damages, including but not limited to loss of profits, data, or use, incurred by you or any third party.</p>
+                
+                <h2>10. Service Availability</h2>
+                <p>We strive to maintain high service availability but do not guarantee uninterrupted access. We reserve the right to modify, suspend, or discontinue any part of our service at any time.</p>
+                
+                <h2>11. Termination</h2>
+                <p>We may terminate or suspend your account and access to our services immediately, without prior notice, for any reason, including breach of these Terms of Service.</p>
+                
+                <h2>12. Changes to Terms</h2>
+                <p>We reserve the right to modify these terms at any time. Changes will be effective immediately upon posting. Your continued use of the service constitutes acceptance of the modified terms.</p>
+                
+                <h2>13. Governing Law</h2>
+                <p>These terms shall be governed by and construed in accordance with the laws of Nepal. Any disputes shall be resolved in the courts of Kathmandu, Nepal.</p>
+                
+                <h2>14. Contact Information</h2>
+                <p>If you have any questions about these Terms of Service, please contact us:</p>
+                <ul>
+                    <li><strong>Email:</strong> legal@cgaph.com</li>
+                    <li><strong>Phone:</strong> +977 9800745053</li>
+                    <li><strong>Address:</strong> Kathmandu, Nepal</li>
+                </ul>
+                
+                <div class="last-updated">
+                    <i class="fas fa-calendar-alt"></i>
+                    Last Updated: January 2024
+                </div>
+            </div>
         </div>
-      </div>
-      <div class="footer-section">
-        <h4>Quick Links</h4>
-        <ul>
-          <li><a href="index.html">Home</a></li>
-          <li><a href="all-products.html">Products</a></li>
-          <li><a href="about.html">About Us</a></li>
-          <li><a href="contact.html">Contact</a></li>
-        </ul>
-      </div>
-      <div class="footer-section">
-        <h4>Support</h4>
-        <ul>
-          <li><a href="privacy.html">Privacy Policy</a></li>
-          <li><a href="terms.html">Terms of Service</a></li>
-          <li><a href="refund.html">Refund Policy</a></li>
-          <li><a href="contact.html">Help Center</a></li>
-        </ul>
-      </div>
-      <div class="footer-section">
-        <h4>Contact Info</h4>
-        <p><i class="fas fa-envelope"></i> support@cgaph.com</p>
-        <p><i class="fas fa-phone"></i> +977 9800745053</p>
-        <p><i class="fas fa-map-marker-alt"></i> Kathmandu, Nepal</p>
-      </div>
-    </div>
-    <div class="footer-bottom">
-      <p>&copy; 2024 CGAPH. All rights reserved.</p>
-    </div>
-  </footer>
+    </section>
 
-  <script type="module" src="./cart.js"></script>
-  <script type="module" src="./loading.js"></script>
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-section">
+                <h4>CGAPH</h4>
+                <p>Your trusted partner for digital products and gaming solutions in Nepal.</p>
+                <div class="social-links">
+                    <a href="https://www.facebook.com/profile.php?id=61579288196935" target="_blank" rel="noopener" aria-label="Facebook"><i class="fab fa-facebook"></i></a>
+                    <a href="https://www.youtube.com/@cgaph" target="_blank" rel="noopener" aria-label="YouTube"><i class="fab fa-youtube"></i></a>
+                    <a href="https://www.tiktok.com/@cgaph?is_from_webapp=1&sender_device=pc" target="_blank" rel="noopener" aria-label="TikTok"><i class="fab fa-tiktok"></i></a>
+                    <a href="https://discord.gg/xfYVjDW3Bc" target="_blank" rel="noopener" aria-label="Discord"><i class="fab fa-discord"></i></a>
+                </div>
+            </div>
+            <div class="footer-section">
+                <h4>Quick Links</h4>
+                <ul>
+                    <li><a href="index.html">Home</a></li>
+                    <li><a href="all-products.html">Products</a></li>
+                    <li><a href="about.html">About Us</a></li>
+                    <li><a href="contact.html">Contact</a></li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h4>Support</h4>
+                <ul>
+                    <li><a href="privacy.html">Privacy Policy</a></li>
+                    <li><a href="terms.html">Terms of Service</a></li>
+                    <li><a href="refund.html">Refund Policy</a></li>
+                    <li><a href="contact.html">Help Center</a></li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h4>Contact Info</h4>
+                <p><i class="fas fa-envelope"></i> support@cgaph.com</p>
+                <p><i class="fas fa-phone"></i> +977 9800745053</p>
+                <p><i class="fas fa-map-marker-alt"></i> Kathmandu, Nepal</p>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2024 CGAPH. All rights reserved.</p>
+        </div>
+    </footer>
+
+   
+    <script type="module" src="./cart.js"></script>
 </body>
 </html>

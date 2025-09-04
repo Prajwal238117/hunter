@@ -11,7 +11,6 @@ class TopProducts {
         try {
             await this.loadTopProducts();
         } catch (error) {
-            console.error('Error initializing top products:', error);
             this.showError();
         }
     }
@@ -27,11 +26,11 @@ class TopProducts {
             
             querySnapshot.forEach((doc) => {
                 const productData = { id: doc.id, ...doc.data() };
-                console.log('Product data:', productData); // Debug log
+    
                 products.push(productData);
             });
         } catch (error) {
-            console.log('Error loading products with sales data:', error);
+            // Error loading products with sales data
         }
         
         // Priority 2: If no sales data, get top 10 by creation date
@@ -43,15 +42,15 @@ class TopProducts {
                 
                 querySnapshot.forEach((doc) => {
                     const productData = { id: doc.id, ...doc.data() };
-                    console.log('Product data (by date):', productData); // Debug log
+        
                     products.push(productData);
                 });
-            } catch (error) {
-                console.log('Error loading products:', error);
-            }
+                    } catch (error) {
+            // Error loading products
+        }
         }
         
-        console.log('Total products loaded:', products.length); // Debug log
+        
         this.displayProducts(products);
     }
 
@@ -92,7 +91,7 @@ class TopProducts {
         const isHot = salesCount > 10; // Mark as hot if more than 10 sales
         
         // Debug log to see what image data we have
-        console.log('Product:', name, 'Image URL:', imageUrl);
+        
 
         return `
             <div class="product-card compact" onclick="window.location.href='product-details.html?id=${product.id}'">

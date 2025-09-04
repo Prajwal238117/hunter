@@ -30,7 +30,7 @@ class ProductSearch {
                 ...doc.data()
             }));
         } catch (error) {
-            console.error('Error loading products for search:', error);
+            // Error loading products for search
         }
     }
 

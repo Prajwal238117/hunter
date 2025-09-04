@@ -32,9 +32,7 @@ class ProductManager {
                 });
             }
             
-            console.log('Products loaded:', this.products);
         } catch (error) {
-            console.error('Error loading products:', error);
             showToast('Error loading products', 'error');
         }
     }
@@ -50,7 +48,6 @@ class ProductManager {
             }
             return null;
         } catch (error) {
-            console.error('Error getting product:', error);
             return null;
         }
     }
@@ -61,7 +58,6 @@ class ProductManager {
             const imageRef = ref(storage, imagePath);
             return await getDownloadURL(imageRef);
         } catch (error) {
-            console.error('Error getting image URL:', error);
             return null;
         }
     }
@@ -114,8 +110,7 @@ class ProductManager {
             return;
         }
 
-        console.log('Product loaded for details:', product); // Debug log
-        console.log('Product extraFields:', product.extraFields); // Debug log
+
 
         this.currentProduct = product;
         this.selectedVariant = product.variants?.[0] || null;
@@ -315,40 +310,51 @@ class ProductManager {
     }
 
     displayVariants(variants) {
-        // Load variants in the modal grid instead of the old option-grid
-        const modalGrid = document.querySelector('.variant-grid-modal');
-        if (!modalGrid) return;
+        // Load variants in the direct grid instead of the modal grid
+        const directGrid = document.querySelector('.variant-grid-direct');
+        if (!directGrid) return;
 
         // Display variants in the order they were added (no sorting)
         const variantsHTML = variants.map((variant, index) => `
-            <div class="variant-card-modal" data-price="${variant.price}" data-variant-index="${index}">
-                <div class="variant-icon-modal">
-                    <i class="fas fa-coins"></i>
-                </div>
-                <div class="variant-label-modal">${variant.label || 'Option'}</div>
-                <div class="variant-price-modal">Rs ${variant.price}</div>
+            <div class="variant-card-direct" data-price="${variant.price}" data-variant-index="${index}">
+                <div class="variant-label-direct" data-variant-label="${variant.label || 'Option'}">${variant.label || 'Option'}</div>
+                <div class="variant-price-direct">Rs ${variant.price}</div>
             </div>
         `).join('');
 
-        modalGrid.innerHTML = variantsHTML;
+        directGrid.innerHTML = variantsHTML;
 
-        // Add click event listeners to variant options in modal
-        const variantCards = modalGrid.querySelectorAll('.variant-card-modal');
+        // Add click event listeners to variant options in direct grid
+        const variantCards = directGrid.querySelectorAll('.variant-card-direct');
         variantCards.forEach(card => {
             card.addEventListener('click', () => {
                 this.selectVariant(parseInt(card.dataset.variantIndex));
-                closeVariantModal(); // Close modal after selection
             });
+        });
+
+        // Apply marquee to long variant names after a short delay
+        setTimeout(() => {
+            this.applyMarqueeToVariants();
+        }, 100);
+    }
+
+    applyMarqueeToVariants() {
+        const variantLabels = document.querySelectorAll('.variant-label-direct');
+        variantLabels.forEach(label => {
+            // Check if text is overflowing
+            if (label.scrollWidth > label.offsetWidth) {
+                label.classList.add('marquee');
+            }
         });
     }
 
     selectVariant(variantIndex) {
-        // Remove active class from all options in modal
-        document.querySelectorAll('.variant-card-modal').forEach(card => {
+        // Remove active class from all options in direct grid
+        document.querySelectorAll('.variant-card-direct').forEach(card => {
             card.classList.remove('selected');
         });
 
-        // Add active class to selected option in modal
+        // Add active class to selected option in direct grid
         const selectedCard = document.querySelector(`[data-variant-index="${variantIndex}"]`);
         if (selectedCard) {
             selectedCard.classList.add('selected');
@@ -364,15 +370,9 @@ class ProductManager {
 
         const selectedAmount = document.querySelector('.selected-amount');
         const selectedPrice = document.querySelector('.selected-price');
-        const selectText = document.querySelector('.select-text');
 
         if (selectedAmount) selectedAmount.textContent = `${this.selectedVariant.label || 'Option'}`;
         if (selectedPrice) selectedPrice.textContent = `Rs ${this.selectedVariant.price}`;
-        
-        // Update the select dropdown text
-        if (selectText) {
-            selectText.textContent = `${this.selectedVariant.label || 'Option'} - Rs ${this.selectedVariant.price}`;
-        }
     }
 
     displayFeatures(features) {
@@ -391,7 +391,6 @@ class ProductManager {
         const extraContainer = document.getElementById('extraFieldsContainer');
         
         if (!extraWrap || !extraContainer) {
-            console.log('Missing extraFieldsSection or extraFieldsContainer elements!');
             return;
         }
 
@@ -408,7 +407,7 @@ class ProductManager {
             </div>
         `).join('');
         
-        console.log('Extra fields displayed:', extraFields);
+
     }
 
     validateExtraFields() {
@@ -494,8 +493,7 @@ class ProductManager {
             return;
         }
 
-        console.log('Adding to cart - currentProduct:', this.currentProduct); // Debug log
-        console.log('Adding to cart - extraFields:', this.currentProduct.extraFields); // Debug log
+
 
         // Collect extra field values from the product page
         const extraFieldsData = [];
@@ -522,7 +520,7 @@ class ProductManager {
             extraFields: extraFieldsData
         };
 
-        console.log('Cart item being added:', cartItem); // Debug log
+
 
         // Use the global cart instance if available
         if (window.cart) {
@@ -618,7 +616,6 @@ class ProductManager {
             const reviews = snap.docs.map(d => ({ id: d.id, ...d.data() }));
             this.renderReviews(reviews);
         } catch (err) {
-            console.error('Failed to load reviews', err);
             const list = document.getElementById('reviewsList');
             if (list) list.innerHTML = '<div class="muted">Failed to load reviews.</div>';
         }
@@ -704,7 +701,6 @@ class ProductManager {
             this.renderReviewSummary({ avg, total, all });
             return { avg, total };
         } catch (e) {
-            console.error('Failed to load review summary', e);
             this.renderReviewSummary({ avg: 0, total: 0, all: [] });
             return { avg: 0, total: 0 };
         }
@@ -754,10 +750,9 @@ class ProductManager {
                     form.reset();
                     if (wrap && writeBtn) { wrap.style.display = 'none'; writeBtn.style.display = 'inline-block'; }
                     await this.loadLatestReviews(productId);
-                } catch (err) {
-                    console.error('Failed to submit review', err);
-                    showToast('Failed to submit review', 'error');
-                }
+                        } catch (err) {
+            showToast('Failed to submit review', 'error');
+        }
             });
         }
     }

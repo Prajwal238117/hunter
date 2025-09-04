@@ -18,7 +18,6 @@ class AllProducts {
             this.setupEventListeners();
             this.handleSearchFromURL();
         } catch (error) {
-            console.error('Error initializing all products:', error);
             this.showError();
         }
     }
@@ -87,7 +86,6 @@ class AllProducts {
                 this.sortSelect.value = 'priority';
             }
         } catch (error) {
-            console.error('Error loading all products:', error);
             this.displayProducts([]);
         }
     }

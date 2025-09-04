@@ -1,135 +1,396 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>About Us - CGAPH</title>
-  <link rel="stylesheet" href="styles.css" />
-  <link rel="stylesheet" href="pages-styles.css" />
-  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>About CGAPH - Digital Gaming Solutions Nepal</title>
+    <meta name="description" content="Learn about CGAPH - Nepal's leading digital gaming platform providing top-ups, gift cards, and gaming solutions.">
+    <link rel="icon" type="image/png" sizes="32x32" href="logo.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="logo.png">
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        .about-section {
+            padding: 2rem;
+            margin-top: 80px;
+            background: linear-gradient(135deg, #1A1A2E 0%, #16213e 100%);
+            min-height: calc(100vh - 80px);
+        }
+        
+        .about-container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+        
+        .about-hero {
+            text-align: center;
+            margin-bottom: 3rem;
+            padding: 2rem;
+            background: linear-gradient(135deg, #16213e 0%, #1A1A2E 100%);
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+            border: 2px solid #334155;
+        }
+        
+        .about-hero h1 {
+            color: #8b5cf6;
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            text-shadow: 0 4px 8px rgba(139, 92, 246, 0.3);
+        }
+        
+        .about-hero p {
+            color: #cbd5e1;
+            font-size: 1.2rem;
+            line-height: 1.6;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        
+        .about-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            margin-bottom: 3rem;
+        }
+        
+        .about-card {
+            background: linear-gradient(135deg, #16213e 0%, #1A1A2E 100%);
+            border-radius: 20px;
+            padding: 2rem;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+            border: 2px solid #334155;
+            transition: all 0.3s ease;
+        }
+        
+        .about-card:hover {
+            transform: translateY(-5px);
+            border-color: #8b5cf6;
+            box-shadow: 0 25px 70px rgba(139, 92, 246, 0.2);
+        }
+        
+        .about-card h2 {
+            color: #8b5cf6;
+            font-size: 1.8rem;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+        }
+        
+        .about-card h2 i {
+            margin-right: 0.8rem;
+            font-size: 1.5rem;
+        }
+        
+        .about-card p {
+            color: #e2e8f0;
+            line-height: 1.7;
+            margin-bottom: 1rem;
+        }
+        
+        .about-card ul {
+            color: #cbd5e1;
+            line-height: 1.6;
+            padding-left: 1.5rem;
+        }
+        
+        .about-card li {
+            margin-bottom: 0.5rem;
+        }
+        
+        .stats-section {
+            background: linear-gradient(135deg, #16213e 0%, #1A1A2E 100%);
+            border-radius: 20px;
+            padding: 2rem;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+            border: 2px solid #334155;
+            margin-bottom: 3rem;
+        }
+        
+        .stats-section h2 {
+            color: #8b5cf6;
+            font-size: 2rem;
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 2rem;
+        }
+        
+        .stat-item {
+            text-align: center;
+            padding: 1.5rem;
+            background: linear-gradient(135deg, #334155 0%, #475569 100%);
+            border-radius: 15px;
+            border: 1px solid #475569;
+            transition: all 0.3s ease;
+        }
+        
+        .stat-item:hover {
+            transform: translateY(-3px);
+            border-color: #8b5cf6;
+            box-shadow: 0 10px 30px rgba(139, 92, 246, 0.2);
+        }
+        
+        .stat-item i {
+            font-size: 2.5rem;
+            color: #8b5cf6;
+            margin-bottom: 1rem;
+        }
+        
+        .stat-item .stat-number {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #fbbf24;
+            margin-bottom: 0.5rem;
+        }
+        
+        .stat-item .stat-label {
+            color: #cbd5e1;
+            font-size: 1rem;
+        }
+        
+        .mission-vision {
+            background: linear-gradient(135deg, #16213e 0%, #1A1A2E 100%);
+            border-radius: 20px;
+            padding: 2rem;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+            border: 2px solid #334155;
+            margin-bottom: 3rem;
+        }
+        
+        .mission-vision h2 {
+            color: #8b5cf6;
+            font-size: 2rem;
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+        
+        .mission-vision-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+        }
+        
+        .mission-item {
+            text-align: center;
+            padding: 1.5rem;
+            background: linear-gradient(135deg, #334155 0%, #475569 100%);
+            border-radius: 15px;
+            border: 1px solid #475569;
+        }
+        
+        .mission-item h3 {
+            color: #6366f1;
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+        }
+        
+        .mission-item p {
+            color: #e2e8f0;
+            line-height: 1.6;
+        }
+        
+        @media (max-width: 768px) {
+            .about-section {
+                padding: 1rem;
+                margin-top: 70px;
+            }
+            
+            .about-hero h1 {
+                font-size: 2.5rem;
+            }
+            
+            .about-content {
+                grid-template-columns: 1fr;
+                gap: 1.5rem;
+            }
+            
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 1rem;
+            }
+            
+            .mission-vision-grid {
+                grid-template-columns: 1fr;
+                gap: 1.5rem;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .about-hero h1 {
+                font-size: 2rem;
+            }
+        }
+    </style>
 </head>
 <body>
-  <header class="header">
-    <nav class="navbar">
-      <div class="nav-brand">
-        <i class="fas fa-gamepad"></i>
-        <span>CGAPH</span>
-      </div>
-      <ul class="nav-menu">
-        <li><a href="index.html" class="nav-link">Home</a></li>
-        <li><a href="all-products.html" class="nav-link">Products</a></li>
-        <li><a href="index.html#latest-purchases" class="nav-link">Recent</a></li>
-        <li><a href="features.html" class="nav-link">Features</a></li>
-      </ul>
-      <div class="nav-cart">
-        <a href="cart.html">
-        <i class="fas fa-shopping-cart"></i>
-        <span class="cart-count">0</span>
-        </a>
-      </div>
-      <div class="nav-auth">
-        <a href="login.html" class="nav-link">Login</a>
-        <a href="register.html" class="nav-link">Register</a>
-      </div>
-      <div class="hamburger">
-        <span class="bar"></span>
-        <span class="bar"></span>
-        <span class="bar"></span>
-      </div>
-    </nav>
-  </header>
+    <!-- Header -->
+                <header class="header">
+        <nav class="navbar">
+            <div class="nav-brand">
+                <img src="logo.png" alt="CGAPH Logo" class="nav-logo">
+            </div>
+            <ul class="nav-menu">
+                <li><a href="index.html" class="nav-link">Home</a></li>
+                <li><a href="all-products.html" class="nav-link">Products</a></li>
+                <li><a href="index.html#latest-purchases" class="nav-link">Recent</a></li>
+                <li><a href="features.html" class="nav-link">Features</a></li>
+            </ul>
+            <div class="nav-cart">
+                <a href="cart.html">
+                    <i class="fas fa-shopping-cart"></i>
+                    <span class="cart-count">0</span>
+                </a>
+            </div>
+            <div class="nav-auth">
+                <a href="login.html" class="nav-link">Login</a>
+                <a href="register.html" class="nav-link">Register</a>
+            </div>
+            <div class="hamburger" aria-label="Menu" role="button" tabindex="0">
+                <span class="bar"></span>
+                <span class="bar"></span>
+                <span class="bar"></span>
+            </div>
+        </nav>
+    </header>
 
-  <section class="page-hero">
-    <div class="page-hero-inner">
-      <h1>About CGAPH</h1>
-      <p>Created by three friends to make digital items simple, fast, and reliable.</p>
-    </div>
-  </section>
-
-  <main class="page-container">
-    <section class="content-card" style="margin-bottom:1.5rem;">
-      <h2 class="section-title">Our Story</h2>
-       <p class="section-subtitle">CGAPH is a platform for instant delivery of digital gaming top-ups, gift cards, and entertainment codes. Built with a passion for gaming and technology, our mission is to provide a safe and smooth experience for players worldwide.</p>
+    <!-- About Section -->
+    <section class="about-section">
+        <div class="about-container">
+            <!-- Hero Section -->
+            <div class="about-hero">
+                <h1><i class="fas fa-gamepad"></i> About CGAPH</h1>
+                <p>Nepal's premier digital gaming platform, revolutionizing the way gamers access top-ups, gift cards, and digital entertainment solutions. We're committed to providing seamless, secure, and instant digital gaming experiences.</p>
+            </div>
+            
+            <!-- Main Content -->
+            <div class="about-content">
+                <div class="about-card">
+                    <h2><i class="fas fa-rocket"></i> Our Story</h2>
+                    <p>Founded in 2024, CGAPH emerged from a simple vision: to make digital gaming accessible to every Nepali gamer. What started as a small startup has grown into the country's most trusted digital gaming platform.</p>
+                    <p>We recognized the challenges faced by Nepali gamers - limited access to international payment methods, high transaction fees, and delayed delivery times. CGAPH was built to solve these problems.</p>
+                </div>
+                
+                <div class="about-card">
+                    <h2><i class="fas fa-users"></i> Our Team</h2>
+                    <p>Our team consists of passionate gamers, tech enthusiasts, and customer service experts who understand the gaming community's needs. We're united by our love for gaming and commitment to excellence.</p>
+                    <p>From developers to support staff, every team member contributes to creating the best possible experience for our customers.</p>
+                </div>
+                
+                <div class="about-card">
+                    <h2><i class="fas fa-shield-alt"></i> Security & Trust</h2>
+                    <p>Security is at the core of everything we do. We implement industry-standard encryption and security protocols to protect your personal and financial information.</p>
+                    <ul>
+                        <li>SSL encryption for all transactions</li>
+                        <li>Secure payment gateway integration</li>
+                        <li>Regular security audits and updates</li>
+                        <li>Compliance with international standards</li>
+                    </ul>
+                </div>
+                
+                <div class="about-card">
+                    <h2><i class="fas fa-globe"></i> Global Reach</h2>
+                    <p>While we're based in Nepal, our services reach gamers worldwide. We partner with leading international gaming companies to provide authentic, region-appropriate digital products.</p>
+                    <p>Our platform supports multiple currencies and payment methods, making it accessible to gamers from different countries and regions.</p>
+                </div>
+            </div>
+            
+            <!-- Statistics Section -->
+            <div class="stats-section">
+                <h2><i class="fas fa-chart-line"></i> CGAPH by the Numbers</h2>
+                <div class="stats-grid">
+                    <div class="stat-item">
+                        <i class="fas fa-users"></i>
+                        <div class="stat-number">10K+</div>
+                        <div class="stat-label">Happy Customers</div>
+                    </div>
+                    <div class="stat-item">
+                        <i class="fas fa-gamepad"></i>
+                        <div class="stat-number">50+</div>
+                        <div class="stat-label">Game Titles</div>
+                    </div>
+                    <div class="stat-item">
+                        <i class="fas fa-clock"></i>
+                        <div class="stat-number">24/7</div>
+                        <div class="stat-label">Support Available</div>
+                    </div>
+                    <div class="stat-item">
+                        <i class="fas fa-bolt"></i>
+                        <div class="stat-number">99.9%</div>
+                        <div class="stat-label">Uptime</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Mission & Vision -->
+            <div class="mission-vision">
+                <h2><i class="fas fa-bullseye"></i> Our Mission & Vision</h2>
+                <div class="mission-vision-grid">
+                    <div class="mission-item">
+                        <h3><i class="fas fa-flag"></i> Mission</h3>
+                        <p>To democratize digital gaming by providing affordable, accessible, and secure gaming solutions to every Nepali gamer, while maintaining the highest standards of customer service and product quality.</p>
+                    </div>
+                    <div class="mission-item">
+                        <h3><i class="fas fa-eye"></i> Vision</h3>
+                        <p>To become the leading digital gaming platform in South Asia, setting industry standards for innovation, security, and customer satisfaction while expanding our reach to serve gamers worldwide.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
     </section>
 
-    <section class="content-card">
-      <h2 class="section-title">Founders</h2>
-      <div class="team-grid">
-        <div class="team-card">
-          <div class="team-avatar">
-            <i class="fas fa-user"></i>
-          </div>
-          <h4>Prajwal Bhusal</h4>
-          <span>Designer, Creator & Founder</span>
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-section">
+                <h4>CGAPH</h4>
+                <p>Your trusted partner for digital products and gaming solutions in Nepal.</p>
+                <div class="social-links">
+                    <a href="https://www.facebook.com/profile.php?id=61579288196935" target="_blank" rel="noopener" aria-label="Facebook"><i class="fab fa-facebook"></i></a>
+                    <a href="https://www.youtube.com/@cgaph" target="_blank" rel="noopener" aria-label="YouTube"><i class="fab fa-youtube"></i></a>
+                    <a href="https://www.tiktok.com/@cgaph?is_from_webapp=1&sender_device=pc" target="_blank" rel="noopener" aria-label="TikTok"><i class="fab fa-tiktok"></i></a>
+                    <a href="https://discord.gg/xfYVjDW3Bc" target="_blank" rel="noopener" aria-label="Discord"><i class="fab fa-discord"></i></a>
+                </div>
+            </div>
+            <div class="footer-section">
+                <h4>Quick Links</h4>
+                <ul>
+                    <li><a href="index.html">Home</a></li>
+                    <li><a href="all-products.html">Products</a></li>
+                    <li><a href="about.html">About Us</a></li>
+                    <li><a href="contact.html">Contact</a></li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h4>Support</h4>
+                <ul>
+                    <li><a href="privacy.html">Privacy Policy</a></li>
+                    <li><a href="terms.html">Terms of Service</a></li>
+                    <li><a href="refund.html">Refund Policy</a></li>
+                    <li><a href="contact.html">Help Center</a></li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h4>Contact Info</h4>
+                <p><i class="fas fa-envelope"></i> support@cgaph.com</p>
+                <p><i class="fas fa-phone"></i> +977 9800745053</p>
+                <p><i class="fas fa-map-marker-alt"></i> Kathmandu, Nepal</p>
+            </div>
         </div>
-        <div class="team-card">
-          <div class="team-avatar">
-            <i class="fas fa-user"></i>
-          </div>
-          <h4>Prashant Subedi</h4>
-          <span>Co‑founder</span>
+        <div class="footer-bottom">
+            <p>&copy; 2024 CGAPH. All rights reserved.</p>
         </div>
-        <div class="team-card">
-          <div class="team-avatar">
-            <i class="fas fa-user"></i>
-          </div>
-          <h4>Saroj Rijal</h4>
-          <span>Co‑founder</span>
-        </div>
-        <div class="team-card">
-          <div class="team-avatar">
-            <i class="fas fa-user"></i>
-          </div>
-          <h4>Niru Gnawali</h4>
-          <span>Promoter</span>
-        </div>
-      </div>
-    </section>
-  </main>
+    </footer>
 
-  <footer class="footer">
-    <div class="footer-content">
-      <div class="footer-section">
-        <h3>CGAPH</h3>
-        <p>Your trusted source for digital gaming and entertainment content.</p>
-        <div class="social-links">
-          <a href="https://www.facebook.com/profile.php?id=61579288196935" target="_blank" rel="noopener" aria-label="Facebook"><i class="fab fa-facebook"></i></a>
-          <a href="#" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
-          <a href="#" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
-          <a href="#" aria-label="Discord"><i class="fab fa-discord"></i></a>
-        </div>
-      </div>
-      <div class="footer-section">
-        <h4>Quick Links</h4>
-        <ul>
-          <li><a href="index.html">Home</a></li>
-          <li><a href="all-products.html">Products</a></li>
-          <li><a href="about.html">About Us</a></li>
-          <li><a href="contact.html">Contact</a></li>
-        </ul>
-      </div>
-      <div class="footer-section">
-        <h4>Support</h4>
-        <ul>
-          <li><a href="privacy.html">Privacy Policy</a></li>
-          <li><a href="terms.html">Terms of Service</a></li>
-          <li><a href="refund.html">Refund Policy</a></li>
-          <li><a href="contact.html">Help Center</a></li>
-        </ul>
-      </div>
-      <div class="footer-section">
-        <h4>Contact Info</h4>
-        <p><i class="fas fa-envelope"></i> support@cgaph.com</p>
-        <p><i class="fas fa-phone"></i> +977 9800745053</p>
-        <p><i class="fas fa-map-marker-alt"></i> Kathmandu, Nepal</p>
-      </div>
-    </div>
-    <div class="footer-bottom">
-      <p>&copy; 2024 CGAPH. All rights reserved.</p>
-    </div>
-  </footer>
-
-  <script type="module" src="./cart.js"></script>
-  <script type="module" src="./loading.js"></script>
+   
+    <script type="module" src="./cart.js"></script>
 </body>
 </html>

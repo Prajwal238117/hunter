@@ -81,7 +81,6 @@ function wireEmailRegistration() {
       showToast('Account created. Please verify your email.', 'success');
       window.location.href = 'index.html';
     } catch (err) {
-      console.error(err);
       showToast(authErrorMessage(err, 'register'), 'error');
     } finally {
       if (btn) { btn.disabled = false; btn.textContent = original || 'Create Account'; }
@@ -111,7 +110,6 @@ function wireGoogleSignup() {
       }, { merge: true });
       window.location.href = 'index.html';
     } catch (err) {
-      console.error(err);
       // Fallback to redirect for popup issues or unsupported envs
       try {
         const provider = new GoogleAuthProvider();

@@ -35,7 +35,6 @@ async function loadUserProfile(user) {
             document.getElementById('profileEmail').textContent = user.email || '';
         }
     } catch (error) {
-        console.error('Error loading user profile:', error);
         showToast('Error loading profile data', 'error');
     }
 }
@@ -98,7 +97,6 @@ async function loadRecentOrders(user) {
         }
         
     } catch (error) {
-        console.error('Error loading recent orders:', error);
         showToast('Error loading recent orders', 'error');
         document.getElementById('activityList').innerHTML = '<p class="no-orders">Error loading orders.</p>';
     }
@@ -142,10 +140,9 @@ document.addEventListener('DOMContentLoaded', function() {
                 
                 showToast('Profile updated successfully', 'success');
                 
-            } catch (error) {
-                console.error('Error updating profile:', error);
-                showToast('Error updating profile', 'error');
-            }
+                    } catch (error) {
+            showToast('Error updating profile', 'error');
+        }
         });
     }
 });
@@ -158,10 +155,9 @@ async function logout() {
         setTimeout(() => {
             window.location.href = 'index.html';
         }, 1000);
-    } catch (error) {
-        console.error('Error logging out:', error);
-        showToast('Error logging out', 'error');
-    }
+            } catch (error) {
+            showToast('Error logging out', 'error');
+        }
 }
 
 // Make logout function globally accessible

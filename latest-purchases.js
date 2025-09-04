@@ -11,7 +11,6 @@ class LatestPurchases {
         try {
             await this.loadLatestPurchases();
         } catch (error) {
-            console.error('Error initializing latest purchases:', error);
             this.showError();
         }
     }
@@ -33,14 +32,13 @@ class LatestPurchases {
                     });
                 });
             } catch (paymentsError) {
-                console.log('Payments collection access denied, showing sample data');
+    
                 // Show sample data if access is denied
                 purchases = this.getSamplePurchases();
             }
             
             this.displayPurchases(purchases);
         } catch (error) {
-            console.error('Error loading latest purchases:', error);
             // Show sample data on error
             this.displayPurchases(this.getSamplePurchases());
         }
