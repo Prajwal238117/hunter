@@ -261,6 +261,73 @@ function closeAddCouponModal() {
     document.getElementById('couponForm').reset();
 }
 
+// Edit Coupon Functions
+async function editCoupon(couponId) {
+    try {
+        const couponDoc = await getDoc(doc(db, 'coupons', couponId));
+        if (!couponDoc.exists()) {
+            showToast('Coupon not found', 'error');
+            return;
+        }
+        
+        const coupon = couponDoc.data();
+        
+        // Populate edit form fields
+        document.getElementById('editCouponId').value = couponId;
+        document.getElementById('editCouponCode').value = coupon.code || '';
+        document.getElementById('editCouponType').value = coupon.type || 'percentage';
+        document.getElementById('editCouponValue').value = coupon.value || '';
+        document.getElementById('editCouponMinAmount').value = coupon.minAmount || '';
+        document.getElementById('editCouponUsageLimit').value = coupon.usageLimit || '';
+        document.getElementById('editCouponExpiry').value = coupon.expiryDate ? 
+            coupon.expiryDate.toDate().toISOString().slice(0, 16) : '';
+        document.getElementById('editCouponDescription').value = coupon.description || '';
+        document.getElementById('editCouponStatus').value = coupon.isActive ? 'active' : 'inactive';
+        
+        // Show edit modal
+        openEditCouponModal();
+        
+    } catch (error) {
+        console.error('Error loading coupon for edit:', error);
+        showToast('Failed to load coupon details', 'error');
+    }
+}
+
+async function deleteCoupon(couponId) {
+    if (!confirm('Are you sure you want to delete this coupon? This action cannot be undone.')) {
+        return;
+    }
+    
+    try {
+        await deleteDoc(doc(db, 'coupons', couponId));
+        showToast('Coupon deleted successfully', 'success');
+        loadCoupons();
+    } catch (error) {
+        console.error('Error deleting coupon:', error);
+        showToast('Error deleting coupon', 'error');
+    }
+}
+
+// Edit Coupon Modal Functions
+function openEditCouponModal() {
+    document.getElementById('editCouponModal').style.display = 'block';
+    document.body.style.overflow = 'hidden';
+}
+
+function closeEditCouponModal() {
+    document.getElementById('editCouponModal').style.display = 'none';
+    document.body.style.overflow = 'auto';
+    document.getElementById('editCouponForm').reset();
+}
+
+function deleteCouponFromEdit() {
+    const couponId = document.getElementById('editCouponId').value;
+    if (couponId) {
+        closeEditCouponModal();
+        deleteCoupon(couponId);
+    }
+}
+
 // Setup coupon form submission
 function setupCouponForm() {
     const couponForm = document.getElementById('couponForm');
@@ -299,6 +366,54 @@ function setupCouponForm() {
             } catch (error) {
                 console.error('Error creating coupon:', error);
                 showToast('Failed to create coupon', 'error');
+            }
+        });
+    }
+    
+    // Setup edit coupon form submission
+    const editCouponForm = document.getElementById('editCouponForm');
+    if (editCouponForm) {
+        editCouponForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const couponId = document.getElementById('editCouponId').value;
+            if (!couponId) {
+                showToast('Coupon ID not found', 'error');
+                return;
+            }
+            
+            const formData = {
+                code: document.getElementById('editCouponCode').value.trim().toUpperCase(),
+                type: document.getElementById('editCouponType').value,
+                value: parseFloat(document.getElementById('editCouponValue').value),
+                minAmount: parseFloat(document.getElementById('editCouponMinAmount').value),
+                usageLimit: parseInt(document.getElementById('editCouponUsageLimit').value),
+                expiryDate: new Date(document.getElementById('editCouponExpiry').value),
+                description: document.getElementById('editCouponDescription').value.trim(),
+                isActive: document.getElementById('editCouponStatus').value === 'active',
+                updatedAt: serverTimestamp()
+            };
+            
+            try {
+                // Check if coupon code already exists (excluding current coupon)
+                if (formData.code !== couponId) {
+                    const existingCoupon = await getDoc(doc(db, 'coupons', formData.code));
+                    if (existingCoupon.exists()) {
+                        showToast('Coupon code already exists', 'error');
+                        return;
+                    }
+                }
+                
+                // Update coupon document
+                await updateDoc(doc(db, 'coupons', couponId), formData);
+                
+                showToast('Coupon updated successfully!', 'success');
+                closeEditCouponModal();
+                loadCoupons();
+                
+            } catch (error) {
+                console.error('Error updating coupon:', error);
+                showToast('Failed to update coupon', 'error');
             }
         });
     }
@@ -475,7 +590,7 @@ async function loadProducts() {
       const priorityText = getPriorityText(product.priority || 2);
       const salesCount = product.salesCount || 0;
       
-              return `
+      return `
         <div class="product-card" data-product-id="${product.id}">
           <div class="product-image">
             ${ (product.imageUrl || product.imagePath) ? 
@@ -1182,14 +1297,53 @@ async function ensureUserDocument(userId, userData) {
   }
 }
 
+// Debug function to check user count and permissions
+async function debugUserAccess() {
+  try {
+    const currentUser = auth.currentUser;
+    if (!currentUser) {
+      console.log('No authenticated user');
+      return;
+    }
+    
+    console.log('Current user:', currentUser.uid, currentUser.email);
+    
+    // Check if user is admin
+    const isAdminUser = await isAdmin(currentUser.uid);
+    console.log('Is admin:', isAdminUser);
+    
+    // Try to get user count
+    const allUsers = await getDocs(usersCol);
+    console.log('Total users in database:', allUsers.size);
+    
+    // List first few users
+    allUsers.forEach((doc, index) => {
+      if (index < 5) {
+        console.log(`User ${index + 1}:`, doc.id, doc.data());
+      }
+    });
+    
+  } catch (error) {
+    console.error('Debug user access error:', error);
+  }
+}
+
 async function loadUsers() {
   const tbody = document.querySelector('#usersTable tbody');
   if (!tbody) return;
   
-  tbody.innerHTML = '<tr><td colspan="5">Loading...</td></tr>';
+  tbody.innerHTML = '<tr><td colspan="6">Loading...</td></tr>';
   try {
-    const q = query(usersCol, orderBy('createdAt', 'desc'));
-    const snap = await getDocs(q);
+    // Try to get users with orderBy first, if it fails, get all users without ordering
+    let snap;
+    try {
+      const q = query(usersCol, orderBy('createdAt', 'desc'));
+      snap = await getDocs(q);
+    } catch (orderError) {
+      // If orderBy fails (likely due to missing index), get all users without ordering
+      snap = await getDocs(usersCol);
+    }
+    
     const rows = [];
     
     snap.forEach(docSnap => {
@@ -1199,6 +1353,7 @@ async function loadUsers() {
       const name = `${userData.firstName || ''} ${userData.lastName || ''}`.trim() || 'N/A';
       const email = userData.email || 'N/A';
       const role = userData.role || 'user';
+      const status = userData.status || 'active';
       
       rows.push(`
         <tr data-user-id="${docSnap.id}">
@@ -1210,6 +1365,7 @@ async function loadUsers() {
               <option value="admin" ${role === 'admin' ? 'selected' : ''}>Admin</option>
             </select>
           </td>
+          <td><span class="status-badge ${status === 'active' ? 'status-active' : 'status-inactive'}">${status}</span></td>
           <td>${dateStr}</td>
           <td>
             <button class="btn" onclick="viewUserDetails('${docSnap.id}')">View</button>
@@ -1218,11 +1374,20 @@ async function loadUsers() {
       `);
     });
     
+    // Sort rows by creation date if we couldn't use orderBy
+    if (rows.length > 0) {
+      rows.sort((a, b) => {
+        const dateA = new Date(a.match(/<td>(\d+\/\d+\/\d+)<\/td>/)?.[1] || '1970/1/1');
+        const dateB = new Date(b.match(/<td>(\d+\/\d+\/\d+)<\/td>/)?.[1] || '1970/1/1');
+        return dateB - dateA; // Descending order
+      });
+    }
+    
     tbody.dataset.allRows = JSON.stringify(rows);
-    tbody.innerHTML = rows.length ? rows.join('') : '<tr><td colspan="5">No users found.</td></tr>';
+    tbody.innerHTML = rows.length ? rows.join('') : '<tr><td colspan="6">No users found.</td></tr>';
   } catch (err) {
-    console.error(err);
-    tbody.innerHTML = '<tr><td colspan="5">Failed to load users.</td></tr>';
+    console.error('Error loading users:', err);
+    tbody.innerHTML = '<tr><td colspan="6">Failed to load users. Check console for details.</td></tr>';
   }
 }
 
@@ -1359,6 +1524,12 @@ window.updateUserRole = updateUserRole;
 window.viewUserDetails = viewUserDetails;
 window.viewContactMessage = viewContactMessage;
 window.viewBase64Image = viewBase64Image;
+window.debugUserAccess = debugUserAccess;
+window.editCoupon = editCoupon;
+window.deleteCoupon = deleteCoupon;
+window.openEditCouponModal = openEditCouponModal;
+window.closeEditCouponModal = closeEditCouponModal;
+window.deleteCouponFromEdit = deleteCouponFromEdit;
 window.openEditProductModal = function() {
   document.getElementById('editProductModal').style.display = 'block';
   document.body.style.overflow = 'hidden';
@@ -1483,21 +1654,22 @@ function initializeAdminPanel() {
   setupProductForm();
   document.getElementById('refreshProductsBtn')?.addEventListener('click', loadProducts);
   
-      // Setup user management
+  // Setup user management
     console.log('Setting up user management...');
-    loadUsers();
-    document.getElementById('refreshUsersBtn')?.addEventListener('click', loadUsers);
-    const usersSearch = document.getElementById('searchUsersInput');
-    if (usersSearch) {
-        usersSearch.addEventListener('input', () => {
-            const tbody = document.querySelector('#usersTable tbody');
-            const q = usersSearch.value.trim().toLowerCase();
-            const all = JSON.parse(tbody?.dataset?.allRows || '[]');
-            if (!q) { tbody.innerHTML = all.join(''); return; }
-            const filtered = all.filter(html => html.toLowerCase().includes(q));
-            tbody.innerHTML = filtered.length ? filtered.join('') : '<tr><td colspan="5">No matches.</td></tr>';
-        });
-    }
+  loadUsers();
+  debugUserAccess(); // Debug user access
+  document.getElementById('refreshUsersBtn')?.addEventListener('click', loadUsers);
+  const usersSearch = document.getElementById('searchUsersInput');
+  if (usersSearch) {
+    usersSearch.addEventListener('input', () => {
+      const tbody = document.querySelector('#usersTable tbody');
+      const q = usersSearch.value.trim().toLowerCase();
+      const all = JSON.parse(tbody?.dataset?.allRows || '[]');
+      if (!q) { tbody.innerHTML = all.join(''); return; }
+      const filtered = all.filter(html => html.toLowerCase().includes(q));
+      tbody.innerHTML = filtered.length ? filtered.join('') : '<tr><td colspan="5">No matches.</td></tr>';
+    });
+  }
     
     // Setup coupon management
     console.log('Setting up coupon management...');
@@ -1515,11 +1687,11 @@ function initializeAdminPanel() {
             tbody.innerHTML = filtered.length ? filtered.join('') : '<tr><td colspan="9">No matches.</td></tr>';
         });
     }
-    
-    // Setup contact management
+  
+  // Setup contact management
     console.log('Setting up contact management...');
-    loadContacts();
-    document.getElementById('refreshContactsBtn')?.addEventListener('click', loadContacts);
+  loadContacts();
+  document.getElementById('refreshContactsBtn')?.addEventListener('click', loadContacts);
   
   console.log('Admin panel initialization complete');
 }
