@@ -1839,6 +1839,9 @@
             <button class="admin-tab" data-tab="contacts">
                 <i class="fas fa-envelope"></i> Contact Messages
             </button>
+            <button class="admin-tab" data-tab="promoters">
+                <i class="fas fa-users"></i> Promoters
+            </button>
         </div>
 
         <!-- Payments Tab -->
@@ -2010,6 +2013,45 @@
                     </tbody>
                 </table>
             </div>
+        </div>
+
+        <!-- Promoters Tab -->
+        <div id="promoters" class="tab-content">
+            <div class="promoters-header">
+                <div class="promoters-title">
+                    <h3><i class="fas fa-users"></i> Promoter Management</h3>
+                    <p>Manage content creators and influencers who promote CGAPH</p>
+                </div>
+                <button class="btn btn-success" onclick="openAddPromoterModal()">
+                    <i class="fas fa-plus"></i> Add New Promoter
+                </button>
+            </div>
+            
+            <div class="table-wrapper">
+                <div class="controls">
+                    <input type="text" id="searchPromotersInput" class="search-input" placeholder="Search promoters...">
+                    <button class="btn" id="refreshPromotersBtn">
+                        <i class="fas fa-sync-alt"></i> Refresh
+                    </button>
+                </div>
+                <table id="promotersTable">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Platform</th>
+                            <th>Subscribers</th>
+                            <th>Videos</th>
+                            <th>Status</th>
+                            <th>Added</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td colspan="7">Loading promoters...</td>
+                        </tr>
+                    </tbody>
+                </table>
             </div>
         </div>
 
@@ -2859,6 +2901,148 @@
                         </button>
                         <button type="button" class="btn btn-danger" onclick="deleteCouponFromEdit()">
                             <i class="fas fa-trash"></i> Delete Coupon
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Promoter Modal -->
+    <div id="addPromoterModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3><i class="fas fa-plus"></i> Add New Promoter</h3>
+                <button class="modal-close" onclick="closeAddPromoterModal()">×</button>
+            </div>
+            <div class="modal-body">
+                <form id="promoterForm">
+                    <div class="form-group">
+                        <label for="promoterUrl">Social Media URL</label>
+                        <div style="display: flex; gap: 0.5rem;">
+                            <input type="url" id="promoterUrl" placeholder="https://youtube.com/@channel or https://tiktok.com/@username" required style="flex: 1;">
+                            <button type="button" class="btn btn-warning" onclick="fetchPromoterInfo(document.getElementById('promoterUrl').value)">
+                                <i class="fas fa-magic"></i> Auto-fill
+                            </button>
+                        </div>
+                        <small>Supported: YouTube, TikTok, Instagram</small>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="promoterName">Name</label>
+                            <input type="text" id="promoterName" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="promoterPlatform">Platform</label>
+                            <select id="promoterPlatform" required>
+                                <option value="">Select Platform</option>
+                                <option value="youtube">YouTube</option>
+                                <option value="tiktok">TikTok</option>
+                                <option value="instagram">Instagram</option>
+                                <option value="facebook">Facebook</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="promoterProfilePicture">Profile Picture URL</label>
+                        <input type="url" id="promoterProfilePicture" placeholder="https://example.com/profile.jpg">
+                        <div id="promoterImagePreview" class="image-preview" style="display: none;">
+                            <img id="promoterPreviewImg" src="" alt="Preview" style="width: 100px; height: 100px; border-radius: 50%; object-fit: cover;">
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="promoterSubscribers">Subscribers/Followers</label>
+                            <input type="number" id="promoterSubscribers" min="0" placeholder="100000">
+                        </div>
+                        <div class="form-group">
+                            <label for="promoterVideos">Videos/Posts</label>
+                            <input type="number" id="promoterVideos" min="0" placeholder="500">
+                        </div>
+                    </div>
+                    
+                    <div class="form-actions">
+                        <button type="button" class="btn btn-secondary" onclick="closeAddPromoterModal()">Cancel</button>
+                        <button type="submit" class="btn btn-success">
+                            <i class="fas fa-save"></i> Add Promoter
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Promoter Modal -->
+    <div id="editPromoterModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3><i class="fas fa-edit"></i> Edit Promoter</h3>
+                <button class="modal-close" onclick="closeEditPromoterModal()">×</button>
+            </div>
+            <div class="modal-body">
+                <form id="editPromoterForm">
+                    <input type="hidden" id="editPromoterId">
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="editPromoterName">Name</label>
+                            <input type="text" id="editPromoterName" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="editPromoterPlatform">Platform</label>
+                            <select id="editPromoterPlatform" required>
+                                <option value="">Select Platform</option>
+                                <option value="youtube">YouTube</option>
+                                <option value="tiktok">TikTok</option>
+                                <option value="instagram">Instagram</option>
+                                <option value="facebook">Facebook</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="editPromoterProfilePicture">Profile Picture URL</label>
+                        <input type="url" id="editPromoterProfilePicture" placeholder="https://example.com/profile.jpg">
+                        <div id="editPromoterImagePreview" class="image-preview" style="display: none;">
+                            <img id="editPromoterPreviewImg" src="" alt="Preview" style="width: 100px; height: 100px; border-radius: 50%; object-fit: cover;">
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="editPromoterSubscribers">Subscribers/Followers</label>
+                            <input type="number" id="editPromoterSubscribers" min="0" placeholder="100000">
+                        </div>
+                        <div class="form-group">
+                            <label for="editPromoterVideos">Videos/Posts</label>
+                            <input type="number" id="editPromoterVideos" min="0" placeholder="500">
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="editPromoterUrl">Social Media URL</label>
+                            <input type="url" id="editPromoterUrl" placeholder="https://youtube.com/@channel">
+                        </div>
+                        <div class="form-group">
+                            <label for="editPromoterStatus">Status</label>
+                            <select id="editPromoterStatus" required>
+                                <option value="active">Active</option>
+                                <option value="inactive">Inactive</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="form-actions">
+                        <button type="button" class="btn btn-secondary" onclick="closeEditPromoterModal()">Cancel</button>
+                        <button type="submit" class="btn btn-success">
+                            <i class="fas fa-save"></i> Update Promoter
+                        </button>
+                        <button type="button" class="btn btn-danger" onclick="deletePromoterFromEdit()">
+                            <i class="fas fa-trash"></i> Delete Promoter
                         </button>
                     </div>
                 </form>

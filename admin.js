@@ -7,6 +7,7 @@ import { showToast } from './toast.js';
 const paymentsCol = collection(db, 'payments');
 const productsCol = collection(db, 'products');
 const usersCol = collection(db, 'users');
+const promotersCol = collection(db, 'promoters');
 
 // Check admin via either admins/{uid}.active or users/{uid}.role == 'admin'
 async function isAdmin(uid) {
@@ -1336,8 +1337,8 @@ async function loadUsers() {
   try {
     // Try to get users with orderBy first, if it fails, get all users without ordering
     let snap;
-    try {
-      const q = query(usersCol, orderBy('createdAt', 'desc'));
+  try {
+    const q = query(usersCol, orderBy('createdAt', 'desc'));
       snap = await getDocs(q);
     } catch (orderError) {
       // If orderBy fails (likely due to missing index), get all users without ordering
@@ -1514,22 +1515,295 @@ function viewContactMessage(name, email, subject, message, date) {
   showToast(lines.join('\n'), 'info', { timeout: 8000 });
 }
 
-// Global functions for onclick handlers
-window.addVariant = addVariant;
-window.addExtraField = addExtraField;
-window.editProduct = editProduct;
-window.cancelAddProduct = cancelAddProduct;
-window.deleteProduct = deleteProduct;
-window.updateUserRole = updateUserRole;
-window.viewUserDetails = viewUserDetails;
-window.viewContactMessage = viewContactMessage;
-window.viewBase64Image = viewBase64Image;
-window.debugUserAccess = debugUserAccess;
-window.editCoupon = editCoupon;
-window.deleteCoupon = deleteCoupon;
-window.openEditCouponModal = openEditCouponModal;
-window.closeEditCouponModal = closeEditCouponModal;
-window.deleteCouponFromEdit = deleteCouponFromEdit;
+// Promoter Management Functions
+async function loadPromoters() {
+  const tbody = document.querySelector('#promotersTable tbody');
+  if (!tbody) return;
+  
+  tbody.innerHTML = '<tr><td colspan="7">Loading...</td></tr>';
+  try {
+    const q = query(promotersCol, orderBy('createdAt', 'desc'));
+    const snap = await getDocs(q);
+    const rows = [];
+    
+    snap.forEach(docSnap => {
+      const promoterData = docSnap.data();
+      const created = promoterData.createdAt?.toDate?.() || new Date(0);
+      const dateStr = created.toLocaleDateString();
+      const name = promoterData.name || 'N/A';
+      const platform = promoterData.platform || 'N/A';
+      const subscribers = formatNumber(promoterData.subscribers || 0);
+      const status = promoterData.isActive ? 'Active' : 'Inactive';
+      const statusClass = promoterData.isActive ? 'status-active' : 'status-inactive';
+      
+      rows.push(`
+        <tr data-promoter-id="${docSnap.id}">
+          <td>
+            <div style="display: flex; align-items: center; gap: 0.75rem;">
+              <img src="${promoterData.profilePicture || 'https://via.placeholder.com/40x40/667eea/ffffff?text=?'}" 
+                   alt="${name}" 
+                   style="width: 40px; height: 40px; border-radius: 50%; object-fit: cover;"
+                   onerror="this.src='https://via.placeholder.com/40x40/667eea/ffffff?text=?'">
+              <span>${name}</span>
+      </div>
+          </td>
+          <td>${platform}</td>
+          <td>${subscribers}</td>
+          <td>${promoterData.videos || 0}</td>
+          <td><span class="status-badge ${statusClass}">${status}</span></td>
+          <td>${dateStr}</td>
+          <td class="actions">
+            <button class="btn btn-warning btn-sm" onclick="editPromoter('${docSnap.id}')">
+              <i class="fas fa-edit"></i>
+            </button>
+            <button class="btn btn-danger btn-sm" onclick="deletePromoter('${docSnap.id}')">
+              <i class="fas fa-trash"></i>
+            </button>
+          </td>
+        </tr>
+      `);
+    });
+    
+    tbody.dataset.allRows = JSON.stringify(rows);
+    tbody.innerHTML = rows.length ? rows.join('') : '<tr><td colspan="7">No promoters found.</td></tr>';
+  } catch (err) {
+    console.error(err);
+    tbody.innerHTML = '<tr><td colspan="7">Failed to load promoters.</td></tr>';
+  }
+}
+
+function formatNumber(num) {
+  if (num >= 1000000) {
+    return (num / 1000000).toFixed(1) + 'M';
+  } else if (num >= 1000) {
+    return (num / 1000).toFixed(1) + 'K';
+  }
+  return num.toString();
+}
+
+async function fetchPromoterInfo(url) {
+  try {
+    showToast('Fetching promoter information...', 'info');
+    
+    // Extract platform and ID from URL
+    let platform = '';
+    let channelId = '';
+    
+    if (url.includes('youtube.com') || url.includes('youtu.be')) {
+      platform = 'youtube';
+      // Extract channel ID from YouTube URL
+      const match = url.match(/(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/);
+      if (match) {
+        channelId = match[1];
+      }
+    } else if (url.includes('tiktok.com')) {
+      platform = 'tiktok';
+      // Extract username from TikTok URL
+      const match = url.match(/tiktok\.com\/@([^\/\?]+)/);
+      if (match) {
+        channelId = match[1];
+      }
+    } else if (url.includes('instagram.com')) {
+      platform = 'instagram';
+      const match = url.match(/instagram\.com\/([^\/\?]+)/);
+      if (match) {
+        channelId = match[1];
+      }
+    } else {
+      throw new Error('Unsupported platform. Please use YouTube, TikTok, or Instagram URLs.');
+    }
+    
+    // For demo purposes, we'll create mock data
+    // In a real implementation, you would use APIs like YouTube Data API, TikTok API, etc.
+    const mockData = {
+      name: channelId.charAt(0).toUpperCase() + channelId.slice(1),
+      platform: platform,
+      profilePicture: `https://via.placeholder.com/200x200/667eea/ffffff?text=${channelId.charAt(0).toUpperCase()}`,
+      subscribers: Math.floor(Math.random() * 1000000) + 1000,
+      videos: Math.floor(Math.random() * 500) + 10,
+      url: url
+    };
+    
+    // Populate the form with fetched data
+    document.getElementById('promoterName').value = mockData.name;
+    document.getElementById('promoterPlatform').value = mockData.platform;
+    document.getElementById('promoterProfilePicture').value = mockData.profilePicture;
+    document.getElementById('promoterSubscribers').value = mockData.subscribers;
+    document.getElementById('promoterVideos').value = mockData.videos;
+    document.getElementById('promoterUrl').value = mockData.url;
+    
+    // Show profile picture preview
+    const preview = document.getElementById('promoterImagePreview');
+    if (preview) {
+      preview.src = mockData.profilePicture;
+      preview.style.display = 'block';
+    }
+    
+    showToast('Promoter information fetched successfully!', 'success');
+    
+  } catch (error) {
+    console.error('Error fetching promoter info:', error);
+    showToast('Error fetching promoter information: ' + error.message, 'error');
+  }
+}
+
+async function editPromoter(promoterId) {
+  try {
+    const promoterDoc = await getDoc(doc(db, 'promoters', promoterId));
+    if (!promoterDoc.exists()) {
+      showToast('Promoter not found', 'error');
+      return;
+    }
+    
+    const promoter = promoterDoc.data();
+    
+    // Populate edit form fields
+    document.getElementById('editPromoterId').value = promoterId;
+    document.getElementById('editPromoterName').value = promoter.name || '';
+    document.getElementById('editPromoterPlatform').value = promoter.platform || '';
+    document.getElementById('editPromoterProfilePicture').value = promoter.profilePicture || '';
+    document.getElementById('editPromoterSubscribers').value = promoter.subscribers || '';
+    document.getElementById('editPromoterVideos').value = promoter.videos || '';
+    document.getElementById('editPromoterUrl').value = promoter.url || '';
+    document.getElementById('editPromoterStatus').value = promoter.isActive ? 'active' : 'inactive';
+    
+    // Show profile picture preview
+    const editPreview = document.getElementById('editPromoterImagePreview');
+    if (editPreview && promoter.profilePicture) {
+      editPreview.src = promoter.profilePicture;
+      editPreview.style.display = 'block';
+    }
+    
+    // Show edit modal
+    openEditPromoterModal();
+    
+  } catch (error) {
+    console.error('Error loading promoter for edit:', error);
+    showToast('Failed to load promoter details', 'error');
+  }
+}
+
+async function deletePromoter(promoterId) {
+  if (!confirm('Are you sure you want to delete this promoter? This action cannot be undone.')) {
+    return;
+  }
+  
+  try {
+    await deleteDoc(doc(db, 'promoters', promoterId));
+    showToast('Promoter deleted successfully', 'success');
+    loadPromoters();
+  } catch (error) {
+    console.error('Error deleting promoter:', error);
+    showToast('Error deleting promoter', 'error');
+    }
+}
+
+// Setup promoter form submission
+function setupPromoterForm() {
+    const promoterForm = document.getElementById('promoterForm');
+    if (promoterForm) {
+        promoterForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const formData = {
+                name: document.getElementById('promoterName').value.trim(),
+                platform: document.getElementById('promoterPlatform').value,
+                profilePicture: document.getElementById('promoterProfilePicture').value.trim(),
+                subscribers: parseInt(document.getElementById('promoterSubscribers').value) || 0,
+                videos: parseInt(document.getElementById('promoterVideos').value) || 0,
+                url: document.getElementById('promoterUrl').value.trim(),
+                isActive: true,
+                createdAt: serverTimestamp()
+            };
+            
+            try {
+                // Add new promoter
+                await addDoc(promotersCol, formData);
+                
+                showToast('Promoter added successfully!', 'success');
+                closeAddPromoterModal();
+                loadPromoters();
+                
+            } catch (error) {
+                console.error('Error adding promoter:', error);
+                showToast('Failed to add promoter', 'error');
+    }
+  });
+}
+
+    // Setup edit promoter form submission
+    const editPromoterForm = document.getElementById('editPromoterForm');
+    if (editPromoterForm) {
+        editPromoterForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const promoterId = document.getElementById('editPromoterId').value;
+            if (!promoterId) {
+                showToast('Promoter ID not found', 'error');
+                return;
+            }
+            
+            const formData = {
+                name: document.getElementById('editPromoterName').value.trim(),
+                platform: document.getElementById('editPromoterPlatform').value,
+                profilePicture: document.getElementById('editPromoterProfilePicture').value.trim(),
+                subscribers: parseInt(document.getElementById('editPromoterSubscribers').value) || 0,
+                videos: parseInt(document.getElementById('editPromoterVideos').value) || 0,
+                url: document.getElementById('editPromoterUrl').value.trim(),
+                isActive: document.getElementById('editPromoterStatus').value === 'active',
+                updatedAt: serverTimestamp()
+            };
+            
+            try {
+                // Update promoter document
+                await updateDoc(doc(db, 'promoters', promoterId), formData);
+                
+                showToast('Promoter updated successfully!', 'success');
+                closeEditPromoterModal();
+                loadPromoters();
+                
+            } catch (error) {
+                console.error('Error updating promoter:', error);
+                showToast('Failed to update promoter', 'error');
+            }
+        });
+    }
+}
+
+// Promoter Modal Functions
+function openAddPromoterModal() {
+    document.getElementById('addPromoterModal').style.display = 'block';
+    document.body.style.overflow = 'hidden';
+}
+
+function closeAddPromoterModal() {
+    document.getElementById('addPromoterModal').style.display = 'none';
+    document.body.style.overflow = 'auto';
+    document.getElementById('promoterForm').reset();
+    document.getElementById('promoterImagePreview').style.display = 'none';
+}
+
+function openEditPromoterModal() {
+    document.getElementById('editPromoterModal').style.display = 'block';
+    document.body.style.overflow = 'hidden';
+}
+
+function closeEditPromoterModal() {
+    document.getElementById('editPromoterModal').style.display = 'none';
+    document.body.style.overflow = 'auto';
+    document.getElementById('editPromoterForm').reset();
+    document.getElementById('editPromoterImagePreview').style.display = 'none';
+}
+
+function deletePromoterFromEdit() {
+    const promoterId = document.getElementById('editPromoterId').value;
+    if (promoterId) {
+        closeEditPromoterModal();
+        deletePromoter(promoterId);
+    }
+}
+
+// Global functions for onclick handlers - moved to end of file
 window.openEditProductModal = function() {
   document.getElementById('editProductModal').style.display = 'block';
   document.body.style.overflow = 'hidden';
@@ -1685,13 +1959,30 @@ function initializeAdminPanel() {
             if (!q) { tbody.innerHTML = all.join(''); return; }
             const filtered = all.filter(html => html.toLowerCase().includes(q));
             tbody.innerHTML = filtered.length ? filtered.join('') : '<tr><td colspan="9">No matches.</td></tr>';
-        });
-    }
+    });
+  }
   
   // Setup contact management
     console.log('Setting up contact management...');
   loadContacts();
   document.getElementById('refreshContactsBtn')?.addEventListener('click', loadContacts);
+  
+  // Setup promoter management
+    console.log('Setting up promoter management...');
+  loadPromoters();
+  setupPromoterForm();
+  document.getElementById('refreshPromotersBtn')?.addEventListener('click', loadPromoters);
+  const promotersSearch = document.getElementById('searchPromotersInput');
+  if (promotersSearch) {
+      promotersSearch.addEventListener('input', () => {
+          const tbody = document.querySelector('#promotersTable tbody');
+          const q = promotersSearch.value.trim().toLowerCase();
+          const all = JSON.parse(tbody?.dataset?.allRows || '[]');
+          if (!q) { tbody.innerHTML = all.join(''); return; }
+          const filtered = all.filter(html => html.toLowerCase().includes(q));
+          tbody.innerHTML = filtered.length ? filtered.join('') : '<tr><td colspan="7">No matches.</td></tr>';
+      });
+  }
   
   console.log('Admin panel initialization complete');
 }
@@ -1745,5 +2036,30 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
   });
 });
+
+// Export all functions to global scope
+window.addVariant = addVariant;
+window.addExtraField = addExtraField;
+window.editProduct = editProduct;
+window.cancelAddProduct = cancelAddProduct;
+window.deleteProduct = deleteProduct;
+window.updateUserRole = updateUserRole;
+window.viewUserDetails = viewUserDetails;
+window.viewContactMessage = viewContactMessage;
+window.viewBase64Image = viewBase64Image;
+window.debugUserAccess = debugUserAccess;
+window.editCoupon = editCoupon;
+window.deleteCoupon = deleteCoupon;
+window.openEditCouponModal = openEditCouponModal;
+window.closeEditCouponModal = closeEditCouponModal;
+window.deleteCouponFromEdit = deleteCouponFromEdit;
+window.editPromoter = editPromoter;
+window.deletePromoter = deletePromoter;
+window.openAddPromoterModal = openAddPromoterModal;
+window.closeAddPromoterModal = closeAddPromoterModal;
+window.openEditPromoterModal = openEditPromoterModal;
+window.closeEditPromoterModal = closeEditPromoterModal;
+window.deletePromoterFromEdit = deletePromoterFromEdit;
+window.fetchPromoterInfo = fetchPromoterInfo;
 
 
