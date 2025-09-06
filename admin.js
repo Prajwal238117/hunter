@@ -1340,15 +1340,19 @@ async function loadUsers() {
   try {
     const q = query(usersCol, orderBy('createdAt', 'desc'));
       snap = await getDocs(q);
+      console.log('Users loaded with orderBy:', snap.size);
     } catch (orderError) {
       // If orderBy fails (likely due to missing index), get all users without ordering
+      console.log('OrderBy failed, trying without ordering:', orderError.message);
       snap = await getDocs(usersCol);
+      console.log('Users loaded without orderBy:', snap.size);
     }
     
     const rows = [];
     
     snap.forEach(docSnap => {
       const userData = docSnap.data();
+      console.log('Processing user:', docSnap.id, userData.email);
       const created = userData.createdAt?.toDate?.() || new Date(0);
       const dateStr = created.toLocaleDateString();
       const name = `${userData.firstName || ''} ${userData.lastName || ''}`.trim() || 'N/A';
@@ -1384,6 +1388,7 @@ async function loadUsers() {
       });
     }
     
+    console.log('Total rows processed:', rows.length);
     tbody.dataset.allRows = JSON.stringify(rows);
     tbody.innerHTML = rows.length ? rows.join('') : '<tr><td colspan="6">No users found.</td></tr>';
   } catch (err) {
@@ -1520,7 +1525,7 @@ async function loadPromoters() {
   const tbody = document.querySelector('#promotersTable tbody');
   if (!tbody) return;
   
-  tbody.innerHTML = '<tr><td colspan="7">Loading...</td></tr>';
+  tbody.innerHTML = '<tr><td colspan="7"><div class="promoters-loading"></div></td></tr>';
   try {
     const q = query(promotersCol, orderBy('createdAt', 'desc'));
     const snap = await getDocs(q);
@@ -1539,36 +1544,46 @@ async function loadPromoters() {
       rows.push(`
         <tr data-promoter-id="${docSnap.id}">
           <td>
-            <div style="display: flex; align-items: center; gap: 0.75rem;">
-              <img src="${promoterData.profilePicture || 'https://via.placeholder.com/40x40/667eea/ffffff?text=?'}" 
+            <div class="promoter-profile">
+              <img src="${promoterData.profilePicture || 'https://via.placeholder.com/40x40/667eea/ffffff?text=' + (name.charAt(0) || '?')}" 
                    alt="${name}" 
-                   style="width: 40px; height: 40px; border-radius: 50%; object-fit: cover;"
-                   onerror="this.src='https://via.placeholder.com/40x40/667eea/ffffff?text=?'">
-              <span>${name}</span>
+                   class="promoter-avatar"
+                   onerror="this.src='https://via.placeholder.com/40x40/667eea/ffffff?text=' + '${name.charAt(0) || '?'}'">
+              <div class="promoter-info">
+                <h4>${name}</h4>
+                <p>${promoterData.url || 'No URL'}</p>
       </div>
+    </div>
           </td>
-          <td>${platform}</td>
-          <td>${subscribers}</td>
+          <td>
+            <span class="platform-badge platform-${platform}">
+              <i class="fab fa-${platform === 'youtube' ? 'youtube' : platform === 'tiktok' ? 'tiktok' : platform === 'instagram' ? 'instagram' : 'facebook'}"></i>
+              ${platform.charAt(0).toUpperCase() + platform.slice(1)}
+            </span>
+          </td>
+          <td><span class="subscriber-count">${subscribers}</span></td>
           <td>${promoterData.videos || 0}</td>
           <td><span class="status-badge ${statusClass}">${status}</span></td>
           <td>${dateStr}</td>
-          <td class="actions">
-            <button class="btn btn-warning btn-sm" onclick="editPromoter('${docSnap.id}')">
-              <i class="fas fa-edit"></i>
-            </button>
-            <button class="btn btn-danger btn-sm" onclick="deletePromoter('${docSnap.id}')">
-              <i class="fas fa-trash"></i>
-            </button>
+          <td>
+            <div class="promoter-actions">
+              <button class="btn" onclick="editPromoter('${docSnap.id}')">
+                <i class="fas fa-edit"></i> Edit
+              </button>
+              <button class="btn btn-danger" onclick="deletePromoter('${docSnap.id}')">
+                <i class="fas fa-trash"></i> Delete
+              </button>
+            </div>
           </td>
         </tr>
       `);
     });
     
     tbody.dataset.allRows = JSON.stringify(rows);
-    tbody.innerHTML = rows.length ? rows.join('') : '<tr><td colspan="7">No promoters found.</td></tr>';
+    tbody.innerHTML = rows.length ? rows.join('') : '<tr><td colspan="7"><div class="promoters-empty"><i class="fas fa-users"></i><h3>No Promoters Found</h3><p>Start by adding your first promoter to get started.</p><button class="btn btn-success" onclick="openAddPromoterModal()"><i class="fas fa-plus"></i> Add Promoter</button></div></td></tr>';
   } catch (err) {
     console.error(err);
-    tbody.innerHTML = '<tr><td colspan="7">Failed to load promoters.</td></tr>';
+    tbody.innerHTML = '<tr><td colspan="7"><div class="promoters-empty"><i class="fas fa-exclamation-triangle"></i><h3>Error Loading Promoters</h3><p>There was an error loading the promoters. Please try again.</p><button class="btn" onclick="loadPromoters()"><i class="fas fa-sync-alt"></i> Retry</button></div></td></tr>';
   }
 }
 

@@ -174,3 +174,4 @@ document.addEventListener('DOMContentLoaded', () => {
 
 // Make functions globally available
 window.sharePromoter = sharePromoter;
+
