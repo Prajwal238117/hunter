@@ -1,6 +1,6 @@
 import { auth, db } from './firebase-config.js';
 import { signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-auth.js";
-import { collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
+import { collection, addDoc, serverTimestamp, updateDoc, doc } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
 import { showToast } from './toast.js';
 
 // Turnstile callback must be on window for data-callback to find it
@@ -264,6 +264,16 @@ function handleSubmit() {
 
       const paymentDoc = await addDoc(collection(db, 'payments'), payload);
 
+      // Track coupon usage if a coupon was applied
+      if (appliedCoupon && appliedCoupon.code) {
+        try {
+          await trackCouponUsage(appliedCoupon, productIds, orderId);
+        } catch (error) {
+          console.error('Error tracking coupon usage:', error);
+          // Don't fail the payment if coupon tracking fails
+        }
+      }
+
       // Get order details for success page
       const orderId = paymentDoc.id;
       const orderTotal = getOrderTotal();
@@ -476,4 +486,35 @@ document.addEventListener('DOMContentLoaded', () => {
   handleSubmit();
 });
 
+// Function to track coupon usage
+async function trackCouponUsage(coupon, productIds, orderId) {
+  try {
+    const couponUsageData = {
+      couponCode: coupon.code,
+      couponId: coupon.id || coupon.code, // Use coupon ID if available, otherwise use code
+      orderId: orderId,
+      productIds: productIds,
+      discountAmount: coupon.type === 'percentage' ? 
+        (getOrderTotal().replace('Rs ', '') * coupon.value / 100) : 
+        coupon.value,
+      discountType: coupon.type,
+      usedAt: serverTimestamp(),
+      userId: auth.currentUser?.uid || 'anonymous'
+    };
 
+    // Add to coupon usage collection
+    await addDoc(collection(db, 'couponUsage'), couponUsageData);
+    
+    // Update coupon usage count in coupons collection
+    if (coupon.id) {
+      const couponRef = doc(db, 'coupons', coupon.id);
+      await updateDoc(couponRef, {
+        usageCount: (coupon.usageCount || 0) + 1,
+        lastUsedAt: serverTimestamp()
+      });
+    }
+  } catch (error) {
+    console.error('Error tracking coupon usage:', error);
+    throw error;
+  }
+}

@@ -571,6 +571,9 @@ async function loadProducts() {
       return;
     }
     
+    // Get coupon usage data
+    const couponUsageData = await getCouponUsageData();
+    
     // Sort products by priority (high to low) and then by sales count (high to low)
     const products = snap.docs.map(doc => ({
       id: doc.id,
@@ -591,6 +594,14 @@ async function loadProducts() {
       const priorityText = getPriorityText(product.priority || 2);
       const salesCount = product.salesCount || 0;
       
+      // Get coupon usage for this product
+      const productCouponUsage = couponUsageData.filter(usage => 
+        usage.productIds && usage.productIds.includes(product.id)
+      );
+      
+      const couponUsageCount = productCouponUsage.length;
+      const uniqueCouponsUsed = [...new Set(productCouponUsage.map(usage => usage.couponCode))].length;
+      
       return `
         <div class="product-card" data-product-id="${product.id}">
           <div class="product-image">
@@ -607,6 +618,24 @@ async function loadProducts() {
             <p class="product-price">Rs ${basePrice}</p>
             <p class="muted">${variants.length} variant${variants.length !== 1 ? 's' : ''}</p>
             <p class="sales-info">Sales: ${salesCount}</p>
+            <div class="coupon-usage-info">
+              <p class="coupon-usage">
+                <i class="fas fa-tag"></i> 
+                Coupon Usage: ${couponUsageCount} time${couponUsageCount !== 1 ? 's' : ''}
+                ${uniqueCouponsUsed > 0 ? ` (${uniqueCouponsUsed} unique coupon${uniqueCouponsUsed !== 1 ? 's' : ''})` : ''}
+              </p>
+              ${couponUsageCount > 0 ? `
+                <div class="coupon-details">
+                  <small>Recent coupons used:</small>
+                  <div class="coupon-list">
+                    ${productCouponUsage.slice(0, 3).map(usage => 
+                      `<span class="coupon-tag">${usage.couponCode}</span>`
+                    ).join('')}
+                    ${productCouponUsage.length > 3 ? `<span class="coupon-more">+${productCouponUsage.length - 3} more</span>` : ''}
+                  </div>
+                </div>
+              ` : ''}
+            </div>
             <div class="product-actions">
               <button class="btn" onclick="editProduct('${product.id}')">Edit</button>
               <button class="btn" onclick="deleteProduct('${product.id}')" style="background: #ff4757;">Delete</button>
@@ -631,6 +660,23 @@ function getPriorityText(priority) {
     case 3: return 'High';
     case 4: return 'Very High';
     default: return 'Normal';
+  }
+}
+
+// Function to get coupon usage data
+async function getCouponUsageData() {
+  try {
+    const couponUsageCol = collection(db, 'couponUsage');
+    const q = query(couponUsageCol, orderBy('usedAt', 'desc'));
+    const snap = await getDocs(q);
+    
+    return snap.docs.map(doc => ({
+      id: doc.id,
+      ...doc.data()
+    }));
+  } catch (error) {
+    console.error('Error fetching coupon usage data:', error);
+    return [];
   }
 }
 
