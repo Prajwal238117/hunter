@@ -209,10 +209,18 @@ async function loadCoupons() {
             return;
         }
         
+        // Get coupon usage data
+        const couponUsageData = await getCouponUsageData();
+        
         const rows = [];
         snap.forEach(docSnap => {
             const coupon = docSnap.data();
-            rows.push(createCouponRow(docSnap.id, coupon));
+            // Count actual usage from couponUsage collection
+            const actualUsageCount = couponUsageData.filter(usage => 
+                usage.couponCode === coupon.code || usage.couponId === docSnap.id
+            ).length;
+            
+            rows.push(createCouponRow(docSnap.id, coupon, actualUsageCount));
         });
         
         tbody.dataset.allRows = JSON.stringify(rows);
@@ -224,10 +232,33 @@ async function loadCoupons() {
     }
 }
 
-function createCouponRow(id, coupon) {
+function createCouponRow(id, coupon, actualUsageCount = 0) {
     const status = coupon.isActive ? 'Active' : 'Inactive';
     const statusClass = coupon.isActive ? 'status-active' : 'status-inactive';
     const expiryDate = coupon.expiryDate ? coupon.expiryDate.toDate().toLocaleDateString() : 'No expiry';
+    
+    // Use actual usage count from couponUsage collection
+    const usageCount = actualUsageCount || 0;
+    const usageLimit = coupon.usageLimit || 'Unlimited';
+    
+    // Add visual indicator if usage is approaching limit and make it clickable
+    let usageDisplay = usageCount;
+    let usageClass = '';
+    
+    if (usageLimit !== 'Unlimited' && usageCount > 0) {
+        const limit = parseInt(usageLimit);
+        const percentage = (usageCount / limit) * 100;
+        if (percentage >= 90) {
+            usageClass = 'coupon-usage-high';
+        } else if (percentage >= 75) {
+            usageClass = 'coupon-usage-warning';
+        }
+    }
+    
+    // Make usage count clickable if there are usages
+    if (usageCount > 0) {
+        usageDisplay = `<span class="coupon-usage-count ${usageClass}" onclick="showCouponUsageDetails('${coupon.code}')" title="Click to view usage details">${usageCount}</span>`;
+    }
     
     return `
         <tr data-id="${id}">
@@ -235,8 +266,8 @@ function createCouponRow(id, coupon) {
             <td>${coupon.type === 'percentage' ? coupon.value + '%' : 'Rs ' + coupon.value}</td>
             <td>${coupon.type === 'percentage' ? 'Percentage' : 'Fixed Amount'}</td>
             <td>Rs ${coupon.minAmount}</td>
-            <td>${coupon.usageLimit}</td>
-            <td>${coupon.usedCount || 0}</td>
+            <td>${usageLimit}</td>
+            <td>${usageDisplay}</td>
             <td>${expiryDate}</td>
             <td><span class="status-badge ${statusClass}">${status}</span></td>
             <td class="actions">
@@ -677,6 +708,88 @@ async function getCouponUsageData() {
   } catch (error) {
     console.error('Error fetching coupon usage data:', error);
     return [];
+  }
+}
+
+// Function to get detailed coupon usage for a specific coupon
+async function getCouponUsageDetails(couponCode) {
+  try {
+    const couponUsageCol = collection(db, 'couponUsage');
+    const q = query(couponUsageCol, where('couponCode', '==', couponCode), orderBy('usedAt', 'desc'));
+    const snap = await getDocs(q);
+    
+    return snap.docs.map(doc => ({
+      id: doc.id,
+      ...doc.data()
+    }));
+  } catch (error) {
+    console.error('Error fetching coupon usage details:', error);
+    return [];
+  }
+}
+
+// Function to show coupon usage details in a modal
+async function showCouponUsageDetails(couponCode) {
+  try {
+    const usageDetails = await getCouponUsageDetails(couponCode);
+    
+    if (usageDetails.length === 0) {
+      showToast('No usage details found for this coupon', 'info');
+      return;
+    }
+    
+    // Create modal HTML
+    const modalHTML = `
+      <div id="couponUsageModal" style="display: block; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5);">
+        <div style="background-color: white; margin: 5% auto; padding: 20px; border-radius: 10px; width: 80%; max-width: 800px; max-height: 80%; overflow-y: auto;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+            <h2>Coupon Usage Details: ${couponCode}</h2>
+            <button onclick="closeCouponUsageModal()" style="background: none; border: none; font-size: 24px; cursor: pointer;">&times;</button>
+          </div>
+          <div style="margin-bottom: 20px;">
+            <p><strong>Total Usage:</strong> ${usageDetails.length} time${usageDetails.length !== 1 ? 's' : ''}</p>
+            <p><strong>Total Discount Given:</strong> Rs ${usageDetails.reduce((sum, usage) => sum + (usage.discountAmount || 0), 0).toFixed(2)}</p>
+          </div>
+          <table style="width: 100%; border-collapse: collapse; margin-top: 20px;">
+            <thead>
+              <tr style="background-color: #f8f9fa;">
+                <th style="padding: 10px; border: 1px solid #ddd;">Order ID</th>
+                <th style="padding: 10px; border: 1px solid #ddd;">Discount Amount</th>
+                <th style="padding: 10px; border: 1px solid #ddd;">Used Date</th>
+                <th style="padding: 10px; border: 1px solid #ddd;">User ID</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${usageDetails.map(usage => `
+                <tr>
+                  <td style="padding: 10px; border: 1px solid #ddd;">${usage.orderId || 'N/A'}</td>
+                  <td style="padding: 10px; border: 1px solid #ddd;">Rs ${(usage.discountAmount || 0).toFixed(2)}</td>
+                  <td style="padding: 10px; border: 1px solid #ddd;">${usage.usedAt ? usage.usedAt.toDate().toLocaleString() : 'N/A'}</td>
+                  <td style="padding: 10px; border: 1px solid #ddd;">${usage.userId || 'Anonymous'}</td>
+                </tr>
+              `).join('')}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    `;
+    
+    // Add modal to page
+    document.body.insertAdjacentHTML('beforeend', modalHTML);
+    document.body.style.overflow = 'hidden';
+    
+  } catch (error) {
+    console.error('Error showing coupon usage details:', error);
+    showToast('Error loading coupon usage details', 'error');
+  }
+}
+
+// Function to close coupon usage modal
+function closeCouponUsageModal() {
+  const modal = document.getElementById('couponUsageModal');
+  if (modal) {
+    modal.remove();
+    document.body.style.overflow = 'auto';
   }
 }
 
@@ -2114,6 +2227,8 @@ window.deleteCoupon = deleteCoupon;
 window.openEditCouponModal = openEditCouponModal;
 window.closeEditCouponModal = closeEditCouponModal;
 window.deleteCouponFromEdit = deleteCouponFromEdit;
+window.showCouponUsageDetails = showCouponUsageDetails;
+window.closeCouponUsageModal = closeCouponUsageModal;
 window.editPromoter = editPromoter;
 window.deletePromoter = deletePromoter;
 window.openAddPromoterModal = openAddPromoterModal;
