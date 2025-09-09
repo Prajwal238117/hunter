@@ -738,38 +738,210 @@ async function showCouponUsageDetails(couponCode) {
       return;
     }
     
+    // Get product details for each usage
+    const usageDetailsWithProducts = await Promise.all(
+      usageDetails.map(async (usage) => {
+        const productDetails = [];
+        if (usage.productIds && usage.productIds.length > 0) {
+          for (const productId of usage.productIds) {
+            try {
+              const productDoc = await getDoc(doc(db, 'products', productId));
+              if (productDoc.exists()) {
+                const productData = productDoc.data();
+                productDetails.push({
+                  id: productId,
+                  name: productData.name,
+                  imageUrl: productData.imageUrl || productData.imagePath
+                });
+              }
+            } catch (error) {
+              console.error('Error fetching product details:', error);
+            }
+          }
+        }
+        return { ...usage, productDetails };
+      })
+    );
+    
     // Create modal HTML
     const modalHTML = `
       <div id="couponUsageModal" style="display: block; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5);">
-        <div style="background-color: white; margin: 5% auto; padding: 20px; border-radius: 10px; width: 80%; max-width: 800px; max-height: 80%; overflow-y: auto;">
+        <div style="background-color: white; margin: 2% auto; padding: 20px; border-radius: 10px; width: 90%; max-width: 1200px; max-height: 90%; overflow-y: auto;">
           <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
             <h2>Coupon Usage Details: ${couponCode}</h2>
             <button onclick="closeCouponUsageModal()" style="background: none; border: none; font-size: 24px; cursor: pointer;">&times;</button>
           </div>
-          <div style="margin-bottom: 20px;">
-            <p><strong>Total Usage:</strong> ${usageDetails.length} time${usageDetails.length !== 1 ? 's' : ''}</p>
-            <p><strong>Total Discount Given:</strong> Rs ${usageDetails.reduce((sum, usage) => sum + (usage.discountAmount || 0), 0).toFixed(2)}</p>
+          <div style="margin-bottom: 20px; display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px;">
+            <div style="background: #f8f9fa; padding: 15px; border-radius: 8px;">
+              <p style="margin: 0; font-weight: bold; color: #667eea;">Total Usage</p>
+              <p style="margin: 5px 0 0 0; font-size: 24px; font-weight: bold;">${usageDetails.length}</p>
+            </div>
+            <div style="background: #f8f9fa; padding: 15px; border-radius: 8px;">
+              <p style="margin: 0; font-weight: bold; color: #667eea;">Total Discount</p>
+              <p style="margin: 5px 0 0 0; font-size: 24px; font-weight: bold;">Rs ${usageDetails.reduce((sum, usage) => sum + (usage.discountAmount || 0), 0).toFixed(2)}</p>
+            </div>
+            <div style="background: #f8f9fa; padding: 15px; border-radius: 8px;">
+              <p style="margin: 0; font-weight: bold; color: #667eea;">Unique Products</p>
+              <p style="margin: 5px 0 0 0; font-size: 24px; font-weight: bold;">${[...new Set(usageDetails.flatMap(u => u.productIds || []))].length}</p>
+            </div>
+            <div style="background: #f8f9fa; padding: 15px; border-radius: 8px;">
+              <p style="margin: 0; font-weight: bold; color: #667eea;">Total Items</p>
+              <p style="margin: 5px 0 0 0; font-size: 24px; font-weight: bold;">${usageDetails.reduce((sum, usage) => sum + (usage.cartItems ? usage.cartItems.reduce((itemSum, item) => itemSum + item.quantity, 0) : 0), 0)}</p>
+            </div>
           </div>
-          <table style="width: 100%; border-collapse: collapse; margin-top: 20px;">
-            <thead>
-              <tr style="background-color: #f8f9fa;">
-                <th style="padding: 10px; border: 1px solid #ddd;">Order ID</th>
-                <th style="padding: 10px; border: 1px solid #ddd;">Discount Amount</th>
-                <th style="padding: 10px; border: 1px solid #ddd;">Used Date</th>
-                <th style="padding: 10px; border: 1px solid #ddd;">User ID</th>
-              </tr>
-            </thead>
-            <tbody>
-              ${usageDetails.map(usage => `
-                <tr>
-                  <td style="padding: 10px; border: 1px solid #ddd;">${usage.orderId || 'N/A'}</td>
-                  <td style="padding: 10px; border: 1px solid #ddd;">Rs ${(usage.discountAmount || 0).toFixed(2)}</td>
-                  <td style="padding: 10px; border: 1px solid #ddd;">${usage.usedAt ? usage.usedAt.toDate().toLocaleString() : 'N/A'}</td>
-                  <td style="padding: 10px; border: 1px solid #ddd;">${usage.userId || 'Anonymous'}</td>
-                </tr>
+          
+          ${(() => {
+            // Calculate popular products and variants
+            const productStats = {};
+            const variantStats = {};
+            
+            usageDetailsWithProducts.forEach(usage => {
+              if (usage.cartItems) {
+                usage.cartItems.forEach(item => {
+                  // Product stats
+                  const productKey = `${item.productName} (${item.productId})`;
+                  if (!productStats[productKey]) {
+                    productStats[productKey] = { name: item.productName, id: item.productId, count: 0, totalQuantity: 0 };
+                  }
+                  productStats[productKey].count++;
+                  productStats[productKey].totalQuantity += item.quantity;
+                  
+                  // Variant stats
+                  const variantKey = `${item.productName} - ${item.variantLabel}`;
+                  if (!variantStats[variantKey]) {
+                    variantStats[variantKey] = { productName: item.productName, variantLabel: item.variantLabel, count: 0, totalQuantity: 0 };
+                  }
+                  variantStats[variantKey].count++;
+                  variantStats[variantKey].totalQuantity += item.quantity;
+                });
+              }
+            });
+            
+            const topProducts = Object.values(productStats).sort((a, b) => b.count - a.count).slice(0, 5);
+            const topVariants = Object.values(variantStats).sort((a, b) => b.count - a.count).slice(0, 5);
+            
+            return `
+              ${topProducts.length > 0 ? `
+                <div style="margin-top: 20px;">
+                  <h3 style="margin-bottom: 15px; color: #4a5568;">Most Popular Products</h3>
+                  <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px;">
+                    ${topProducts.map(product => `
+                      <div style="background: white; border: 1px solid #e2e8f0; border-radius: 8px; padding: 15px;">
+                        <p style="margin: 0 0 5px 0; font-weight: 600; color: #2d3748;">${product.name}</p>
+                        <p style="margin: 0; color: #667eea; font-size: 14px;">${product.count} purchase${product.count !== 1 ? 's' : ''}</p>
+                        <p style="margin: 5px 0 0 0; color: #718096; font-size: 12px;">${product.totalQuantity} total items</p>
+                      </div>
+                    `).join('')}
+                  </div>
+                </div>
+              ` : ''}
+              
+              ${topVariants.length > 0 ? `
+                <div style="margin-top: 20px;">
+                  <h3 style="margin-bottom: 15px; color: #4a5568;">Most Popular Variants</h3>
+                  <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 10px;">
+                    ${topVariants.map(variant => `
+                      <div style="background: white; border: 1px solid #e2e8f0; border-radius: 8px; padding: 15px;">
+                        <p style="margin: 0 0 5px 0; font-weight: 600; color: #2d3748;">${variant.productName}</p>
+                        <p style="margin: 0; color: #667eea; font-size: 14px; font-weight: 500;">
+                          <i class="fas fa-tag"></i> ${variant.variantLabel}
+                        </p>
+                        <p style="margin: 5px 0 0 0; color: #718096; font-size: 12px;">${variant.count} purchase${variant.count !== 1 ? 's' : ''} • ${variant.totalQuantity} items</p>
+                      </div>
+                    `).join('')}
+                  </div>
+                </div>
+              ` : ''}
+            `;
+          })()}
+          
+          <div style="margin-top: 20px;">
+            <h3 style="margin-bottom: 15px; color: #4a5568;">Usage History</h3>
+            <div style="display: grid; gap: 15px;">
+              ${usageDetailsWithProducts.map((usage, index) => `
+                <div style="border: 1px solid #e2e8f0; border-radius: 10px; padding: 20px; background: #fafafa;">
+                  <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 15px;">
+                    <div>
+                      <h4 style="margin: 0 0 5px 0; color: #2d3748;">Order #${usage.orderId || 'N/A'}</h4>
+                      <p style="margin: 0; color: #718096; font-size: 14px;">
+                        ${usage.usedAt ? usage.usedAt.toDate().toLocaleString() : 'N/A'}
+                      </p>
+                    </div>
+                    <div style="text-align: right;">
+                      <p style="margin: 0; font-size: 18px; font-weight: bold; color: #48bb78;">
+                        Rs ${(usage.discountAmount || 0).toFixed(2)} discount
+                      </p>
+                      <p style="margin: 5px 0 0 0; color: #718096; font-size: 12px;">
+                        User: ${usage.userId || 'Anonymous'}
+                      </p>
+                    </div>
+                  </div>
+                  
+                  ${usage.cartItems && usage.cartItems.length > 0 ? `
+                    <div>
+                      <h5 style="margin: 0 0 10px 0; color: #4a5568;">Products & Variants Purchased:</h5>
+                      <div style="display: grid; gap: 10px;">
+                        ${usage.cartItems.map(item => `
+                          <div style="display: flex; align-items: center; justify-content: space-between; padding: 15px; background: white; border-radius: 8px; border: 1px solid #e2e8f0;">
+                            <div style="display: flex; align-items: center; flex: 1;">
+                              <div style="width: 50px; height: 50px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 8px; margin-right: 15px; display: flex; align-items: center; justify-content: center;">
+                                <i class="fas fa-box" style="color: white; font-size: 20px;"></i>
+                              </div>
+                              <div style="flex: 1;">
+                                <p style="margin: 0; font-weight: 600; color: #2d3748; font-size: 16px;">${item.productName}</p>
+                                <p style="margin: 5px 0 0 0; color: #667eea; font-size: 14px; font-weight: 500;">
+                                  <i class="fas fa-tag"></i> ${item.variantLabel}
+                                </p>
+                                <p style="margin: 5px 0 0 0; color: #718096; font-size: 12px;">
+                                  Product ID: ${item.productId}
+                                </p>
+                              </div>
+                            </div>
+                            <div style="text-align: right;">
+                              <p style="margin: 0; font-size: 14px; color: #718096;">Quantity: ${item.quantity}</p>
+                              <p style="margin: 5px 0 0 0; font-size: 16px; font-weight: bold; color: #48bb78;">
+                                Rs ${item.totalPrice.toFixed(2)}
+                              </p>
+                              <p style="margin: 2px 0 0 0; font-size: 12px; color: #a0aec0;">
+                                Rs ${item.variantPrice} each
+                              </p>
+                            </div>
+                          </div>
+                        `).join('')}
+                      </div>
+                    </div>
+                  ` : usage.productDetails && usage.productDetails.length > 0 ? `
+                    <div>
+                      <h5 style="margin: 0 0 10px 0; color: #4a5568;">Products Purchased (Legacy Data):</h5>
+                      <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 10px;">
+                        ${usage.productDetails.map(product => `
+                          <div style="display: flex; align-items: center; padding: 10px; background: white; border-radius: 8px; border: 1px solid #e2e8f0;">
+                            ${product.imageUrl ? `
+                              <img src="${product.imageUrl}" alt="${product.name}" style="width: 40px; height: 40px; object-fit: cover; border-radius: 6px; margin-right: 10px;">
+                            ` : `
+                              <div style="width: 40px; height: 40px; background: #e2e8f0; border-radius: 6px; margin-right: 10px; display: flex; align-items: center; justify-content: center;">
+                                <i class="fas fa-image" style="color: #a0aec0;"></i>
+                              </div>
+                            `}
+                            <div>
+                              <p style="margin: 0; font-weight: 600; color: #2d3748; font-size: 14px;">${product.name}</p>
+                              <p style="margin: 2px 0 0 0; color: #718096; font-size: 12px;">ID: ${product.id}</p>
+                            </div>
+                          </div>
+                        `).join('')}
+                      </div>
+                    </div>
+                  ` : `
+                    <div style="padding: 10px; background: #fed7d7; border-radius: 6px; border-left: 4px solid #f56565;">
+                      <p style="margin: 0; color: #c53030; font-size: 14px;">
+                        <i class="fas fa-exclamation-triangle"></i> Product details not available
+                      </p>
+                    </div>
+                  `}
+                </div>
               `).join('')}
-            </tbody>
-          </table>
+            </div>
+          </div>
         </div>
       </div>
     `;
