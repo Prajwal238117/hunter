@@ -190,6 +190,52 @@ function handleSubmit() {
       return;
     }
 
+    // Get coupon data for tracking
+    let appliedCoupon = null;
+    
+    // Try to get coupon data from multiple sources
+    const checkoutData = localStorage.getItem('checkoutData');
+    if (checkoutData) {
+      try {
+        const parsed = JSON.parse(checkoutData);
+        if (parsed.appliedCoupon && parsed.appliedCoupon.code) {
+          appliedCoupon = parsed.appliedCoupon;
+        }
+      } catch (e) {
+        // Invalid checkout data, try alternative sources
+      }
+    }
+    
+    // If not found in checkoutData, try tempCouponData
+    if (!appliedCoupon) {
+      const tempCouponRaw = localStorage.getItem('tempCouponData');
+      if (tempCouponRaw && tempCouponRaw !== 'null' && tempCouponRaw !== 'undefined') {
+        try {
+          appliedCoupon = JSON.parse(tempCouponRaw);
+          if (!appliedCoupon || typeof appliedCoupon !== 'object' || !appliedCoupon.code) {
+            appliedCoupon = null;
+          }
+        } catch (e) {
+          appliedCoupon = null;
+        }
+      }
+    }
+    
+    // Fallback: try the old appliedCoupon location
+    if (!appliedCoupon) {
+      const appliedCouponRaw = localStorage.getItem('appliedCoupon');
+      if (appliedCouponRaw && appliedCouponRaw !== 'null' && appliedCouponRaw !== 'undefined') {
+        try {
+          appliedCoupon = JSON.parse(appliedCouponRaw);
+          if (!appliedCoupon || typeof appliedCoupon !== 'object' || !appliedCoupon.code) {
+            appliedCoupon = null;
+          }
+        } catch (e) {
+          appliedCoupon = null;
+        }
+      }
+    }
+
     // No verification now
 
     const originalBtnText = submitBtn.innerHTML;
@@ -264,6 +310,9 @@ function handleSubmit() {
 
       const paymentDoc = await addDoc(collection(db, 'payments'), payload);
 
+      // Get order details for success page
+      const orderId = paymentDoc.id;
+
       // Track coupon usage if a coupon was applied
       if (appliedCoupon && appliedCoupon.code) {
         try {
@@ -273,9 +322,6 @@ function handleSubmit() {
           // Don't fail the payment if coupon tracking fails
         }
       }
-
-      // Get order details for success page
-      const orderId = paymentDoc.id;
       const orderTotal = getOrderTotal();
       const paymentMethod = getSelectedPaymentMethod();
 
@@ -489,14 +535,23 @@ document.addEventListener('DOMContentLoaded', () => {
 // Function to track coupon usage
 async function trackCouponUsage(coupon, productIds, orderId) {
   try {
+    // Calculate discount amount based on cart total
+    const cart = JSON.parse(localStorage.getItem('cart') || '[]');
+    const subtotal = cart.reduce((t, i) => t + Number(i.price) * (i.quantity || 1), 0);
+    
+    let discountAmount = 0;
+    if (coupon.type === 'percentage') {
+      discountAmount = (subtotal * coupon.value) / 100;
+    } else {
+      discountAmount = Math.min(coupon.value, subtotal);
+    }
+
     const couponUsageData = {
       couponCode: coupon.code,
       couponId: coupon.id || coupon.code, // Use coupon ID if available, otherwise use code
       orderId: orderId,
       productIds: productIds,
-      discountAmount: coupon.type === 'percentage' ? 
-        (getOrderTotal().replace('Rs ', '') * coupon.value / 100) : 
-        coupon.value,
+      discountAmount: discountAmount,
       discountType: coupon.type,
       usedAt: serverTimestamp(),
       userId: auth.currentUser?.uid || 'anonymous'
