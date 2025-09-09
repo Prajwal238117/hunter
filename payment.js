@@ -1,3 +1,6 @@
+// Payment.js - Updated with coupon tracking functionality
+// Version: 2024-01-15 - Fixed appliedCoupon scope issue
+
 import { auth, db } from './firebase-config.js';
 import { signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-auth.js";
 import { collection, addDoc, serverTimestamp, updateDoc, doc } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
@@ -192,6 +195,7 @@ function handleSubmit() {
 
     // Get coupon data for tracking
     let appliedCoupon = null;
+    console.log('Starting coupon data retrieval for payment tracking...');
     
     // Try to get coupon data from multiple sources
     const checkoutData = localStorage.getItem('checkoutData');
@@ -200,9 +204,10 @@ function handleSubmit() {
         const parsed = JSON.parse(checkoutData);
         if (parsed.appliedCoupon && parsed.appliedCoupon.code) {
           appliedCoupon = parsed.appliedCoupon;
+          console.log('Found coupon in checkoutData:', appliedCoupon.code);
         }
       } catch (e) {
-        // Invalid checkout data, try alternative sources
+        console.log('Invalid checkout data, trying alternative sources...');
       }
     }
     
@@ -316,11 +321,14 @@ function handleSubmit() {
       // Track coupon usage if a coupon was applied
       if (appliedCoupon && appliedCoupon.code) {
         try {
+          console.log('Tracking coupon usage:', appliedCoupon.code);
           await trackCouponUsage(appliedCoupon, productIds, orderId);
         } catch (error) {
           console.error('Error tracking coupon usage:', error);
           // Don't fail the payment if coupon tracking fails
         }
+      } else {
+        console.log('No coupon applied or coupon data missing');
       }
       const orderTotal = getOrderTotal();
       const paymentMethod = getSelectedPaymentMethod();
