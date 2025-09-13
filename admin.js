@@ -1195,6 +1195,8 @@ async function editProduct(productId) {
     document.getElementById('editProductFeatures').value = (product.features || []).join('\n');
     document.getElementById('editFeaturedProduct').checked = product.featured || false;
     document.getElementById('editProductPriority').value = product.priority || '2';
+    document.getElementById('editProductDiscount').value = product.discount || 0;
+    document.getElementById('editProductGame').value = product.game || '';
     
 
     
@@ -1288,6 +1290,8 @@ async function handleProductSubmit(e) {
     const productFeatures = document.getElementById('productFeatures').value;
     const featuredProduct = document.getElementById('featuredProduct').checked;
     const productPriority = document.getElementById('productPriority').value;
+    const productDiscount = document.getElementById('productDiscount').value;
+    
     
     // Handle image upload - support both file upload and URL input
     let imageData = null;
@@ -1355,6 +1359,8 @@ async function handleProductSubmit(e) {
       extraFields: extras,
       featured: featuredProduct,
       priority: parseInt(productPriority),
+      discount: productDiscount ? parseFloat(productDiscount) : 0,
+      game: productGame.trim() || '',
       createdAt: serverTimestamp(),
       updatedAt: serverTimestamp()
     };
@@ -1404,7 +1410,8 @@ async function handleEditProductSubmit(e) {
     const productFeatures = document.getElementById('editProductFeatures').value;
     const featuredProduct = document.getElementById('editFeaturedProduct').checked;
     const productPriority = document.getElementById('editProductPriority').value;
-    
+    const productDiscount = document.getElementById('editProductDiscount').value;
+   
     // Handle image update
     let imageUrl = document.getElementById('editProductImageUrl').value.trim();
     const editProductImage = document.getElementById('editProductImage');
@@ -1486,6 +1493,8 @@ async function handleEditProductSubmit(e) {
       extraFields: extras,
       featured: featuredProduct,
       priority: parseInt(productPriority),
+      discount: productDiscount ? parseFloat(productDiscount) : 0,
+      game: productGame.trim() || '',
       updatedAt: serverTimestamp()
     };
     

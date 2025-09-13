@@ -554,11 +554,22 @@ async function trackCouponUsage(coupon, productIds, orderId) {
       discountAmount = Math.min(coupon.value, subtotal);
     }
 
+    // Prepare detailed cart items with variant information
+    const cartItems = cart.map(item => ({
+      productId: item.productId,
+      productName: item.name,
+      variantLabel: item.variantLabel || item.label || 'Default',
+      variantPrice: item.price,
+      quantity: item.quantity || 1,
+      totalPrice: Number(item.price) * (item.quantity || 1)
+    }));
+
     const couponUsageData = {
       couponCode: coupon.code,
       couponId: coupon.id || coupon.code, // Use coupon ID if available, otherwise use code
       orderId: orderId,
       productIds: productIds,
+      cartItems: cartItems, // Detailed cart information with variants
       discountAmount: discountAmount,
       discountType: coupon.type,
       usedAt: serverTimestamp(),

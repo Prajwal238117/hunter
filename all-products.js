@@ -8,6 +8,13 @@ class AllProducts {
         this.sortSelect = document.getElementById('sortSelect');
         this.allProducts = [];
         this.filteredProducts = [];
+        this.currentFilters = {
+            categories: [],
+            games: [],
+            priceRange: { min: 0, max: 10000 },
+            discount: false
+        };
+        this.searchSuggestions = [];
         
         this.init();
     }
@@ -50,7 +57,91 @@ class AllProducts {
 
         // Handle search from URL parameters
         this.handleSearchFromURL();
+
+            // Setup additional filter functionality
+            this.setupFilterEventListeners();
     }
+
+    setupFilterEventListeners() {
+        // Filter toggle button
+        const filterToggle = document.getElementById('filterToggle');
+        const filterSidebar = document.getElementById('filterSidebar');
+        const filterOverlay = document.getElementById('filterOverlay');
+        const closeFilters = document.getElementById('closeFilters');
+
+        if (filterToggle) {
+            filterToggle.addEventListener('click', () => {
+                this.toggleFilterSidebar();
+            });
+        }
+
+        if (closeFilters) {
+            closeFilters.addEventListener('click', () => {
+                this.closeFilterSidebar();
+            });
+        }
+
+        if (filterOverlay) {
+            filterOverlay.addEventListener('click', () => {
+                this.closeFilterSidebar();
+            });
+        }
+
+        // Filter checkboxes
+        const filterCheckboxes = document.querySelectorAll('.filter-checkbox');
+        filterCheckboxes.forEach(checkbox => {
+            checkbox.addEventListener('change', () => {
+                this.updateFilters();
+            });
+        });
+
+        // Price range inputs
+        const minPrice = document.getElementById('minPrice');
+        const maxPrice = document.getElementById('maxPrice');
+        const priceRangeMin = document.getElementById('priceRangeMin');
+        const priceRangeMax = document.getElementById('priceRangeMax');
+
+        if (minPrice) {
+            minPrice.addEventListener('input', () => {
+                this.updatePriceRangeFromInputs();
+            });
+        }
+
+        if (maxPrice) {
+            maxPrice.addEventListener('input', () => {
+                this.updatePriceRangeFromInputs();
+            });
+        }
+
+        if (priceRangeMin) {
+            priceRangeMin.addEventListener('input', () => {
+                this.updatePriceRangeFromSliders();
+            });
+        }
+
+        if (priceRangeMax) {
+            priceRangeMax.addEventListener('input', () => {
+                this.updatePriceRangeFromSliders();
+            });
+        }
+
+        // Filter buttons
+        const clearAllFilters = document.getElementById('clearAllFilters');
+        const applyFilters = document.getElementById('applyFilters');
+
+        if (clearAllFilters) {
+            clearAllFilters.addEventListener('click', () => {
+                this.clearAllFilters();
+            });
+        }
+
+        if (applyFilters) {
+            applyFilters.addEventListener('click', () => {
+                this.applyFilters();
+            });
+        }
+    }
+
 
     async loadAllProducts() {
         try {
@@ -85,10 +176,290 @@ class AllProducts {
             if (this.sortSelect) {
                 this.sortSelect.value = 'priority';
             }
+
+            // Initialize filter functionality
+            this.updateFilterCounts();
+            this.populateGameFilters();
+            this.initializePriceRange();
         } catch (error) {
             this.displayProducts([]);
         }
     }
+
+    // Filter Sidebar Methods
+    toggleFilterSidebar() {
+        const sidebar = document.getElementById('filterSidebar');
+        const overlay = document.getElementById('filterOverlay');
+        
+        if (sidebar && overlay) {
+            sidebar.classList.toggle('open');
+            overlay.classList.toggle('active');
+            document.body.style.overflow = sidebar.classList.contains('open') ? 'hidden' : '';
+        }
+    }
+
+    closeFilterSidebar() {
+        const sidebar = document.getElementById('filterSidebar');
+        const overlay = document.getElementById('filterOverlay');
+        
+        if (sidebar && overlay) {
+            sidebar.classList.remove('open');
+            overlay.classList.remove('active');
+            document.body.style.overflow = '';
+        }
+    }
+
+    updateFilters() {
+        const categoryCheckboxes = document.querySelectorAll('#categoryFilters .filter-checkbox');
+        const gameCheckboxes = document.querySelectorAll('#gameFilters .filter-checkbox');
+        const discountCheckbox = document.querySelector('input[value="discount"]');
+
+        // Update category filters
+        this.currentFilters.categories = [];
+        categoryCheckboxes.forEach(checkbox => {
+            if (checkbox.checked) {
+                this.currentFilters.categories.push(checkbox.value);
+            }
+        });
+
+        // Update game filters
+        this.currentFilters.games = [];
+        gameCheckboxes.forEach(checkbox => {
+            if (checkbox.checked) {
+                this.currentFilters.games.push(checkbox.value);
+            }
+        });
+
+        // Update other filters
+        this.currentFilters.discount = discountCheckbox ? discountCheckbox.checked : false;
+
+        this.updateActiveFiltersCount();
+    }
+
+    updatePriceRangeFromInputs() {
+        const minPrice = document.getElementById('minPrice');
+        const maxPrice = document.getElementById('maxPrice');
+        const priceRangeMin = document.getElementById('priceRangeMin');
+        const priceRangeMax = document.getElementById('priceRangeMax');
+
+        if (minPrice && maxPrice && priceRangeMin && priceRangeMax) {
+            const min = parseInt(minPrice.value) || 0;
+            const max = parseInt(maxPrice.value) || 10000;
+            
+            // Ensure min doesn't exceed max
+            if (min > max) {
+                minPrice.value = max;
+                return;
+            }
+            
+            this.currentFilters.priceRange = { min, max };
+            priceRangeMin.value = min;
+            priceRangeMax.value = max;
+            this.updatePriceLabels();
+        }
+    }
+
+    updatePriceRangeFromSliders() {
+        const minPrice = document.getElementById('minPrice');
+        const maxPrice = document.getElementById('maxPrice');
+        const priceRangeMin = document.getElementById('priceRangeMin');
+        const priceRangeMax = document.getElementById('priceRangeMax');
+
+        if (minPrice && maxPrice && priceRangeMin && priceRangeMax) {
+            const min = parseInt(priceRangeMin.value);
+            const max = parseInt(priceRangeMax.value);
+            
+            // Ensure min doesn't exceed max
+            if (min > max) {
+                priceRangeMin.value = max;
+                return;
+            }
+            
+            this.currentFilters.priceRange = { min, max };
+            minPrice.value = min;
+            maxPrice.value = max;
+            this.updatePriceLabels();
+        }
+    }
+
+    updatePriceLabels() {
+        const minPriceLabel = document.getElementById('minPriceLabel');
+        const maxPriceLabel = document.getElementById('maxPriceLabel');
+
+        if (minPriceLabel && maxPriceLabel) {
+            minPriceLabel.textContent = `Rs ${this.currentFilters.priceRange.min.toLocaleString()}`;
+            maxPriceLabel.textContent = this.currentFilters.priceRange.max >= 10000 ? 
+                'Rs 10,000+' : `Rs ${this.currentFilters.priceRange.max.toLocaleString()}`;
+        }
+    }
+
+    clearAllFilters() {
+        // Reset all checkboxes
+        const checkboxes = document.querySelectorAll('.filter-checkbox');
+        checkboxes.forEach(checkbox => {
+            checkbox.checked = false;
+        });
+
+        // Reset price range
+        const minPrice = document.getElementById('minPrice');
+        const maxPrice = document.getElementById('maxPrice');
+        const priceRangeMin = document.getElementById('priceRangeMin');
+        const priceRangeMax = document.getElementById('priceRangeMax');
+
+        if (minPrice) minPrice.value = '';
+        if (maxPrice) maxPrice.value = '';
+        if (priceRangeMin) priceRangeMin.value = 0;
+        if (priceRangeMax) priceRangeMax.value = 10000;
+
+        // Reset filters object
+        this.currentFilters = {
+            categories: [],
+            games: [],
+            priceRange: { min: 0, max: 10000 },
+            discount: false
+        };
+
+        this.updatePriceLabels();
+        this.updateActiveFiltersCount();
+        this.applyFilters();
+    }
+
+    applyFilters() {
+        this.filteredProducts = this.allProducts.filter(product => {
+            // Category filter
+            if (this.currentFilters.categories.length > 0) {
+                const productCategory = product.category?.toLowerCase().replace(/\s+/g, '-');
+                if (!this.currentFilters.categories.includes(productCategory)) {
+                    return false;
+                }
+            }
+
+            // Game filter
+            if (this.currentFilters.games.length > 0) {
+                const productGame = product.game?.toLowerCase();
+                if (!this.currentFilters.games.includes(productGame)) {
+                    return false;
+                }
+            }
+
+            // Price range filter
+            const productPrice = parseFloat(product.price) || 0;
+            if (productPrice < this.currentFilters.priceRange.min || 
+                productPrice > this.currentFilters.priceRange.max) {
+                return false;
+            }
+
+            // Discount filter
+            if (this.currentFilters.discount && !product.discount) {
+                return false;
+            }
+
+            return true;
+        });
+
+        this.displayProducts();
+        this.closeFilterSidebar();
+    }
+
+    updateActiveFiltersCount() {
+        const countElement = document.getElementById('activeFiltersCount');
+        let count = 0;
+
+        count += this.currentFilters.categories.length;
+        count += this.currentFilters.games.length;
+        if (this.currentFilters.discount) count++;
+        if (this.currentFilters.priceRange.min > 0 || this.currentFilters.priceRange.max < 10000) count++;
+
+        if (countElement) {
+            if (count > 0) {
+                countElement.textContent = count;
+                countElement.style.display = 'flex';
+            } else {
+                countElement.style.display = 'none';
+            }
+        }
+    }
+
+    populateGameFilters() {
+        const gameFiltersContainer = document.getElementById('gameFilters');
+        if (!gameFiltersContainer) return;
+
+        const games = [...new Set(this.allProducts.map(product => product.game).filter(Boolean))];
+        
+        gameFiltersContainer.innerHTML = games.map(game => `
+            <label class="filter-option">
+                <input type="checkbox" value="${game.toLowerCase()}" class="filter-checkbox">
+                <span class="checkmark"></span>
+                <span class="option-text">${game}</span>
+                <span class="option-count">0</span>
+            </label>
+        `).join('');
+
+        // Re-attach event listeners
+        const newCheckboxes = gameFiltersContainer.querySelectorAll('.filter-checkbox');
+        newCheckboxes.forEach(checkbox => {
+            checkbox.addEventListener('change', () => {
+                this.updateFilters();
+            });
+        });
+
+        this.updateFilterCounts();
+    }
+
+    updateFilterCounts() {
+        // Update category counts
+        const categoryOptions = document.querySelectorAll('#categoryFilters .filter-option');
+        categoryOptions.forEach(option => {
+            const checkbox = option.querySelector('.filter-checkbox');
+            const countElement = option.querySelector('.option-count');
+            if (checkbox && countElement) {
+                const category = checkbox.value;
+                const count = this.allProducts.filter(product => 
+                    product.category?.toLowerCase().replace(/\s+/g, '-') === category
+                ).length;
+                countElement.textContent = count;
+            }
+        });
+
+        // Update game counts
+        const gameOptions = document.querySelectorAll('#gameFilters .filter-option');
+        gameOptions.forEach(option => {
+            const checkbox = option.querySelector('.filter-checkbox');
+            const countElement = option.querySelector('.option-count');
+            if (checkbox && countElement) {
+                const game = checkbox.value;
+                const count = this.allProducts.filter(product => 
+                    product.game?.toLowerCase() === game
+                ).length;
+                countElement.textContent = count;
+            }
+        });
+
+        // Update other filter counts
+        const discountCount = this.allProducts.filter(product => product.discount).length;
+
+        const discountCountElement = document.querySelector('input[value="discount"]')?.parentElement?.querySelector('.option-count');
+
+        if (discountCountElement) discountCountElement.textContent = discountCount;
+    }
+
+    initializePriceRange() {
+        const prices = this.allProducts.map(product => parseFloat(product.price) || 0);
+        const maxPrice = Math.max(...prices);
+        const priceRangeMin = document.getElementById('priceRangeMin');
+        const priceRangeMax = document.getElementById('priceRangeMax');
+
+        if (priceRangeMin && priceRangeMax) {
+            const maxRange = Math.ceil(maxPrice / 100) * 100; // Round up to nearest 100
+            priceRangeMin.max = maxRange;
+            priceRangeMax.max = maxRange;
+            priceRangeMin.value = 0;
+            priceRangeMax.value = maxRange;
+            this.currentFilters.priceRange.max = maxRange;
+            this.updatePriceLabels();
+        }
+    }
+
 
     filterProducts(searchTerm) {
         if (!searchTerm.trim()) {

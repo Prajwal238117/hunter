@@ -65,12 +65,23 @@ service cloud.firestore {
       allow create, update, delete: if isAdmin();
     }
 
+    // Coupon usage tracking - anyone can create (for payment tracking), admins can read
+    match /couponUsage/{usageId} {
+      allow create: if isSignedIn(); // Allow creation during payment processing
+      allow read, update, delete: if isAdmin();
+    }
+
     // Contact messages - anyone can create, admins can read
     match /contacts/{contactId} {
       allow create: if true; // Anyone can submit contact form
       allow read, update, delete: if isAdmin();
     }
 
+    // Promoters collection - admins can manage, public can read
+    match /promoters/{promoterId} {
+      allow read: if true; // Anyone can read promoter info
+      allow create, update, delete: if isAdmin();
+    }
 
   }
 }
