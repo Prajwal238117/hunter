@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Business Intelligence & Analytics - CGAPH</title>
+    <meta name="description" content="Comprehensive business analytics and insights for CGAPH - track sales, user behavior, and business performance.">
+    <meta name="keywords" content="analytics, business intelligence, sales reports, user insights, CGAPH">
+    
+    <!-- Open Graph Meta Tags -->
+    <meta property="og:title" content="Business Intelligence & Analytics - CGAPH">
+    <meta property="og:description" content="Comprehensive business analytics and insights for CGAPH">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://cgaph.com/analytics.html">
+    <meta property="og:image" content="https://cgaph.com/assets/og-analytics.jpg">
+    
+    <!-- Twitter Card Meta Tags -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Business Intelligence & Analytics - CGAPH">
+    <meta name="twitter:description" content="Comprehensive business analytics and insights for CGAPH">
+    <meta name="twitter:image" content="https://cgaph.com/assets/twitter-analytics.jpg">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="assets/favicon.ico">
+    <link rel="apple-touch-icon" sizes="180x180" href="assets/apple-touch-icon.png">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <!-- Custom Styles -->
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="analytics-styles.css">
+    
+    <!-- Firebase -->
+    <script type="module">
+        import { auth, db } from './firebase-config.js';
+        
+        window.db = db;
+        window.auth = auth;
+    </script>
+</head>
+<body>
+
+    <!-- Analytics Dashboard -->
+    <main class="analytics-main">
+        <!-- Header Section -->
+        <section class="analytics-header">
+            <div class="container">
+                <div class="analytics-hero">
+                    <h1><i class="fas fa-chart-line"></i> Business Intelligence & Analytics</h1>
+                    <p>Comprehensive insights into your business performance, sales trends, and user behavior</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Analytics Dashboard -->
+        <section class="analytics-dashboard">
+            <div class="container">
+                <!-- Date Range Selector -->
+                <div class="date-range-selector">
+                    <div class="date-inputs">
+                        <div class="date-input-group">
+                            <label for="startDate">From:</label>
+                            <input type="date" id="startDate" class="date-input">
+                        </div>
+                        <div class="date-input-group">
+                            <label for="endDate">To:</label>
+                            <input type="date" id="endDate" class="date-input">
+                        </div>
+                        <button id="applyDateRange" class="btn btn-primary">
+                            <i class="fas fa-filter"></i> Apply Filter
+                        </button>
+                        <button id="resetDateRange" class="btn btn-secondary">
+                            <i class="fas fa-undo"></i> Reset
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Key Metrics Cards -->
+                <div class="metrics-grid">
+                    <div class="metric-card">
+                        <div class="metric-icon">
+                            <i class="fas fa-dollar-sign"></i>
+                        </div>
+                        <div class="metric-content">
+                            <h3 id="totalRevenue">Rs 0</h3>
+                            <p>Total Revenue</p>
+                            <span class="metric-change positive" id="revenueChange">+0%</span>
+                        </div>
+                    </div>
+                    
+                    <div class="metric-card">
+                        <div class="metric-icon">
+                            <i class="fas fa-shopping-cart"></i>
+                        </div>
+                        <div class="metric-content">
+                            <h3 id="totalOrders">0</h3>
+                            <p>Total Orders</p>
+                            <span class="metric-change positive" id="ordersChange">+0%</span>
+                        </div>
+                    </div>
+                    
+                    <div class="metric-card">
+                        <div class="metric-icon">
+                            <i class="fas fa-users"></i>
+                        </div>
+                        <div class="metric-content">
+                            <h3 id="totalUsers">0</h3>
+                            <p>Total Users</p>
+                            <span class="metric-change positive" id="usersChange">+0%</span>
+                        </div>
+                    </div>
+                    
+                    <div class="metric-card">
+                        <div class="metric-icon">
+                            <i class="fas fa-percentage"></i>
+                        </div>
+                        <div class="metric-content">
+                            <h3 id="conversionRate">0%</h3>
+                            <p>Conversion Rate</p>
+                            <span class="metric-change positive" id="conversionChange">+0%</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Charts Section -->
+                <div class="charts-grid">
+                    <!-- Revenue Chart -->
+                    <div class="chart-container">
+                        <div class="chart-header">
+                            <h3><i class="fas fa-chart-line"></i> Revenue Trend</h3>
+                            <div class="chart-controls">
+                                <select id="revenuePeriod" class="chart-select">
+                                    <option value="7">Last 7 Days</option>
+                                    <option value="30" selected>Last 30 Days</option>
+                                    <option value="90">Last 90 Days</option>
+                                    <option value="365">Last Year</option>
+                                </select>
+                            </div>
+                        </div>
+                        <canvas id="revenueChart"></canvas>
+                    </div>
+
+                    <!-- Sales by Category -->
+                    <div class="chart-container">
+                        <div class="chart-header">
+                            <h3><i class="fas fa-chart-pie"></i> Sales by Category</h3>
+                        </div>
+                        <canvas id="categoryChart"></canvas>
+                    </div>
+
+                    <!-- User Growth -->
+                    <div class="chart-container">
+                        <div class="chart-header">
+                            <h3><i class="fas fa-chart-area"></i> User Growth</h3>
+                        </div>
+                        <canvas id="userGrowthChart"></canvas>
+                    </div>
+
+                    <!-- Top Products -->
+                    <div class="chart-container">
+                        <div class="chart-header">
+                            <h3><i class="fas fa-chart-bar"></i> Top Selling Products</h3>
+                        </div>
+                        <canvas id="topProductsChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- Detailed Reports -->
+                <div class="reports-section">
+                    <div class="reports-header">
+                        <h2><i class="fas fa-file-alt"></i> Detailed Reports</h2>
+                        <div class="report-actions">
+                            <button id="exportReport" class="btn btn-success">
+                                <i class="fas fa-download"></i> Export Report
+                            </button>
+                            <button id="refreshData" class="btn btn-primary">
+                                <i class="fas fa-sync"></i> Refresh Data
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Sales Report Table -->
+                    <div class="report-table-container">
+                        <h3>Recent Sales</h3>
+                        <div class="table-wrapper">
+                            <table class="analytics-table" id="salesTable">
+                                <thead>
+                                    <tr>
+                                        <th>Order ID</th>
+                                        <th>Customer</th>
+                                        <th>Products</th>
+                                        <th>Amount</th>
+                                        <th>Date</th>
+                                        <th>Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="salesTableBody">
+                                    <!-- Dynamic content -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- User Analytics -->
+                    <div class="user-analytics">
+                        <div class="analytics-card">
+                            <h3><i class="fas fa-user-clock"></i> User Activity</h3>
+                            <div class="activity-stats">
+                                <div class="activity-item">
+                                    <span class="activity-label">Active Users (24h)</span>
+                                    <span class="activity-value" id="activeUsers24h">0</span>
+                                </div>
+                                <div class="activity-item">
+                                    <span class="activity-label">New Registrations</span>
+                                    <span class="activity-value" id="newRegistrations">0</span>
+                                </div>
+                                <div class="activity-item">
+                                    <span class="activity-label">Returning Users</span>
+                                    <span class="activity-value" id="returningUsers">0</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="analytics-card">
+                            <h3><i class="fas fa-mobile-alt"></i> Device Analytics</h3>
+                            <div class="device-stats">
+                                <div class="device-item">
+                                    <i class="fas fa-mobile-alt"></i>
+                                    <span>Mobile</span>
+                                    <span class="device-percentage" id="mobilePercentage">0%</span>
+                                </div>
+                                <div class="device-item">
+                                    <i class="fas fa-desktop"></i>
+                                    <span>Desktop</span>
+                                    <span class="device-percentage" id="desktopPercentage">0%</span>
+                                </div>
+                                <div class="device-item">
+                                    <i class="fas fa-tablet-alt"></i>
+                                    <span>Tablet</span>
+                                    <span class="device-percentage" id="tabletPercentage">0%</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Performance Insights -->
+                <div class="insights-section">
+                    <h2><i class="fas fa-lightbulb"></i> Performance Insights</h2>
+                    <div class="insights-grid" id="insightsGrid">
+                        <!-- Dynamic insights will be populated here -->
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-section">
+                <h3>CGAPH</h3>
+                <p>Your trusted source for digital gaming and entertainment content.</p>
+                <div class="social-links">
+                    <a href="https://www.facebook.com/profile.php?id=61579288196935" target="_blank" rel="noopener" aria-label="Facebook"><i class="fab fa-facebook"></i></a>
+                    <a href="https://www.youtube.com/@cgaph" target="_blank" rel="noopener" aria-label="YouTube"><i class="fab fa-youtube"></i></a>
+                    <a href="https://www.tiktok.com/@cgaph?is_from_webapp=1&sender_device=pc" target="_blank" rel="noopener" aria-label="TikTok"><i class="fab fa-tiktok"></i></a>
+                    <a href="https://discord.gg/xfYVjDW3Bc" target="_blank" rel="noopener" aria-label="Discord"><i class="fab fa-discord"></i></a>
+                </div>
+            </div>
+            <div class="footer-section">
+                <h4>Quick Links</h4>
+                <ul>
+                    <li><a href="index.html">Home</a></li>
+                    <li><a href="all-products.html">Products</a></li>
+                    <li><a href="promoters.html">Promoters</a></li>
+                    <li><a href="about.html">About Us</a></li>
+                    <li><a href="contact.html">Contact</a></li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h4>Support</h4>
+                <ul>
+                    <li><a href="privacy.html">Privacy Policy</a></li>
+                    <li><a href="terms.html">Terms of Service</a></li>
+                    <li><a href="refund.html">Refund Policy</a></li>
+                    <li><a href="contact.html">Help Center</a></li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h4>Contact Info</h4>
+                <p><i class="fas fa-envelope"></i> support@cgaph.com</p>
+                <p><i class="fas fa-phone"></i> +977 9800745053</p>
+                <p><i class="fas fa-map-marker-alt"></i> Kathmandu, Nepal</p>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2024 CGAPH. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="script.js"></script>
+    <script type="module" src="cart.js"></script>
+    <script type="module" src="analytics.js"></script>
+</body>
+</html>
