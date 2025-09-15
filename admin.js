@@ -1411,6 +1411,7 @@ async function handleEditProductSubmit(e) {
     const featuredProduct = document.getElementById('editFeaturedProduct').checked;
     const productPriority = document.getElementById('editProductPriority').value;
     const productDiscount = document.getElementById('editProductDiscount').value;
+    const productGame = document.getElementById('editProductGame').value;
    
     // Handle image update
     let imageUrl = document.getElementById('editProductImageUrl').value.trim();
