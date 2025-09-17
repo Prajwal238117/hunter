@@ -46,41 +46,147 @@
             min-height: 100vh;
         }
 
-        .admin-header {
+        /* Hamburger Menu Styles */
+        .hamburger-menu {
+            position: fixed;
+            top: 1rem;
+            left: 1rem;
+            z-index: 1000;
+            background: var(--gradient);
+            border: none;
+            border-radius: 12px;
+            padding: 0.75rem;
+            cursor: pointer;
+            box-shadow: var(--shadow-lg);
+            transition: all 0.3s ease;
+        }
+
+        .hamburger-menu:hover {
+            transform: scale(1.05);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+        }
+
+        .hamburger-icon {
+            display: flex;
+            flex-direction: column;
+            width: 24px;
+            height: 18px;
+            justify-content: space-between;
+        }
+
+        .hamburger-line {
+            width: 100%;
+            height: 3px;
+            background: white;
+            border-radius: 2px;
+            transition: all 0.3s ease;
+        }
+
+        .hamburger-menu.active .hamburger-line:nth-child(1) {
+            transform: rotate(45deg) translate(6px, 6px);
+        }
+
+        .hamburger-menu.active .hamburger-line:nth-child(2) {
+            opacity: 0;
+        }
+
+        .hamburger-menu.active .hamburger-line:nth-child(3) {
+            transform: rotate(-45deg) translate(6px, -6px);
+        }
+
+        /* Mobile Navigation Menu */
+        .mobile-nav {
+            position: fixed;
+            top: 0;
+            left: -100%;
+            width: 280px;
+            height: 100vh;
+            background: white;
+            box-shadow: 0 0 30px rgba(0, 0, 0, 0.2);
+            transition: left 0.3s ease;
+            z-index: 999;
+            overflow-y: auto;
+        }
+
+        .mobile-nav.active {
+            left: 0;
+        }
+
+        .mobile-nav-header {
             background: var(--gradient);
             color: white;
-            padding: 2rem;
-            border-radius: 20px;
-            margin-bottom: 2rem;
-            box-shadow: var(--shadow-lg);
-            position: relative;
-            overflow: hidden;
+            padding: 2rem 1.5rem;
+            text-align: center;
         }
 
-        .admin-header::before {
-            content: '';
-            position: absolute;
+        .mobile-nav-header h2 {
+            margin: 0;
+            font-size: 1.5rem;
+            font-weight: 700;
+        }
+
+        .mobile-nav-header p {
+            margin: 0.5rem 0 0 0;
+            opacity: 0.9;
+            font-size: 0.9rem;
+        }
+
+        .mobile-nav-tabs {
+            padding: 1rem 0;
+        }
+
+        .mobile-nav-tab {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem 1.5rem;
+            color: var(--dark);
+            text-decoration: none;
+            border: none;
+            background: none;
+            width: 100%;
+            text-align: left;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border-left: 4px solid transparent;
+        }
+
+        .mobile-nav-tab:hover {
+            background: rgba(102, 126, 234, 0.1);
+            border-left-color: var(--primary);
+        }
+
+        .mobile-nav-tab.active {
+            background: rgba(102, 126, 234, 0.15);
+            border-left-color: var(--primary);
+            color: var(--primary);
+            font-weight: 600;
+        }
+
+        .mobile-nav-tab i {
+            font-size: 1.2rem;
+            width: 20px;
+            text-align: center;
+        }
+
+        /* Overlay for mobile menu */
+        .mobile-overlay {
+            position: fixed;
             top: 0;
             left: 0;
-            right: 0;
-            bottom: 0;
-            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grain" width="100" height="100" patternUnits="userSpaceOnUse"><circle cx="25" cy="25" r="1" fill="rgba(255,255,255,0.1)"/><circle cx="75" cy="75" r="1" fill="rgba(255,255,255,0.1)"/><circle cx="50" cy="10" r="0.5" fill="rgba(255,255,255,0.1)"/><circle cx="10" cy="60" r="0.5" fill="rgba(255,255,255,0.1)"/><circle cx="90" cy="40" r="0.5" fill="rgba(255,255,255,0.1)"/></pattern></defs><rect width="100" height="100" fill="url(%23grain)"/></svg>');
-            opacity: 0.3;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 998;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
         }
 
-        .admin-header h1 {
-            font-size: 2.5rem;
-            font-weight: 700;
-            margin-bottom: 0.5rem;
-            position: relative;
-            z-index: 2;
-        }
-
-        .admin-header p {
-            font-size: 1.1rem;
-            opacity: 0.9;
-            position: relative;
-            z-index: 2;
+        .mobile-overlay.active {
+            opacity: 1;
+            visibility: visible;
         }
 
         .btn {
@@ -129,6 +235,11 @@
             margin-bottom: 2rem;
             box-shadow: var(--shadow);
             overflow-x: auto;
+        }
+
+        /* Show hamburger menu on all screen sizes since desktop tabs are removed */
+        .admin-tabs {
+            display: none;
         }
 
         .admin-tab {
@@ -224,6 +335,25 @@
             animation: slideIn 0.3s ease;
         }
 
+        /* Mobile-optimized modal styles */
+        @media (max-width: 768px) {
+            .modal-content {
+                width: 95%;
+                margin: 1% auto;
+                max-height: 98vh;
+                border-radius: 15px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .modal-content {
+                width: 98%;
+                margin: 0.5% auto;
+                max-height: 99vh;
+                border-radius: 12px;
+            }
+        }
+
         .modal-header {
             background: var(--gradient);
             color: white;
@@ -235,12 +365,18 @@
             position: sticky;
             top: 0;
             z-index: 10;
+            min-height: 60px;
         }
 
         .modal-header h3 {
             margin: 0;
             font-size: 1.5rem;
             font-weight: 600;
+            flex: 1;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            margin-right: 1rem;
         }
 
         .modal-close {
@@ -256,6 +392,9 @@
             align-items: center;
             justify-content: center;
             transition: all 0.3s ease;
+            flex-shrink: 0;
+            position: relative;
+            z-index: 10;
         }
 
         .modal-close:hover {
@@ -263,8 +402,220 @@
             transform: scale(1.1);
         }
 
+        /* Mobile modal header styles */
+        @media (max-width: 768px) {
+            .modal-header {
+                padding: 1rem 1.5rem;
+                border-radius: 15px 15px 0 0;
+                min-height: 50px;
+            }
+
+            .modal-header h3 {
+                font-size: 1.2rem;
+                margin-right: 0.75rem;
+            }
+
+            .modal-close {
+                width: 35px;
+                height: 35px;
+                font-size: 1.3rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .modal-header {
+                padding: 0.75rem 1rem;
+                border-radius: 12px 12px 0 0;
+                min-height: 45px;
+            }
+
+            .modal-header h3 {
+                font-size: 1rem;
+                margin-right: 0.5rem;
+            }
+
+            .modal-close {
+                width: 32px;
+                height: 32px;
+                font-size: 1.2rem;
+            }
+        }
+
         .modal-body {
             padding: 2rem;
+        }
+
+        /* Mobile modal body styles */
+        @media (max-width: 768px) {
+            .modal-body {
+                padding: 1.5rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .modal-body {
+                padding: 1rem;
+            }
+        }
+
+        /* Order Details Modal Specific Styles */
+        .order-items,
+        .order-summary {
+            margin-bottom: 1.5rem;
+            padding: 1rem;
+            background: #f8f9fa;
+            border-radius: 10px;
+            border-left: 4px solid var(--primary);
+        }
+
+        .order-items h4,
+        .order-summary h4 {
+            margin: 0 0 1rem 0;
+            color: var(--primary);
+            font-size: 1.1rem;
+            font-weight: 600;
+        }
+
+        .order-summary p {
+            margin: 0.5rem 0;
+            font-size: 0.9rem;
+        }
+
+        .order-item {
+            background: white;
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            border: 1px solid #e2e8f0;
+        }
+
+        .order-item h4 {
+            margin: 0 0 0.5rem 0;
+            color: var(--dark);
+            font-size: 1rem;
+        }
+
+        .order-item p {
+            margin: 0.25rem 0;
+            font-size: 0.85rem;
+            color: #666;
+        }
+
+        .item-total {
+            font-weight: 600;
+            color: var(--success);
+        }
+
+        .extra-fields {
+            margin-top: 0.5rem;
+            padding-top: 0.5rem;
+            border-top: 1px solid #e2e8f0;
+        }
+
+        .extra-fields h5 {
+            margin: 0 0 0.5rem 0;
+            font-size: 0.9rem;
+            color: var(--primary);
+        }
+
+        /* Mobile styles for order details */
+        @media (max-width: 768px) {
+            .order-items,
+            .order-summary {
+                margin-bottom: 1rem;
+                padding: 0.75rem;
+            }
+
+            .order-items h4,
+            .order-summary h4 {
+                font-size: 1rem;
+                margin-bottom: 0.75rem;
+            }
+
+            .order-summary p {
+                font-size: 0.85rem;
+            }
+
+            .order-item {
+                padding: 0.75rem;
+                margin-bottom: 0.75rem;
+            }
+
+            .order-item h4 {
+                font-size: 0.9rem;
+            }
+
+            .order-item p {
+                font-size: 0.8rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .order-items,
+            .order-summary {
+                margin-bottom: 0.75rem;
+                padding: 0.5rem;
+            }
+
+            .order-items h4,
+            .order-summary h4 {
+                font-size: 0.9rem;
+                margin-bottom: 0.5rem;
+            }
+
+            .order-summary p {
+                font-size: 0.8rem;
+            }
+
+            .order-item {
+                padding: 0.5rem;
+                margin-bottom: 0.5rem;
+            }
+
+            .order-item h4 {
+                font-size: 0.85rem;
+            }
+
+            .order-item p {
+                font-size: 0.75rem;
+            }
+        }
+
+        /* Screenshot Viewer Styles */
+        .screenshot-viewer {
+            text-align: center;
+            padding: 1rem;
+        }
+
+        .screenshot-viewer img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            margin-bottom: 1rem;
+        }
+
+        /* Mobile screenshot viewer */
+        @media (max-width: 768px) {
+            .screenshot-viewer {
+                padding: 0.75rem;
+            }
+
+            .screenshot-viewer img {
+                border-radius: 8px;
+                margin-bottom: 0.75rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .screenshot-viewer {
+                padding: 0.5rem;
+            }
+
+            .screenshot-viewer img {
+                border-radius: 6px;
+                margin-bottom: 0.5rem;
+            }
         }
 
         @keyframes slideIn {
@@ -308,46 +659,6 @@
             padding: 2rem;
         }
 
-        .admin-header {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 3rem 2rem;
-            border-radius: 25px;
-            margin-bottom: 2rem;
-            box-shadow: 0 20px 60px rgba(102, 126, 234, 0.3);
-            position: relative;
-            overflow: hidden;
-            text-align: center;
-        }
-
-        .admin-header::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grain" width="100" height="100" patternUnits="userSpaceOnUse"><circle cx="25" cy="25" r="1" fill="rgba(255,255,255,0.1)"/><circle cx="75" cy="75" r="1" fill="rgba(255,255,255,0.1)"/><circle cx="50" cy="10" r="0.5" fill="rgba(255,255,255,0.1)"/><circle cx="10" cy="60" r="0.5" fill="rgba(255,255,255,0.1)"/><circle cx="90" cy="40" r="0.5" fill="rgba(255,255,255,0.1)"/></pattern></defs><rect width="100" height="100" fill="url(%23grain)"/></svg>');
-            opacity: 0.3;
-        }
-
-        .admin-header h1 {
-            font-size: 3rem;
-            font-weight: 800;
-            margin-bottom: 1rem;
-            position: relative;
-            z-index: 2;
-            text-shadow: 0 2px 10px rgba(0,0,0,0.1);
-        }
-
-        .admin-header p {
-            font-size: 1.2rem;
-            opacity: 0.95;
-            position: relative;
-            z-index: 2;
-            max-width: 600px;
-            margin: 0 auto;
-        }
 
         .admin-tabs {
             display: flex;
@@ -428,6 +739,31 @@
             overflow: hidden;
             border: 1px solid rgba(102, 126, 234, 0.1);
             transition: all 0.3s ease;
+            position: relative;
+        }
+
+        /* Scroll indicator for mobile tables */
+        .table-wrapper::after {
+            content: '← Scroll horizontally →';
+            position: absolute;
+            bottom: 0.5rem;
+            right: 1rem;
+            background: rgba(102, 126, 234, 0.1);
+            color: var(--primary);
+            padding: 0.25rem 0.5rem;
+            border-radius: 12px;
+            font-size: 0.7rem;
+            font-weight: 500;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            pointer-events: none;
+            z-index: 10;
+        }
+
+        @media (max-width: 768px) {
+            .table-wrapper::after {
+                opacity: 1;
+            }
         }
 
         .table-wrapper:hover {
@@ -1651,28 +1987,14 @@
         /* Mobile Responsive */
         @media (max-width: 768px) {
             .admin-container {
-                padding: 1rem;
+                padding: 0.5rem;
             }
 
-            .admin-header {
-                padding: 1.5rem;
-            }
-
-            .admin-header h1 {
-                font-size: 2rem;
-            }
 
             .form-row {
                 grid-template-columns: 1fr;
             }
 
-            .admin-tabs {
-                flex-direction: column;
-            }
-
-            .admin-tab {
-                text-align: center;
-            }
 
             .variant-grid {
                 grid-template-columns: 1fr;
@@ -1687,12 +2009,56 @@
                 grid-template-columns: 1fr;
             }
 
+            /* Make tables horizontally scrollable and compressed */
+            .table-wrapper {
+                overflow-x: auto;
+                -webkit-overflow-scrolling: touch;
+                padding: 0.5rem;
+                margin-bottom: 0.5rem;
+            }
+
             table {
-                font-size: 0.8rem;
+                font-size: 0.7rem;
+                min-width: 600px; /* Prevent over-compression */
             }
 
             th, td {
-                padding: 0.75rem 0.5rem;
+                padding: 0.25rem 0.15rem;
+                white-space: nowrap;
+            }
+
+            /* Compress specific columns */
+            th:nth-child(1), td:nth-child(1) { min-width: 80px; }
+            th:nth-child(2), td:nth-child(2) { min-width: 60px; }
+            th:nth-child(3), td:nth-child(3) { min-width: 50px; }
+            th:nth-child(4), td:nth-child(4) { min-width: 60px; }
+            th:nth-child(5), td:nth-child(5) { min-width: 50px; }
+
+            /* Compress buttons and badges */
+            .btn {
+                padding: 0.4rem 0.8rem;
+                font-size: 0.7rem;
+            }
+
+            .btn-sm {
+                padding: 0.25rem 0.5rem;
+                font-size: 0.65rem;
+            }
+
+            .status-badge {
+                font-size: 0.6rem;
+                padding: 0.15rem 0.3rem;
+            }
+
+            .actions {
+                display: flex;
+                gap: 0.25rem;
+                flex-wrap: wrap;
+            }
+
+            .actions .btn {
+                padding: 0.2rem 0.4rem;
+                font-size: 0.6rem;
             }
 
             /* Modal Mobile Styles */
@@ -1723,20 +2089,66 @@
         }
 
         @media (max-width: 480px) {
-            .admin-header h1 {
-                font-size: 1.5rem;
+            .admin-container {
+                padding: 0.25rem;
+            }
+
+
+
+            .table-wrapper {
+                padding: 0.25rem;
+                margin-bottom: 0.25rem;
+            }
+
+            table {
+                font-size: 0.6rem;
+                min-width: 500px;
+            }
+
+            th, td {
+                padding: 0.15rem 0.1rem;
+                font-size: 0.6rem;
+            }
+
+            /* Ultra-compressed columns for very small screens */
+            th:nth-child(1), td:nth-child(1) { min-width: 60px; }
+            th:nth-child(2), td:nth-child(2) { min-width: 45px; }
+            th:nth-child(3), td:nth-child(3) { min-width: 40px; }
+            th:nth-child(4), td:nth-child(4) { min-width: 45px; }
+            th:nth-child(5), td:nth-child(5) { min-width: 40px; }
+
+            .btn {
+                padding: 0.3rem 0.6rem;
+                font-size: 0.6rem;
+            }
+
+            .btn-sm {
+                padding: 0.2rem 0.4rem;
+                font-size: 0.55rem;
+            }
+
+            .status-badge {
+                font-size: 0.5rem;
+                padding: 0.1rem 0.2rem;
+            }
+
+            .actions .btn {
+                padding: 0.15rem 0.3rem;
+                font-size: 0.55rem;
             }
 
             .product-form {
-                padding: 1rem;
+                padding: 0.75rem;
             }
 
             .controls {
-                padding: 1rem;
+                padding: 0.5rem;
             }
 
             .search-input {
                 max-width: 100%;
+                padding: 0.4rem;
+                font-size: 0.7rem;
             }
         }
 
@@ -2156,17 +2568,22 @@
         /* Responsive Design */
         @media (max-width: 768px) {
             .table-wrapper {
-                padding: 1rem;
-                margin-bottom: 1rem;
+                padding: 0.5rem;
+                margin-bottom: 0.5rem;
+                overflow-x: auto;
+                -webkit-overflow-scrolling: touch;
             }
 
             .controls {
                 flex-direction: column;
                 align-items: stretch;
+                gap: 0.5rem;
             }
 
             .search-input {
                 min-width: auto;
+                padding: 0.5rem;
+                font-size: 0.8rem;
             }
 
             .products-header,
@@ -2177,50 +2594,90 @@
                 text-align: center;
             }
 
-            th, td {
-                padding: 0.75rem 0.5rem;
-                font-size: 0.8rem;
+            table {
+                min-width: 600px;
+                font-size: 0.7rem;
             }
 
+            th, td {
+                padding: 0.25rem 0.15rem;
+                font-size: 0.7rem;
+                white-space: nowrap;
+            }
+
+            /* Compress specific columns */
+            th:nth-child(1), td:nth-child(1) { min-width: 80px; }
+            th:nth-child(2), td:nth-child(2) { min-width: 60px; }
+            th:nth-child(3), td:nth-child(3) { min-width: 50px; }
+            th:nth-child(4), td:nth-child(4) { min-width: 60px; }
+            th:nth-child(5), td:nth-child(5) { min-width: 50px; }
+
             .actions {
-                flex-direction: column;
+                flex-direction: row;
                 gap: 0.25rem;
+                flex-wrap: wrap;
             }
 
             .btn-sm {
-                padding: 0.5rem;
-                font-size: 0.75rem;
+                padding: 0.25rem 0.5rem;
+                font-size: 0.65rem;
+            }
+
+            .status-badge {
+                font-size: 0.6rem;
+                padding: 0.15rem 0.3rem;
             }
         }
     </style>
 </head>
 <body>
-    <div class="admin-container">
-        <div class="admin-header">
-            <h1><i class="fas fa-shield-alt"></i> CGAPH Admin Panel</h1>
-            <p>Manage payments, products, users, and contact messages</p>
+    <!-- Hamburger Menu -->
+    <button class="hamburger-menu" id="hamburgerMenu">
+        <div class="hamburger-icon">
+            <div class="hamburger-line"></div>
+            <div class="hamburger-line"></div>
+            <div class="hamburger-line"></div>
         </div>
+    </button>
 
-        <div class="admin-tabs">
-            <button class="admin-tab active" data-tab="payments">
-                <i class="fas fa-credit-card"></i> Payments
+    <!-- Mobile Navigation -->
+    <div class="mobile-nav" id="mobileNav">
+        <div class="mobile-nav-header">
+            <h2><i class="fas fa-shield-alt"></i> CGAPH Admin</h2>
+            <p>Admin Panel</p>
+        </div>
+        <div class="mobile-nav-tabs">
+            <button class="mobile-nav-tab active" data-tab="payments">
+                <i class="fas fa-credit-card"></i>
+                <span>Payments</span>
             </button>
-            <button class="admin-tab" data-tab="products">
-                <i class="fas fa-box"></i> Products
+            <button class="mobile-nav-tab" data-tab="products">
+                <i class="fas fa-box"></i>
+                <span>Products</span>
             </button>
-            <button class="admin-tab" data-tab="users">
-                <i class="fas fa-users"></i> Users
+            <button class="mobile-nav-tab" data-tab="users">
+                <i class="fas fa-users"></i>
+                <span>Users</span>
             </button>
-            <button class="admin-tab" data-tab="coupons">
-                <i class="fas fa-tag"></i> Coupons
+            <button class="mobile-nav-tab" data-tab="coupons">
+                <i class="fas fa-tag"></i>
+                <span>Coupons</span>
             </button>
-            <button class="admin-tab" data-tab="contacts">
-                <i class="fas fa-envelope"></i> Contact Messages
+            <button class="mobile-nav-tab" data-tab="contacts">
+                <i class="fas fa-envelope"></i>
+                <span>Contacts</span>
             </button>
-            <button class="admin-tab" data-tab="promoters">
-                <i class="fas fa-users"></i> Promoters
+            <button class="mobile-nav-tab" data-tab="promoters">
+                <i class="fas fa-users"></i>
+                <span>Promoters</span>
             </button>
         </div>
+    </div>
+
+    <!-- Mobile Overlay -->
+    <div class="mobile-overlay" id="mobileOverlay"></div>
+
+    <div class="admin-container">
 
         <!-- Payments Tab -->
         <div id="payments" class="tab-content active">
@@ -3457,6 +3914,52 @@
             </div>
         </div>
     </div>
+
+    <script>
+        // Hamburger Menu Functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            const hamburgerMenu = document.getElementById('hamburgerMenu');
+            const mobileNav = document.getElementById('mobileNav');
+            const mobileOverlay = document.getElementById('mobileOverlay');
+            const mobileNavTabs = document.querySelectorAll('.mobile-nav-tab');
+            const adminTabs = document.querySelectorAll('.admin-tab');
+
+            // Toggle mobile menu
+            hamburgerMenu.addEventListener('click', function() {
+                hamburgerMenu.classList.toggle('active');
+                mobileNav.classList.toggle('active');
+                mobileOverlay.classList.toggle('active');
+            });
+
+            // Close mobile menu when clicking overlay
+            mobileOverlay.addEventListener('click', function() {
+                hamburgerMenu.classList.remove('active');
+                mobileNav.classList.remove('active');
+                mobileOverlay.classList.remove('active');
+            });
+
+            // Handle mobile nav tab clicks
+            mobileNavTabs.forEach(tab => {
+                tab.addEventListener('click', function() {
+                    const targetTab = this.dataset.tab;
+                    
+                    // Update mobile nav active state
+                    mobileNavTabs.forEach(t => t.classList.remove('active'));
+                    this.classList.add('active');
+                    
+                    // Show the target tab content
+                    showTab(targetTab);
+                    
+                    // Close mobile menu
+                    hamburgerMenu.classList.remove('active');
+                    mobileNav.classList.remove('active');
+                    mobileOverlay.classList.remove('active');
+                });
+            });
+
+            // Desktop tabs are removed, only mobile navigation is used
+        });
+    </script>
 </body>
 </html>
 

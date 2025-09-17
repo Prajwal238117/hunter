@@ -134,20 +134,14 @@ async function showOrderDetails(paymentId) {
           <button class="close-modal" onclick="closeOrderDetailsModal()">&times;</button>
         </div>
         <div class="modal-body">
-          <div class="customer-info">
-            <h4>Customer Information</h4>
-            <p><strong>Name:</strong> ${paymentData.fullName || 'N/A'}</p>
-            <p><strong>Email:</strong> ${paymentData.email || 'N/A'}</p>
-            <p><strong>Phone:</strong> ${paymentData.phone || 'N/A'}</p>
-          </div>
           <div class="order-items">
-            <h4>Order Items (${orderItems.length} item${orderItems.length !== 1 ? 's' : ''})</h4>
+            <h4><i class="fas fa-shopping-cart"></i> Order Items (${orderItems.length} item${orderItems.length !== 1 ? 's' : ''})</h4>
             ${orderDetailsHTML}
           </div>
           <div class="order-summary">
-            <h4>Order Summary</h4>
+            <h4><i class="fas fa-receipt"></i> Order Summary</h4>
             <p><strong>Total Items:</strong> ${orderItems.reduce((sum, item) => sum + (item.quantity || 1), 0)}</p>
-            <p><strong>Total Amount:</strong> Rs ${paymentData.orderTotal || 'N/A'}</p>
+            <p><strong>Total Amount:</strong> ${paymentData.orderTotal || 'N/A'}</p>
             <p><strong>Payment Method:</strong> ${paymentData.paymentMethod || 'N/A'}</p>
             <p><strong>Order Date:</strong> ${paymentData.createdAt?.toDate?.()?.toLocaleString() || 'N/A'}</p>
           </div>
@@ -175,14 +169,18 @@ function viewBase64Image(base64Data, filename) {
   const modalContent = document.getElementById('orderDetailsContent');
   
   if (modal && modalContent) {
+    // Truncate filename if too long for mobile
+    const truncatedFilename = filename.length > 30 ? filename.substring(0, 27) + '...' : filename;
+    
     modalContent.innerHTML = `
       <div class="modal-header">
-        <h3>Screenshot: ${filename}</h3>
+        <h3 title="${filename}">Screenshot: ${truncatedFilename}</h3>
         <button class="close-modal" onclick="closeOrderDetailsModal()">&times;</button>
       </div>
       <div class="modal-body">
         <div class="screenshot-viewer">
           <img src="${base64Data}" alt="${filename}" style="max-width: 100%; height: auto; border-radius: 10px;">
+          <p style="margin-top: 0.5rem; font-size: 0.8rem; color: #666; word-break: break-all;">${filename}</p>
         </div>
       </div>
     `;
