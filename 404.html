@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Page Not Found | CGAPH</title>
+    <meta name="description" content="The page you are looking for doesn't exist or was moved.">
+    <meta name="robots" content="noindex, nofollow">
+    <link rel="icon" type="image/png" sizes="32x32" href="logo.png">
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #667eea;
+            --secondary: #764ba2;
+            --dark: #2d3748;
+            --light: #f7fafc;
+            --border: #e2e8f0;
+            --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            --gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+
+        body {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            color: var(--dark);
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 960px;
+            padding: 2rem;
+        }
+
+        .card {
+            background: #ffffff;
+            border-radius: 20px;
+            box-shadow: var(--shadow);
+            padding: 2rem;
+            text-align: center;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.75rem;
+            margin-bottom: 1.25rem;
+        }
+
+        .brand img {
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+        }
+
+        .code {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 80px;
+            height: 80px;
+            border-radius: 16px;
+            background: var(--gradient);
+            color: #fff;
+            font-weight: 800;
+            font-size: 1.25rem;
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.3);
+            margin-bottom: 1rem;
+        }
+
+        h1 {
+            font-size: 1.75rem;
+            margin-bottom: 0.5rem;
+        }
+
+        p.subtitle {
+            color: #4a5568;
+            margin-bottom: 1.5rem;
+        }
+
+        .actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.75rem;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .btn {
+            background: var(--gradient);
+            color: #ffffff;
+            border: none;
+            padding: 0.75rem 1.25rem;
+            border-radius: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            box-shadow: var(--shadow);
+        }
+
+        .btn.secondary {
+            background: #edf2f7;
+            color: #2d3748;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.25);
+        }
+
+        .help {
+            margin-top: 1.25rem;
+            color: #4a5568;
+            font-size: 0.95rem;
+        }
+
+        .tips {
+            margin-top: 1.25rem;
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 0.75rem;
+        }
+
+        .tip {
+            background: #f7fafc;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 0.75rem;
+            font-size: 0.9rem;
+            color: #4a5568;
+        }
+
+        @media (max-width: 640px) {
+            .tips { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <main class="container" role="main">
+        <div class="card" aria-labelledby="page-title">
+            <div class="brand">
+                <img src="logo.png" alt="CGAPH logo" loading="lazy" width="40" height="40">
+                <strong>CGAPH</strong>
+            </div>
+            <div class="code" aria-hidden="true">404</div>
+            <h1 id="page-title">Page not found</h1>
+            <p class="subtitle">The page you’re looking for doesn’t exist or may have been moved.</p>
+            <div class="actions">
+                <a class="btn" href="index.html" aria-label="Go to homepage">
+                    <i class="fas fa-home"></i>
+                    Home
+                </a>
+                <a class="btn secondary" href="all-products.html" aria-label="Browse all products">
+                    <i class="fas fa-th-large"></i>
+                    Browse products
+                </a>
+            </div>
+            <p class="help">If you believe this is an error, contact us at
+                <a href="mailto:support@cgaph.com">support@cgaph.com</a>.
+            </p>
+            <div class="tips" aria-label="Helpful links">
+                <div class="tip"><i class="fas fa-receipt"></i> Check your recent purchases</div>
+                <div class="tip"><i class="fas fa-headset"></i> Visit the Help Center</div>
+                <div class="tip"><i class="fas fa-percentage"></i> Explore current offers</div>
+            </div>
+        </div>
+    </main>
+</body>
+</html>
+
+
