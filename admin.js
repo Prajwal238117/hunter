@@ -1289,6 +1289,7 @@ async function handleProductSubmit(e) {
     const featuredProduct = document.getElementById('featuredProduct').checked;
     const productPriority = document.getElementById('productPriority').value;
     const productDiscount = document.getElementById('productDiscount').value;
+    const productGame = (document.getElementById('productGame')?.value || '').trim();
     
     
     // Handle image upload - support both file upload and URL input
@@ -1358,7 +1359,7 @@ async function handleProductSubmit(e) {
       featured: featuredProduct,
       priority: parseInt(productPriority),
       discount: productDiscount ? parseFloat(productDiscount) : 0,
-      game: productGame.trim() || '',
+      game: productGame || '',
       createdAt: serverTimestamp(),
       updatedAt: serverTimestamp()
     };
