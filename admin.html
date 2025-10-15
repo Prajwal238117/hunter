@@ -1667,6 +1667,262 @@
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
         }
 
+        /* Code Management Styles */
+        .codes-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            padding: 1.5rem;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 12px;
+            color: white;
+        }
+
+        .codes-title h3 {
+            margin: 0 0 0.5rem 0;
+            font-size: 1.5rem;
+        }
+
+        .codes-title p {
+            margin: 0;
+            opacity: 0.9;
+        }
+
+        .code-creation-section {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .code-creation-tabs {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 1.5rem;
+            border-bottom: 2px solid #f1f3f4;
+        }
+
+        .code-tab-btn {
+            background: none;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            cursor: pointer;
+            border-radius: 8px 8px 0 0;
+            transition: all 0.3s ease;
+            font-weight: 500;
+            color: #6b7280;
+        }
+
+        .code-tab-btn.active {
+            background: #667eea;
+            color: white;
+        }
+
+        .code-tab-btn:hover:not(.active) {
+            background: #f3f4f6;
+        }
+
+        .code-tab-content {
+            display: none;
+        }
+
+        .code-tab-content.active {
+            display: block;
+        }
+
+        .code-form-card {
+            background: #f8fafc;
+            border-radius: 8px;
+            padding: 1.5rem;
+            border: 1px solid #e2e8f0;
+        }
+
+        .code-form-card h4 {
+            margin: 0 0 1rem 0;
+            color: #374151;
+            font-size: 1.2rem;
+        }
+
+        .generated-codes-section {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .generated-codes-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .generated-codes-header h4 {
+            margin: 0;
+            color: #374151;
+        }
+
+        .codes-list {
+            display: grid;
+            gap: 0.75rem;
+        }
+
+        .code-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem;
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+        }
+
+        .code-value {
+            font-weight: bold;
+            color: #1f2937;
+            letter-spacing: 1px;
+        }
+
+        .code-amount {
+            color: #059669;
+            font-weight: 600;
+        }
+
+        .copy-code-btn {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            transition: background 0.3s ease;
+        }
+
+        .copy-code-btn:hover {
+            background: #5a67d8;
+        }
+
+        .all-codes-section {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .all-codes-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .all-codes-header h4 {
+            margin: 0;
+            color: #374151;
+        }
+
+        .code-filters {
+            display: flex;
+            gap: 0.5rem;
+            align-items: center;
+        }
+
+        .code-filters select {
+            padding: 0.5rem;
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
+            background: white;
+        }
+
+        .code-status {
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .code-status.unused {
+            background: #dcfce7;
+            color: #166534;
+        }
+
+        .code-status.used {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .code-status.expired {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .code-type {
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .code-type.spin {
+            background: #e0e7ff;
+            color: #3730a3;
+        }
+
+        .code-type.balance {
+            background: #f0fdf4;
+            color: #166534;
+        }
+
+        /* Responsive Design for Code Management */
+        @media (max-width: 768px) {
+            .codes-header {
+                flex-direction: column;
+                gap: 1rem;
+                text-align: center;
+            }
+
+            .code-creation-tabs {
+                flex-direction: column;
+            }
+
+            .code-tab-btn {
+                border-radius: 8px;
+            }
+
+            .all-codes-header {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .code-filters {
+                justify-content: center;
+            }
+
+            .code-item {
+                flex-direction: column;
+                gap: 0.5rem;
+                text-align: center;
+            }
+
+            #allCodesTable {
+                font-size: 0.85rem;
+            }
+
+            #allCodesTable th,
+            #allCodesTable td {
+                padding: 0.75rem 0.5rem;
+            }
+        }
+
         /* Responsive Design for Promoters */
         @media (max-width: 768px) {
             .promoters-header {
@@ -2510,6 +2766,16 @@
             color: white;
         }
 
+        .status-delivered {
+            background: #d1ecf1;
+            color: #0c5460;
+        }
+        
+        .status-cancelled {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
         .status-pending {
             background: var(--gradient-warning);
             color: white;
@@ -2628,6 +2894,333 @@
                 padding: 0.15rem 0.3rem;
             }
         }
+        .user-details-container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .user-info-section, .user-edit-section {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            border: 1px solid #e9ecef;
+        }
+
+        .user-info-section h4, .user-edit-section h4 {
+            color: #495057;
+            margin-bottom: 1rem;
+            font-size: 1.1rem;
+            font-weight: 600;
+        }
+
+        .user-details-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1rem;
+        }
+
+        .detail-item {
+            display: flex;
+            flex-direction: column;
+            gap: 0.25rem;
+        }
+
+        .detail-item label {
+            font-weight: 600;
+            color: #6c757d;
+            font-size: 0.9rem;
+        }
+
+        .detail-item span {
+            color: #495057;
+            font-size: 0.95rem;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .form-group label {
+            font-weight: 600;
+            color: #495057;
+            font-size: 0.9rem;
+        }
+
+        .form-group input, .form-group select {
+            padding: 0.75rem;
+            border: 1px solid #ced4da;
+            border-radius: 6px;
+            font-size: 0.9rem;
+            transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+        }
+
+        .form-group input:focus, .form-group select:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+        }
+
+        .form-actions {
+            display: flex;
+            gap: 1rem;
+            justify-content: flex-end;
+            margin-top: 1.5rem;
+            padding-top: 1rem;
+            border-top: 1px solid #e9ecef;
+        }
+
+        /* Profit Distribution Modal Styling */
+        .profit-history-modal {
+            max-width: 100%;
+            margin: 0;
+        }
+
+        .profit-history-modal h3 {
+            color: #2c3e50;
+            font-size: 1.8rem;
+            margin-bottom: 1.5rem;
+            text-align: center;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .profit-history-modal h4 {
+            color: #34495e;
+            font-size: 1.3rem;
+            margin: 2rem 0 1rem 0;
+            padding: 0.75rem 1rem;
+            background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+            border-radius: 8px;
+            border-left: 4px solid #667eea;
+            font-weight: 600;
+        }
+
+        .wallet-transaction, .distribution-item, .deduction-item {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+            border: 1px solid #e9ecef;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .wallet-transaction:hover, .distribution-item:hover, .deduction-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.12);
+        }
+
+        .wallet-transaction.distribution {
+            border-left: 4px solid #27ae60;
+        }
+
+        .wallet-transaction.deduction {
+            border-left: 4px solid #e74c3c;
+        }
+
+        .transaction-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+            padding-bottom: 0.75rem;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .transaction-type {
+            font-weight: 600;
+            font-size: 1.1rem;
+            color: #2c3e50;
+        }
+
+        .transaction-amount {
+            font-weight: bold;
+            font-size: 1.2rem;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+        }
+
+        .transaction-amount.positive {
+            background: linear-gradient(135deg, #d4edda, #c3e6cb);
+            color: #155724;
+        }
+
+        .transaction-amount.negative {
+            background: linear-gradient(135deg, #f8d7da, #f5c6cb);
+            color: #721c24;
+        }
+
+        .transaction-details {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 0.75rem;
+        }
+
+        .transaction-details p {
+            margin: 0;
+            padding: 0.5rem;
+            background: #f8f9fa;
+            border-radius: 6px;
+            font-size: 0.9rem;
+        }
+
+        .transaction-details strong {
+            color: #495057;
+            font-weight: 600;
+        }
+
+        .distribution-item h5, .deduction-item h5 {
+            color: #2c3e50;
+            font-size: 1.2rem;
+            margin-bottom: 1rem;
+            padding: 0.75rem 1rem;
+            background: linear-gradient(135deg, #e3f2fd, #bbdefb);
+            border-radius: 8px;
+            border-left: 4px solid #2196f3;
+        }
+
+        .distribution-item p, .deduction-item p {
+            margin: 0.5rem 0;
+            padding: 0.5rem 0.75rem;
+            background: #f8f9fa;
+            border-radius: 6px;
+            font-size: 0.9rem;
+        }
+
+        .distributions-list, .deductions-list {
+            margin-top: 1rem;
+            padding: 1rem;
+            background: #f8f9fa;
+            border-radius: 8px;
+            border: 1px solid #e9ecef;
+        }
+
+        .distributions-list h6, .deductions-list h6 {
+            color: #495057;
+            margin-bottom: 0.75rem;
+            font-size: 1rem;
+            font-weight: 600;
+        }
+
+        .user-distribution, .user-deduction {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr 1fr;
+            gap: 1rem;
+            padding: 0.75rem;
+            margin-bottom: 0.5rem;
+            background: white;
+            border-radius: 6px;
+            border: 1px solid #e9ecef;
+            font-size: 0.9rem;
+            align-items: center;
+        }
+
+        .user-distribution span:first-child, .user-deduction span:first-child {
+            font-weight: 600;
+            color: #2c3e50;
+        }
+
+        .user-distribution span:nth-child(2), .user-deduction span:nth-child(2) {
+            color: #667eea;
+            font-weight: 600;
+        }
+
+        .user-distribution span:nth-child(3), .user-deduction span:nth-child(3) {
+            color: #27ae60;
+            font-weight: 600;
+        }
+
+        .user-deduction span:nth-child(3) {
+            color: #e74c3c;
+        }
+
+        .user-distribution span:nth-child(4), .user-deduction span:nth-child(4) {
+            color: #6c757d;
+            font-size: 0.8rem;
+        }
+
+        /* Empty state styling */
+        .profit-history-modal .empty-state {
+            text-align: center;
+            padding: 3rem 1rem;
+            color: #6c757d;
+        }
+
+        .profit-history-modal .empty-state i {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            opacity: 0.5;
+        }
+
+        /* Responsive design */
+        @media (max-width: 768px) {
+            .profit-history-modal h3 {
+                font-size: 1.5rem;
+            }
+
+            .profit-history-modal h4 {
+                font-size: 1.1rem;
+                margin: 1.5rem 0 0.75rem 0;
+            }
+
+            .wallet-transaction, .distribution-item, .deduction-item {
+                padding: 1rem;
+                margin-bottom: 0.75rem;
+            }
+
+            .transaction-header {
+                flex-direction: column;
+                gap: 0.5rem;
+                text-align: center;
+            }
+
+            .transaction-details {
+                grid-template-columns: 1fr;
+            }
+
+            .user-distribution, .user-deduction {
+                grid-template-columns: 1fr;
+                gap: 0.5rem;
+                text-align: center;
+            }
+
+            .user-distribution span, .user-deduction span {
+                padding: 0.25rem;
+                background: #f8f9fa;
+                border-radius: 4px;
+            }
+        }
+
+        /* Loading state */
+        .profit-history-modal .loading-state {
+            text-align: center;
+            padding: 3rem 1rem;
+            color: #6c757d;
+        }
+
+        .profit-history-modal .loading-state i {
+            font-size: 2rem;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
     </style>
 </head>
 <body>
@@ -2671,6 +3264,10 @@
                 <i class="fas fa-users"></i>
                 <span>Promoters</span>
             </button>
+            <button class="mobile-nav-tab" data-tab="codes">
+                <i class="fas fa-key"></i>
+                <span>Codes</span>
+            </button>
         </div>
     </div>
 
@@ -2684,15 +3281,25 @@
             <div class="table-wrapper">
                 <div class="controls">
                     <input type="text" id="searchPaymentsInput" class="search-input" placeholder="Search payments...">
-                    <button class="btn" id="refreshBtn">
-                        <i class="fas fa-sync-alt"></i> Refresh
-                    </button>
+                        <button class="btn" id="refreshBtn">
+                            <i class="fas fa-sync-alt"></i> Refresh
+                        </button>
+                        <button class="btn" onclick="viewProfitDistributions()">
+                            <i class="fas fa-chart-pie"></i> Profit History
+                        </button>
+                        <button class="btn" onclick="loadWalletTopups()" id="walletTopupsBtn">
+                            <i class="fas fa-wallet"></i> Wallet Top-ups
+                        </button>
+                        <button class="btn" onclick="showPaymentsTable()" id="paymentsBtn" style="display: none;">
+                            <i class="fas fa-credit-card"></i> Payments
+                        </button>
                 </div>
                 <table id="paymentsTable">
                     <thead>
                         <tr>
                             <th>Customer</th>
-                            <th>Status</th>
+                            <th>Payment Status</th>
+                            <th>Order Status</th>
                             <th>Actions</th>
                             <th>Amount</th>
                             <th>Screenshot</th>
@@ -2700,7 +3307,29 @@
                     </thead>
                     <tbody>
                         <tr>
-                            <td colspan="5">Loading payments...</td>
+                            <td colspan="6">Loading payments...</td>
+                        </tr>
+                    </tbody>
+                </table>
+                
+                <!-- Wallet Top-ups Table (hidden by default) -->
+                <table id="walletTopupsTable" style="display: none;">
+                    <thead>
+                        <tr>
+                            <th>Request ID</th>
+                            <th>User</th>
+                            <th>Email</th>
+                            <th>Amount</th>
+                            <th>Payment Method</th>
+                            <th>Status</th>
+                            <th>Submitted At</th>
+                            <th>Screenshot</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td colspan="9">Loading wallet top-ups...</td>
                         </tr>
                     </tbody>
                 </table>
@@ -2890,6 +3519,140 @@
             </div>
         </div>
 
+        <!-- Code Management Tab -->
+        <div id="codes" class="tab-content">
+            <div class="codes-header">
+                <div class="codes-title">
+                    <h3><i class="fas fa-key"></i> Code Management</h3>
+                    <p>Create and manage scratch card codes and store balance redeem codes</p>
+                </div>
+            </div>
+            
+            <!-- Code Creation Section -->
+            <div class="code-creation-section">
+                <div class="code-creation-tabs">
+                    <button class="code-tab-btn active" onclick="showCodeTab('spin')">
+                        <i class="fas fa-gift"></i> Scratch Card Codes
+                    </button>
+                    <button class="code-tab-btn" onclick="showCodeTab('balance')">
+                        <i class="fas fa-wallet"></i> Store Balance Codes
+                    </button>
+                </div>
+
+                <!-- Spin Wheel Code Creation -->
+                <div id="spinCodeTab" class="code-tab-content active">
+                    <div class="code-form-card">
+                        <h4><i class="fas fa-gift"></i> Create Scratch Card Code</h4>
+                        <form id="createSpinCodeForm">
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="spinCodeQuantity">Quantity</label>
+                                    <input type="number" id="spinCodeQuantity" min="1" max="100" value="1" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="spinCodeExpiry">Expiry Days</label>
+                                    <input type="number" id="spinCodeExpiry" min="1" max="365" value="30" required>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="spinCodeDescription">Description (Optional)</label>
+                                <input type="text" id="spinCodeDescription" placeholder="e.g., Special promotion, Event reward">
+                            </div>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-plus"></i> Generate Scratch Card Codes
+                            </button>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Store Balance Code Creation -->
+                <div id="balanceCodeTab" class="code-tab-content">
+                    <div class="code-form-card">
+                        <h4><i class="fas fa-wallet"></i> Create Store Balance Code</h4>
+                        <form id="createBalanceCodeForm">
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="balanceAmount">Balance Amount (Rs)</label>
+                                    <input type="number" id="balanceAmount" min="1" step="0.01" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="balanceCodeQuantity">Quantity</label>
+                                    <input type="number" id="balanceCodeQuantity" min="1" max="100" value="1" required>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="balanceCodeExpiry">Expiry Days</label>
+                                <input type="number" id="balanceCodeExpiry" min="1" max="365" value="30" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="balanceCodeDescription">Description (Optional)</label>
+                                <input type="text" id="balanceCodeDescription" placeholder="e.g., Special promotion, Customer service">
+                            </div>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-plus"></i> Generate Balance Codes
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Generated Codes Display -->
+            <div class="generated-codes-section" id="generatedCodesSection" style="display: none;">
+                <div class="generated-codes-header">
+                    <h4><i class="fas fa-list"></i> Generated Codes</h4>
+                    <button class="btn btn-secondary" onclick="copyAllCodes()">
+                        <i class="fas fa-copy"></i> Copy All
+                    </button>
+                </div>
+                <div class="codes-list" id="codesList"></div>
+            </div>
+
+            <!-- All Codes Management -->
+            <div class="all-codes-section">
+                <div class="all-codes-header">
+                    <h4><i class="fas fa-database"></i> All Codes</h4>
+                    <div class="code-filters">
+                        <select id="codeTypeFilter">
+                            <option value="all">All Types</option>
+                            <option value="spin">Scratch Card</option>
+                            <option value="balance">Store Balance</option>
+                        </select>
+                        <select id="codeStatusFilter">
+                            <option value="all">All Status</option>
+                            <option value="unused">Unused</option>
+                            <option value="used">Used</option>
+                            <option value="expired">Expired</option>
+                        </select>
+                        <button class="btn" onclick="loadAllCodes()">
+                            <i class="fas fa-sync-alt"></i> Refresh
+                        </button>
+                    </div>
+                </div>
+                <div class="table-wrapper">
+                    <table id="allCodesTable">
+                        <thead>
+                            <tr>
+                                <th>Code</th>
+                                <th>Type</th>
+                                <th>Amount</th>
+                                <th>Status</th>
+                                <th>Created</th>
+                                <th>Expires</th>
+                                <th>Used By</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td colspan="8">Loading codes...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+
     <!-- Add Product Modal -->
     <div id="addProductModal" class="modal">
         <div class="modal-content">
@@ -2911,6 +3674,7 @@
                                 <option value="game-topup">Game Top-Up</option>
                                 <option value="gift-card">Gift Card</option>
                                 <option value="subscription">Subscription</option>
+                                <option value="pc-games">PC Games</option>
                             </select>
                         </div>
                     </div>
@@ -2990,8 +3754,22 @@
                         <div id="variantsContainer">
                             <div class="variant-item">
                                 <div class="variant-grid">
-                                    <input type="text" class="variant-label" placeholder="Variant name (e.g., 100 Diamonds)" required>
-                                    <input type="number" class="variant-price" placeholder="Price" step="0.01" required>
+                                    <div class="form-group">
+                                        <label>Label (e.g. 1000 V-Bucks)</label>
+                                        <input type="text" class="variant-label" placeholder="1000 V-Bucks" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Cost Price (CP) - Rs</label>
+                                        <input type="number" class="variant-cp" step="0.01" placeholder="5.00" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Selling Price (SP) - Rs</label>
+                                        <input type="number" class="variant-sp" step="0.01" placeholder="7.99" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Profit Margin</label>
+                                        <input type="text" class="variant-margin" readonly placeholder="Auto-calculated">
+                                    </div>
                                     <button type="button" class="remove-variant" onclick="removeVariant(this)">×</button>
                                 </div>
                             </div>
@@ -3061,6 +3839,7 @@
                                 <option value="game-topup">Game Top-Up</option>
                                 <option value="gift-card">Gift Card</option>
                                 <option value="subscription">Subscription</option>
+                                <option value="pc-games">PC Games</option>
                             </select>
             </div>
         </div>
@@ -3140,8 +3919,22 @@
                         <div id="editVariantsContainer">
                             <div class="variant-item">
                                 <div class="variant-grid">
-                                    <input type="text" class="variant-label" placeholder="Variant name (e.g., 100 Diamonds)" required>
-                                    <input type="number" class="variant-price" placeholder="Price" step="0.01" required>
+                                    <div class="form-group">
+                                        <label>Label (e.g. 1000 V-Bucks)</label>
+                                        <input type="text" class="variant-label" placeholder="1000 V-Bucks" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Cost Price (CP) - Rs</label>
+                                        <input type="number" class="variant-cp" step="0.01" placeholder="5.00" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Selling Price (SP) - Rs</label>
+                                        <input type="number" class="variant-sp" step="0.01" placeholder="7.99" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Profit Margin</label>
+                                        <input type="text" class="variant-margin" readonly placeholder="Auto-calculated">
+                                    </div>
                                     <button type="button" class="remove-variant" onclick="removeVariant(this)">×</button>
                                 </div>
                             </div>

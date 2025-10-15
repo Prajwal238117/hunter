@@ -1,6 +1,7 @@
 import { auth, db } from './firebase-config.js';
-import { onAuthStateChanged, updateProfile, signOut } from 'https://www.gstatic.com/firebasejs/12.1.0/firebase-auth.js';
-import { doc, getDoc, setDoc, collection, query, where, orderBy, limit, getDocs } from 'https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js';
+import { onAuthStateChanged, updateProfile, signOut } from 'https://www.gstatic.com/firebasejs/12.3.0/firebase-auth.js';
+import { doc, getDoc, setDoc, collection, query, where, orderBy, limit, getDocs } from 'https://www.gstatic.com/firebasejs/12.3.0/firebase-firestore.js';
+import { getWalletBalance } from './wallet.js';
 import { showToast } from './toast.js';
 
 function setText(id, text) { const el = document.getElementById(id); if (el) el.textContent = text || ''; }
@@ -13,6 +14,11 @@ document.addEventListener('DOMContentLoaded', function() {
         if (user) {
             await loadUserProfile(user);
             await loadRecentOrders(user);
+            try {
+                const bal = await getWalletBalance(user.uid);
+                const el = document.getElementById('walletBalance');
+                if (el) el.textContent = `Rs ${bal.toFixed(2)}`;
+            } catch {}
         } else {
             // Redirect to login if not authenticated
             window.location.href = 'login.html';
@@ -48,23 +54,35 @@ async function loadRecentOrders(user) {
         // Query payments for this user's email
         // Query latest orders by createdAt and filter by email
         const paymentsRef = collection(db, 'payments');
-        const q = query(
-            paymentsRef,
-            where('email', '==', user.email),
-            orderBy('createdAt', 'desc'),
-            limit(5)
-        );
-        
-        const querySnapshot = await getDocs(q);
+        let querySnapshot;
+        try {
+            // Preferred: filter by email and order by createdAt
+            const q1 = query(
+                paymentsRef,
+                where('email', '==', user.email),
+                orderBy('createdAt', 'desc'),
+                limit(5)
+            );
+            querySnapshot = await getDocs(q1);
+        } catch (orderError) {
+            // Fallback when index is missing: query by email only, then sort client-side
+            const q2 = query(
+                paymentsRef,
+                where('email', '==', user.email),
+                limit(10)
+            );
+            querySnapshot = await getDocs(q2);
+        }
         const orders = [];
         let totalSpent = 0;
         
         querySnapshot.forEach((doc) => {
             const data = doc.data();
+            const created = data.createdAt?.toDate?.() || data.timestamp?.toDate?.() || new Date(0);
             orders.push({
                 id: doc.id,
                 ...data,
-                timestamp: data.timestamp?.toDate() || new Date()
+                timestamp: created
             });
             // Add to total spent if amount is available
             if (data.orderTotal) {
@@ -72,29 +90,89 @@ async function loadRecentOrders(user) {
                 totalSpent += numeric;
             }
         });
+        // If we used the fallback (no orderBy), ensure client-side sort by createdAt desc and take top 5
+        orders.sort((a, b) => (b.timestamp?.getTime?.() || 0) - (a.timestamp?.getTime?.() || 0));
+        const top = orders.slice(0, 5);
         
         // Update stats
         ordersCountElement.textContent = orders.length;
         totalSpentElement.textContent = `Rs ${totalSpent.toFixed(2)}`;
         
-        // Display recent orders
-        if (orders.length > 0) {
-            activityList.innerHTML = orders.map(order => `
-                <div class="activity-item">
-                    <div class="activity-icon">
-                        <i class="fas fa-shopping-bag"></i>
+        // Display recent orders with better formatting
+        if (top.length > 0) {
+            activityList.innerHTML = top.map(order => {
+                const orderDate = order.timestamp.toLocaleDateString('en-US', {
+                    year: 'numeric',
+                    month: 'short',
+                    day: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit'
+                });
+                
+                const statusClass = (order.status || 'pending').toLowerCase();
+                const statusText = (order.status || 'Pending').charAt(0).toUpperCase() + (order.status || 'Pending').slice(1);
+                
+                const orderTotal = order.orderTotal || 'N/A';
+                
+                // Get product names from orderItems array (like in latest-purchases.js)
+                const items = order.orderItems || [];
+                const itemNames = items.map(item => item.name || item.productName || 'Unknown Item');
+                const productName = itemNames.length > 0 ? itemNames.join(', ') : (order.productName || order.product || order.itemName || order.title || 'Digital Items');
+                
+                return `
+                    <div class="order-card">
+                        <div class="order-header">
+                            <div class="order-id">
+                                <i class="fas fa-receipt"></i>
+                                <span class="order-id-text marquee"><span class="marquee-text">Order #${order.id.slice(-8)}</span></span>
+                            </div>
+                            <div class="order-status status-${statusClass}">
+                                <i class="fas fa-circle"></i>
+                                ${statusText}
+                            </div>
+                        </div>
+                        <div class="order-details">
+                            <div class="order-info">
+                                <div class="order-product">
+                                    <i class="fas fa-box"></i>
+                                    <span class="product-name-text marquee"><span class="marquee-text">${productName}</span></span>
+                                </div>
+                                <div class="order-amount">
+                                    <span>${orderTotal}</span>
+                                </div>
+                            </div>
+                            <div class="order-meta">
+                                <div class="order-date">
+                                    <i class="fas fa-calendar"></i>
+                                    <span>${orderDate}</span>
+                                </div>
+                                ${order.paymentMethod ? `
+                                    <div class="order-payment">
+                                        <i class="fas fa-credit-card"></i>
+                                        <span>${order.paymentMethod}</span>
+                                    </div>
+                                ` : ''}
+                            </div>
+                        </div>
                     </div>
-                    <div class="activity-content">
-                        <h4>Order #${order.id.slice(-8)}</h4>
-                        <p>${order.productName || 'Product'}</p>
-                        <span class="activity-date">${order.timestamp.toLocaleDateString()}</span>
-                        <span class="activity-status ${order.status || 'pending'}">${order.status || 'Pending'}</span>
-                    </div>
-                </div>
-            `).join('');
+                `;
+            }).join('');
         } else {
-            activityList.innerHTML = '<p class="no-orders">No recent orders.</p>';
+            activityList.innerHTML = `
+                <div class="no-orders">
+                    <i class="fas fa-shopping-cart"></i>
+                    <p>No recent orders found</p>
+                    <a href="all-products.html" class="shop-now-btn">Start Shopping</a>
+                </div>
+            `;
         }
+        
+        // Trigger marquee after content is loaded
+        setTimeout(() => {
+            if (window.triggerMarquee) {
+                window.triggerMarquee();
+            }
+        }, 200);
         
     } catch (error) {
         showToast('Error loading recent orders', 'error');

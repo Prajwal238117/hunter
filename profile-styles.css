@@ -326,14 +326,14 @@
     }
     
     .profile-sidebar {
-        order: 2;
+        order: 1;
         padding: 1.5rem;
         position: static;
         border-radius: 12px;
     }
     
     .profile-content {
-        order: 1;
+        order: 2;
         padding: 1.5rem;
         border-radius: 12px;
     }
@@ -453,15 +453,9 @@
         gap: 0.8rem;
     }
     
-    .profile-sidebar {
-        padding: 1.2rem;
-        border-radius: 10px;
-    }
+    .profile-sidebar { order: 1; padding: 1.2rem; border-radius: 10px; }
     
-    .profile-content {
-        padding: 1.2rem;
-        border-radius: 10px;
-    }
+    .profile-content { order: 2; padding: 1.2rem; border-radius: 10px; }
     
     .profile-header {
         padding: 0.8rem;
@@ -565,15 +559,9 @@
         gap: 0.6rem;
     }
     
-    .profile-sidebar {
-        padding: 1rem;
-        border-radius: 8px;
-    }
+    .profile-sidebar { order: 1; padding: 1rem; border-radius: 8px; }
     
-    .profile-content {
-        padding: 1rem;
-        border-radius: 8px;
-    }
+    .profile-content { order: 2; padding: 1rem; border-radius: 8px; }
     
     .profile-header {
         padding: 0.6rem;

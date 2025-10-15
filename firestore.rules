@@ -83,5 +83,53 @@ service cloud.firestore {
       allow create, update, delete: if isAdmin();
     }
 
+    // Wallet transactions - users can read their own, create entries for their own userId; admins full access
+    match /walletTransactions/{txId} {
+      allow create: if isSignedIn() && request.resource.data.userId == request.auth.uid;
+      allow read: if isAdmin() || (isSignedIn() && resource.data.userId == request.auth.uid);
+      allow update, delete: if isAdmin();
+    }
+
+    // Profit distributions - admins can create and read
+    match /profitDistributions/{distId} {
+      allow create, read, update, delete: if isAdmin();
+    }
+
+    // Profit deductions - admins can create and read
+    match /profitDeductions/{deductId} {
+      allow create, read, update, delete: if isAdmin();
+    }
+
+    // Spin codes - users can create and read their own, admins full access
+    match /spinCodes/{codeId} {
+      allow create: if isAdmin() || (isSignedIn() && request.resource.data.userId == request.auth.uid);
+      allow read: if isAdmin() || (isSignedIn() && resource.data.userId == request.auth.uid);
+      allow update: if isAdmin();
+      allow delete: if isAdmin();
+    }
+
+    // Balance codes - admins can create and manage, users can read their own
+    match /balanceCodes/{codeId} {
+      allow create: if isAdmin();
+      allow read: if isAdmin() || (isSignedIn() && resource.data.userId == request.auth.uid);
+      allow update: if isAdmin();
+      allow delete: if isAdmin();
+    }
+
+    // Wallet top-ups - users can create their own, admins can manage all
+    match /walletTopups/{topupId} {
+      allow create: if isSignedIn() 
+        && request.resource.data.userId == request.auth.uid
+        && request.resource.data.userEmail == request.auth.token.email
+        && request.resource.data.amount is number
+        && request.resource.data.amount > 0
+        && request.resource.data.paymentMethod is string
+        && request.resource.data.status == 'pending'
+        && request.resource.data.type == 'wallet_topup';
+      allow read: if isAdmin() || (isSignedIn() && resource.data.userId == request.auth.uid);
+      allow update: if isAdmin() || (isSignedIn() && resource.data.userId == request.auth.uid);
+      allow delete: if isAdmin();
+    }
+
   }
 }

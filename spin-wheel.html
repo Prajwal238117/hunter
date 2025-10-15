@@ -1,0 +1,513 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Spin to Win - CGAPH</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        .spin-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+            padding: 20px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .spin-container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: radial-gradient(circle at 20% 80%, rgba(120, 119, 198, 0.3) 0%, transparent 50%),
+                        radial-gradient(circle at 80% 20%, rgba(255, 119, 198, 0.3) 0%, transparent 50%),
+                        radial-gradient(circle at 40% 40%, rgba(120, 219, 255, 0.2) 0%, transparent 50%);
+            animation: backgroundShift 10s ease-in-out infinite;
+        }
+
+        @keyframes backgroundShift {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.8; }
+        }
+
+        .spin-header {
+            text-align: center;
+            color: white;
+            margin-bottom: 30px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .spin-header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+            background: linear-gradient(45deg, #fff, #f0f0f0, #fff);
+            background-size: 200% 200%;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: textShine 3s ease-in-out infinite;
+        }
+
+        .spin-header p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
+        }
+
+        @keyframes textShine {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+        }
+
+        .wheel-container {
+            position: relative;
+            width: 400px;
+            height: 400px;
+            margin: 20px 0;
+            z-index: 1;
+        }
+
+        .wheel {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            position: relative;
+            overflow: hidden;
+            border: 8px solid #fff;
+            box-shadow: 0 0 30px rgba(0,0,0,0.4), 
+                        0 0 60px rgba(255,255,255,0.1),
+                        inset 0 0 20px rgba(255,255,255,0.1);
+            transition: transform 3s cubic-bezier(0.23, 1, 0.32, 1);
+            animation: wheelGlow 2s ease-in-out infinite alternate;
+        }
+
+        @keyframes wheelGlow {
+            0% { 
+                box-shadow: 0 0 30px rgba(0,0,0,0.4), 
+                           0 0 60px rgba(255,255,255,0.1),
+                           inset 0 0 20px rgba(255,255,255,0.1);
+            }
+            100% { 
+                box-shadow: 0 0 40px rgba(0,0,0,0.5), 
+                           0 0 80px rgba(255,255,255,0.2),
+                           inset 0 0 30px rgba(255,255,255,0.2);
+            }
+        }
+
+        .wheel-section {
+            position: absolute;
+            width: 50%;
+            height: 50%;
+            transform-origin: 100% 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            color: white;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.7);
+            font-size: 1.2rem;
+            transition: all 0.3s ease;
+            border: 2px solid rgba(255,255,255,0.3);
+        }
+
+
+        .wheel-section:nth-child(1) {
+            background: linear-gradient(135deg, #ff6b6b, #ee5a52);
+            transform: rotate(0deg);
+            box-shadow: inset 0 0 20px rgba(255,255,255,0.2);
+        }
+
+        .wheel-section:nth-child(2) {
+            background: linear-gradient(135deg, #4ecdc4, #44a08d);
+            transform: rotate(72deg);
+            box-shadow: inset 0 0 20px rgba(255,255,255,0.2);
+        }
+
+        .wheel-section:nth-child(3) {
+            background: linear-gradient(135deg, #45b7d1, #2196f3);
+            transform: rotate(144deg);
+            box-shadow: inset 0 0 20px rgba(255,255,255,0.2);
+        }
+
+        .wheel-section:nth-child(4) {
+            background: linear-gradient(135deg, #96ceb4, #4caf50);
+            transform: rotate(216deg);
+            box-shadow: inset 0 0 20px rgba(255,255,255,0.2);
+        }
+
+        .wheel-section:nth-child(5) {
+            background: linear-gradient(135deg, #feca57, #ff9800);
+            transform: rotate(288deg);
+            box-shadow: inset 0 0 20px rgba(255,255,255,0.2);
+        }
+
+        .wheel-pointer {
+            position: absolute;
+            top: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 0;
+            height: 0;
+            border-left: 15px solid transparent;
+            border-right: 15px solid transparent;
+            border-top: 30px solid #fff;
+            z-index: 10;
+            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
+            animation: pointerPulse 1.5s ease-in-out infinite;
+        }
+
+        @keyframes pointerPulse {
+            0%, 100% { 
+                transform: translateX(-50%) scale(1);
+                filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
+            }
+            50% { 
+                transform: translateX(-50%) scale(1.1);
+                filter: drop-shadow(0 4px 8px rgba(0,0,0,0.4));
+            }
+        }
+
+        .spin-button {
+            background: linear-gradient(45deg, #ff6b6b, #ee5a24, #ff6b6b);
+            background-size: 200% 200%;
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            border-radius: 50px;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            transition: all 0.3s ease;
+            margin: 20px 0;
+            position: relative;
+            overflow: hidden;
+            animation: buttonShine 3s ease-in-out infinite;
+        }
+
+        .spin-button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+            transition: left 0.5s;
+        }
+
+        .spin-button:hover::before {
+            left: 100%;
+        }
+
+        .spin-button:hover {
+            transform: translateY(-2px) scale(1.05);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+        }
+
+        .spin-button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+            animation: none;
+        }
+
+        @keyframes buttonShine {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+        }
+
+        .result-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.8);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .result-content {
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            text-align: center;
+            max-width: 500px;
+            width: 90%;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+
+        .result-content h2 {
+            color: #2c3e50;
+            margin-bottom: 20px;
+        }
+
+        .prize-amount {
+            font-size: 3rem;
+            font-weight: bold;
+            color: #27ae60;
+            margin: 20px 0;
+        }
+
+        .code-display {
+            background: #f8f9fa;
+            border: 2px dashed #dee2e6;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+            font-family: 'Courier New', monospace;
+            font-size: 1.5rem;
+            font-weight: bold;
+            letter-spacing: 2px;
+            color: #495057;
+        }
+
+        .code-instructions {
+            background: #e3f2fd;
+            padding: 15px;
+            border-radius: 10px;
+            margin: 20px 0;
+            color: #1565c0;
+        }
+
+        .close-modal {
+            background: #6c757d;
+            color: white;
+            border: none;
+            padding: 10px 30px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 1rem;
+            margin-top: 20px;
+        }
+
+        .close-modal:hover {
+            background: #5a6268;
+        }
+
+        .rewards-info {
+            background: rgba(255,255,255,0.1);
+            padding: 20px;
+            border-radius: 15px;
+            margin-top: 30px;
+            color: white;
+            text-align: center;
+        }
+
+        .rewards-info h3 {
+            margin-bottom: 15px;
+        }
+
+        .reward-item {
+            display: flex;
+            justify-content: space-between;
+            margin: 8px 0;
+            padding: 5px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.2);
+        }
+
+        @media (max-width: 768px) {
+            .wheel-container {
+                width: 300px;
+                height: 300px;
+            }
+            
+            .spin-header h1 {
+                font-size: 2rem;
+            }
+            
+            .result-content {
+                padding: 20px;
+            }
+            
+            .prize-amount {
+                font-size: 2rem;
+            }
+        }
+        .scratch-container {
+            position: relative;
+            width: 400px;
+            height: 300px;
+            margin: 20px 0;
+            z-index: 1;
+        }
+
+        .scratch-card {
+            width: 100%;
+            height: 100%;
+            border-radius: 20px;
+            position: relative;
+            overflow: hidden;
+            border: 8px solid #fff;
+            box-shadow: 0 0 30px rgba(0,0,0,0.4), 
+                        0 0 60px rgba(255,255,255,0.1),
+                        inset 0 0 20px rgba(255,255,255,0.1);
+            animation: cardGlow 2s ease-in-out infinite alternate;
+        }
+
+        @keyframes cardGlow {
+            0% { 
+                box-shadow: 0 0 30px rgba(0,0,0,0.4), 
+                           0 0 60px rgba(255,255,255,0.1),
+                           inset 0 0 20px rgba(255,255,255,0.1);
+            }
+            100% { 
+                box-shadow: 0 0 40px rgba(0,0,0,0.5), 
+                           0 0 80px rgba(255,255,255,0.2),
+                           inset 0 0 30px rgba(255,255,255,0.2);
+            }
+        }
+
+        .scratch-surface {
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #c0c0c0, #a0a0a0);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            cursor: pointer;
+            transition: opacity 0.3s ease;
+        }
+
+        .scratch-surface.scratched {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .scratch-text {
+            color: #333;
+            font-size: 1.5rem;
+            font-weight: bold;
+            text-shadow: 1px 1px 2px rgba(255,255,255,0.5);
+            margin-bottom: 10px;
+        }
+
+        .scratch-icon {
+            font-size: 3rem;
+            color: #555;
+            animation: scratchPulse 1.5s ease-in-out infinite;
+        }
+
+        @keyframes scratchPulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+
+        .prize-reveal {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: white;
+        }
+
+        .prize-amount {
+            font-size: 3rem;
+            font-weight: bold;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+            margin-bottom: 10px;
+            animation: prizeGlow 1s ease-in-out infinite alternate;
+        }
+
+        @keyframes prizeGlow {
+            0% { text-shadow: 2px 2px 4px rgba(0,0,0,0.5); }
+            100% { text-shadow: 2px 2px 8px rgba(255,255,255,0.3), 0 0 20px rgba(255,255,255,0.2); }
+        }
+
+        .prize-text {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+        }
+
+        .scratch-button {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            padding: 20px 40px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .scratch-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 35px rgba(102, 126, 234, 0.4);
+        }
+
+        .scratch-button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="spin-container">
+        <div class="spin-header">
+            <h1><i class="fas fa-gift"></i> Spin to Win!</h1>
+            <p id="spinMessage">Congratulations on your purchase! Spin the wheel to win amazing rewards!</p>
+        </div>
+
+        <div class="scratch-container">
+            <div class="scratch-card" id="scratchCard">
+                <div class="scratch-surface" id="scratchSurface">
+                    <div class="scratch-text">SCRATCH TO WIN!</div>
+                    <div class="scratch-icon">
+                        <i class="fas fa-hand-paper"></i>
+                    </div>
+                </div>
+                <div class="prize-reveal" id="prizeReveal" style="display: none;">
+                    <div class="prize-amount" id="revealedAmount">Rs 0</div>
+                    <div class="prize-text">Congratulations!</div>
+                </div>
+            </div>
+        </div>
+
+        <button class="scratch-button" id="scratchButton" onclick="scratchCard()">
+            <i class="fas fa-hand-paper"></i> SCRATCH TO WIN!
+        </button>
+
+    </div>
+
+    <!-- Result Modal -->
+    <div class="result-modal" id="resultModal">
+        <div class="result-content">
+            <h2><i class="fas fa-star"></i> Congratulations!</h2>
+            <div class="prize-amount" id="prizeAmount">Rs 0</div>
+            <div class="code-display" id="codeDisplay">Amount has been added to your wallet balance!</div>
+            <button class="close-modal" onclick="closeResultModal()">Close</button>
+        </div>
+    </div>
+
+    <script type="module" src="./toast.js"></script>
+    <script type="module" src="./spin-wheel.js"></script>
+</body>
+</html>

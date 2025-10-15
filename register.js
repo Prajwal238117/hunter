@@ -1,6 +1,7 @@
 import { auth, db } from './firebase-config.js';
-import { GoogleAuthProvider, signInWithPopup, signInWithRedirect, getRedirectResult, createUserWithEmailAndPassword, updateProfile, sendEmailVerification } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-auth.js";
-import { doc, setDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
+import { GoogleAuthProvider, signInWithPopup, signInWithRedirect, getRedirectResult, createUserWithEmailAndPassword, updateProfile, sendEmailVerification } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-auth.js";
+import { doc, setDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-firestore.js";
+import { ensureUserDoc } from './wallet.js';
 import { showToast } from './toast.js';
 import { authErrorMessage } from './auth-errors.js';
 
@@ -75,9 +76,13 @@ function wireEmailRegistration() {
       try { await sendEmailVerification(user); } catch {}
       await setDoc(doc(db, 'users', user.uid), {
         firstName, lastName, email, phone,
+        profitPercentage: 0, // Default to 0, admin will set this later
         role: 'user', // Default role for new users
-        createdAt: serverTimestamp()
+        balance: 0, // Single field for wallet, profit, and balance
+        createdAt: serverTimestamp(),
+        updatedAt: serverTimestamp()
       }, { merge: true });
+      try { await ensureUserDoc(user); } catch {}
       showToast('Account created. Please verify your email.', 'success');
       window.location.href = 'index.html';
     } catch (err) {
@@ -105,9 +110,13 @@ function wireGoogleSignup() {
         lastName: '',
         email: user.email || '',
         phone: user.phoneNumber || '',
+        profitPercentage: 0, // Default to 0 for Google signup
         role: 'user', // Default role for new users
-        createdAt: serverTimestamp()
+        balance: 0, // Single field for wallet, profit, and balance
+        createdAt: serverTimestamp(),
+        updatedAt: serverTimestamp()
       }, { merge: true });
+      try { await ensureUserDoc(user); } catch {}
       window.location.href = 'index.html';
     } catch (err) {
       // Fallback to redirect for popup issues or unsupported envs
@@ -132,9 +141,13 @@ document.addEventListener('DOMContentLoaded', () => {
         lastName: '',
         email: user.email || '',
         phone: user.phoneNumber || '',
+        profitPercentage: 0, // Default to 0 for Google redirect signup
         role: 'user', // Default role for new users
-        createdAt: serverTimestamp()
+        balance: 0, // Single field for wallet, profit, and balance
+        createdAt: serverTimestamp(),
+        updatedAt: serverTimestamp()
       }, { merge: true });
+      try { await ensureUserDoc(user); } catch {}
       window.location.href = 'index.html';
     }
   }).catch(() => {});

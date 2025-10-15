@@ -1,7 +1,7 @@
 import { auth } from './firebase-config.js';
 import { showToast } from './toast.js';
 import { authErrorMessage } from './auth-errors.js';
-import { GoogleAuthProvider, signInWithPopup, signInWithEmailAndPassword, sendPasswordResetEmail } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-auth.js";
+import { GoogleAuthProvider, signInWithPopup, signInWithEmailAndPassword, sendPasswordResetEmail } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-auth.js";
 
 function wireEmailPasswordLogin() {
   const form = document.getElementById('loginForm');

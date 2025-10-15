@@ -2,8 +2,9 @@
 // Version: 2024-01-15 - Fixed appliedCoupon scope issue
 
 import { auth, db } from './firebase-config.js';
-import { signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-auth.js";
-import { collection, addDoc, serverTimestamp, updateDoc, doc } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
+import { signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-auth.js";
+import { collection, addDoc, serverTimestamp, updateDoc, doc } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-firestore.js";
+import { getWalletBalance, spendFromWallet, getCurrentUser } from './wallet.js';
 import { showToast } from './toast.js';
 
 // Turnstile callback must be on window for data-callback to find it
@@ -174,6 +175,40 @@ function setQrByMethod(method) {
 
 let currentCart = [];
 
+// Spin wheel rewards with probabilities
+const REWARDS = [
+    { amount: 1, probability: 75 },
+    { amount: 5, probability: 20 },
+    { amount: 50, probability: 4.99 },
+    { amount: 1000, probability: 0.1 }
+];
+
+// Generate 16-digit alphanumeric code
+function generateSpinCode() {
+    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+    let code = '';
+    for (let i = 0; i < 16; i++) {
+        code += chars.charAt(Math.floor(Math.random() * chars.length));
+    }
+    return code;
+}
+
+// Determine reward based on probability
+function getRandomReward() {
+    const random = Math.random() * 100;
+    let cumulative = 0;
+    
+    for (const reward of REWARDS) {
+        cumulative += reward.probability;
+        if (random <= cumulative) {
+            return reward;
+        }
+    }
+    
+    // Fallback to first reward
+    return REWARDS[0];
+}
+
 function handleSubmit() {
   const form = document.getElementById('paymentForm');
   const submitBtn = document.querySelector('.btn-complete-order');
@@ -182,15 +217,33 @@ function handleSubmit() {
   const extraWrap = document.getElementById('extraFieldsSection');
   const extraContainer = document.getElementById('extraFieldsContainer');
 
+  // Check if this is a wallet top-up request
+  const urlParams = new URLSearchParams(window.location.search);
+  const isWalletTopup = urlParams.get('type') === 'wallet';
+  const topupId = urlParams.get('topupId');
+  const topupAmount = urlParams.get('amount');
+  const topupMethod = urlParams.get('method');
+
   form.addEventListener('submit', async (e) => {
     e.preventDefault();
     
     if (!form.reportValidity()) return;
 
+    const method = getSelectedPaymentMethod();
+    const isWallet = method === 'wallet';
     const file = fileInput && fileInput.files && fileInput.files[0];
-    if (!file) {
-      showToast('Please upload a payment screenshot.', 'info');
-      return;
+    
+    // For wallet top-up, we need a screenshot
+    if (isWalletTopup) {
+      if (!file) {
+        showToast('Please upload a payment screenshot.', 'info');
+        return;
+      }
+    } else if (!isWallet) {
+      if (!file) {
+        showToast('Please upload a payment screenshot.', 'info');
+        return;
+      }
     }
 
     // Get coupon data for tracking
@@ -257,13 +310,113 @@ function handleSubmit() {
     try {
       await ensureAnonymousAuth();
 
-      // Update button to show image processing
+      // Handle wallet top-up flow
+      if (isWalletTopup) {
+        const user = await getCurrentUser();
+        if (!user || user.isAnonymous) {
+          showToast('Please log in to process wallet top-up.', 'error');
+          clearTimeout(safetyTimeout);
+          return;
+        }
+
+        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing Image...';
+        const uploadResult = await uploadToCloudflareImages(file);
+        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Submitting Request...';
+
+        // Update the wallet top-up request with payment details
+        const topupUpdateData = {
+          paymentScreenshot: uploadResult.id,
+          paymentScreenshotUrl: uploadResult.url,
+          paymentScreenshotFilename: uploadResult.filename,
+          imageSize: uploadResult.size,
+          originalSize: uploadResult.originalSize,
+          submittedAt: serverTimestamp(),
+          status: 'pending_verification'
+        };
+
+        await updateDoc(doc(db, 'walletTopups', topupId), topupUpdateData);
+
+        // Redirect to success page
+        const successUrl = `order-success.html?type=wallet_topup&topupId=${topupId}&amount=${topupAmount}&method=${topupMethod}`;
+        clearTimeout(safetyTimeout);
+        window.location.href = successUrl;
+        return;
+      }
+
+      const methodNow = getSelectedPaymentMethod();
+      if (methodNow === 'wallet') {
+        // Wallet flow: ensure authenticated, sufficient balance, then create order and deduct
+        const user = await getCurrentUser();
+        if (!user || user.isAnonymous) {
+          showToast('Please log in to use wallet payment.', 'error');
+          clearTimeout(safetyTimeout);
+          return;
+        }
+
+        // Calculate total numeric
+        const totalText = getOrderTotal();
+        const totalNum = parseFloat(String(totalText).replace(/[^0-9.]/g, '')) || 0;
+
+        // Check balance
+        const balance = await getWalletBalance(user.uid);
+        if (balance < totalNum) {
+          showToast('Insufficient wallet balance.', 'error');
+          clearTimeout(safetyTimeout);
+          return;
+        }
+
+        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Charging Wallet...';
+
+        // Create payment document first for record
+        const productIds = currentCart.map(item => item.productId).filter(id => id);
+        const payload = {
+          email: document.getElementById('email')?.value || '',
+          phone: document.getElementById('phone')?.value || '',
+          fullName: document.getElementById('fullName')?.value || '',
+          paymentMethod: 'wallet',
+          orderTotal: `Rs ${totalNum.toFixed(2)}`,
+          orderItems: currentCart,
+          productIds: productIds,
+          screenshotImageId: null,
+          screenshotUrl: null,
+          screenshotFilename: null,
+          imageSize: null,
+          originalSize: null,
+          turnstileToken: '',
+          createdAt: serverTimestamp(),
+          needsManualVerification: false,
+          status: 'approved',
+          orderStatus: 'pending'
+        };
+        const paymentDoc = await addDoc(collection(db, 'payments'), payload);
+
+        // Deduct from wallet
+        await spendFromWallet(user.uid, totalNum, { paymentId: paymentDoc.id });
+
+        // Generate 16-digit spin code for wallet purchases
+        const spinCode = generateSpinCode();
+        const reward = getRandomReward();
+        
+        // Save spin code to database
+        await addDoc(collection(db, 'spinCodes'), {
+          userId: user.uid,
+          code: spinCode,
+          amount: reward.amount,
+          isUsed: false,
+          createdAt: serverTimestamp(),
+          expiresAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000) // 30 days
+        });
+
+        // Redirect to order success with spin code
+        const successUrl = `order-success.html?orderId=${paymentDoc.id}&total=${totalNum.toFixed(2)}&method=wallet&spinCode=${spinCode}&reward=${reward.amount}`;
+        clearTimeout(safetyTimeout);
+        window.location.href = successUrl;
+        return;
+      }
+
+      // Non-wallet flow: process image upload
       submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing Image...';
-      
-      // Upload to Cloudflare Images
       const uploadResult = await uploadToCloudflareImages(file);
-      
-      // Update button to show submission
       submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Submitting Order...';
 
 
@@ -309,7 +462,9 @@ function handleSubmit() {
           originalSize: uploadResult.originalSize,
           turnstileToken: '',
           createdAt: serverTimestamp(),
-          needsManualVerification: false
+          needsManualVerification: false,
+          status: 'pending',
+          orderStatus: 'pending'
         };
       }
 
@@ -390,7 +545,32 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Bind QR changes
   document.querySelectorAll('input[name="paymentMethod"]').forEach(r => {
-    r.addEventListener('change', () => setQrByMethod(r.value));
+    r.addEventListener('change', async () => {
+      const method = r.value;
+      setQrByMethod(method);
+      const ss = document.getElementById('screenshotSection');
+      const fileInput = document.getElementById('paymentScreenshot');
+      const walletRow = document.getElementById('walletBalanceRow');
+      const qrSection = document.getElementById('qrSection');
+      if (method === 'wallet') {
+        if (ss) ss.style.display = 'none';
+        if (fileInput) fileInput.required = false;
+        if (walletRow) walletRow.style.display = 'block';
+        if (qrSection) qrSection.style.display = 'none';
+        // Show balance if logged in
+        const user = await getCurrentUser();
+        if (user && !user.isAnonymous) {
+          const bal = await getWalletBalance(user.uid);
+          const el = document.getElementById('walletBalanceDisplay');
+          if (el) el.textContent = `Rs ${bal.toFixed(2)}`;
+        }
+      } else {
+        if (ss) ss.style.display = '';
+        if (fileInput) fileInput.required = true;
+        if (walletRow) walletRow.style.display = 'none';
+        if (qrSection) qrSection.style.display = '';
+      }
+    });
   });
   const checked = document.querySelector('input[name="paymentMethod"]:checked');
   setQrByMethod(checked ? checked.value : 'esewa');

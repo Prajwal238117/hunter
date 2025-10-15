@@ -13,8 +13,7 @@
     <header class="header">
         <nav class="navbar">
             <div class="nav-brand">
-                <i class="fas fa-gamepad"></i>
-                <span>CGAPH</span>
+                <img src="logo.png" alt="CGAPH Logo" class="nav-logo">
             </div>
             <ul class="nav-menu">
                 <li><a href="index.html" class="nav-link">Home</a></li>
@@ -28,14 +27,61 @@
                 <span class="cart-count">0</span>
                 </a>
             </div>
+            
+            <!-- Floating Cart Button for Mobile -->
+            <div class="floating-cart">
+                <a href="cart.html">
+                <i class="fas fa-shopping-cart"></i>
+                <span class="cart-count">0</span>
+                </a>
+            </div>
             <div class="nav-auth">
                 <a href="login.html" class="nav-link">Login</a>
                 <a href="register.html" class="nav-link">Register</a>
             </div>
-            <div class="hamburger">
-                <span class="bar"></span>
-                <span class="bar"></span>
-                <span class="bar"></span>
+            <div class="user-button" onclick="toggleUserDropdown()">
+                <i class="fas fa-user"></i>
+                <div class="user-dropdown" id="userDropdown">
+                    <div class="user-dropdown-header">
+                        <div class="user-avatar">
+                            <i class="fas fa-user"></i>
+                        </div>
+                        <div class="user-name" id="dropdownUserName">Loading...</div>
+                        <div class="user-email" id="dropdownUserEmail">Loading...</div>
+                    </div>
+                    <div class="user-dropdown-content">
+                        <div class="user-balance">
+                            <div class="balance-info">
+                                <div class="balance-icon">
+                                    <i class="fas fa-wallet"></i>
+                                </div>
+                                <div>
+                                    <div class="balance-text">Wallet Balance</div>
+                                    <div class="balance-amount" id="dropdownBalance">Loading...</div>
+                                </div>
+                            </div>
+                            <button class="topup-btn" onclick="window.location.href='wallet-topup.html'">Topup</button>
+                        </div>
+                        <div class="user-menu-items">
+                            <a href="profile.html" class="menu-item">
+                                <i class="fas fa-user-circle"></i>
+                                <span>Profile</span>
+                            </a>
+                            <a href="index.html#latest-purchases" class="menu-item">
+                                <i class="fas fa-history"></i>
+                                <span>Transaction History</span>
+                            </a>
+                            <a href="contact.html" class="menu-item">
+                                <i class="fas fa-question-circle"></i>
+                                <span>Help Center</span>
+                            </a>
+                            <button class="menu-item logout" onclick="logout()">
+                                <i class="fas fa-sign-out-alt"></i>
+                                <span>Logout</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
             </div>
         </nav>
     </header>
@@ -83,12 +129,10 @@
             <div class="profile-content">
                 <!-- Overview Tab -->
                 <div class="tab-content active" id="overview">
-                    <div class="content-header">
-                        <h2>Account Overview</h2>
-                        <p>Welcome back! Here's what's happening with your account.</p>
-                    </div>
+                    
                     
                     <div class="overview-grid">
+
                         <div class="overview-card">
                             <div class="card-header">
                                 <i class="fas fa-chart-line"></i>
@@ -144,6 +188,128 @@
             <p>&copy; 2024 CGAPH. All rights reserved.</p>
         </div>
     </footer>
+
+    <!-- Firebase SDK -->
+    <script type="module">
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+        import { getAuth, onAuthStateChanged, signOut } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
+        import { getFirestore, doc, getDoc } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyABhXlczK3kcDTDqV1M5CO-u4JNVbtFRcI",
+            authDomain: "cgaph-by-psp.firebaseapp.com",
+            projectId: "cgaph-by-psp",
+            storageBucket: "cgaph-by-psp.firebasestorage.app",
+            messagingSenderId: "728580350307",
+            appId: "1:728580350307:web:206fcdbfb6e57ef29db356",
+            measurementId: "G-0DE3BBFV75"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        window.auth = auth;
+        window.db = db;
+        window.onAuthStateChanged = onAuthStateChanged;
+
+        async function getWalletBalance() {
+            try {
+                const user = auth.currentUser;
+                if (!user) return 0;
+                const userDoc = await getDoc(doc(db, 'users', user.uid));
+                if (userDoc.exists()) {
+                    const userData = userDoc.data();
+                    return userData.balance || 0;
+                }
+                return 0;
+            } catch (error) {
+                console.error('Error getting wallet balance:', error);
+                return 0;
+            }
+        }
+
+        window.getWalletBalance = getWalletBalance;
+
+        async function logout() {
+            try {
+                await signOut(auth);
+                window.location.href = 'index.html';
+            } catch (error) {
+                console.error('Error signing out:', error);
+            }
+        }
+
+        window.logout = logout;
+    </script>
+
+    <!-- User Dropdown JavaScript -->
+    <script>
+        function toggleUserDropdown() {
+            const user = window.auth ? window.auth.currentUser : null;
+            
+            if (!user) {
+                window.location.href = 'login.html';
+                return;
+            }
+            
+            const dropdown = document.getElementById('userDropdown');
+            if (dropdown) {
+                dropdown.classList.toggle('active');
+            }
+        }
+
+        document.addEventListener('click', function(event) {
+            const dropdown = document.getElementById('userDropdown');
+            const userButton = document.querySelector('.user-button');
+            
+            if (dropdown && userButton && !userButton.contains(event.target)) {
+                dropdown.classList.remove('active');
+            }
+        });
+
+        function updateUserDropdown() {
+            const user = window.auth ? window.auth.currentUser : null;
+            const dropdown = document.getElementById('userDropdown');
+            if (user && dropdown) {
+                const displayName = user.displayName || user.email?.split('@')[0] || 'User';
+                document.getElementById('dropdownUserName').textContent = displayName;
+                document.getElementById('dropdownUserEmail').textContent = user.email || '';
+                if (window.getWalletBalance) {
+                    window.getWalletBalance().then(balance => {
+                        document.getElementById('dropdownBalance').textContent = `Rs ${balance.toFixed(2)}`;
+                    }).catch(error => {
+                        console.error('Error getting wallet balance:', error);
+                        document.getElementById('dropdownBalance').textContent = 'Rs 0.00';
+                    });
+                } else {
+                    document.getElementById('dropdownBalance').textContent = 'Rs 0.00';
+                }
+                dropdown.style.display = 'block';
+            } else {
+                if (dropdown) {
+                    dropdown.style.display = 'none';
+                }
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            setTimeout(() => {
+                if (window.auth && window.onAuthStateChanged) {
+                    window.onAuthStateChanged(window.auth, (user) => {
+                        if (!user) {
+                            window.location.href = 'login.html';
+                            return;
+                        }
+                        updateUserDropdown();
+                    });
+                } else {
+                    window.location.href = 'login.html';
+                }
+            }, 1000);
+        });
+    </script>
+
     <script type="module" src="./toast.js"></script>
     <script type="module" src="./profile.js"></script>
     <script type="module" src="./cart.js"></script>

@@ -1,7 +1,7 @@
 import { auth, db, storage } from './firebase-config.js';
-import { onAuthStateChanged, signInWithPopup, GoogleAuthProvider } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-auth.js";
-import { collection, doc, getDoc, getDocs, limit, orderBy, query, updateDoc, addDoc, deleteDoc, where, serverTimestamp, setDoc } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
-import { ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-storage.js";
+import { onAuthStateChanged, signInWithPopup, GoogleAuthProvider } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-auth.js";
+import { collection, doc, getDoc, getDocs, limit, orderBy, query, updateDoc, addDoc, deleteDoc, where, serverTimestamp, setDoc } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-firestore.js";
+import { ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-storage.js";
 import { showToast } from './toast.js';
 
 const paymentsCol = collection(db, 'payments');
@@ -78,6 +78,11 @@ function showTab(tabName) {
   const selectedTab = document.querySelector(`[data-tab="${tabName}"]`);
   if (selectedTab) {
     selectedTab.classList.add('active');
+  }
+
+  // Load data for specific tabs
+  if (tabName === 'wallet-topups') {
+    loadWalletTopups();
   }
 }
 
@@ -449,13 +454,690 @@ function setupCouponForm() {
     }
 }
 
+// Profit Distribution Functions
+async function distributeProfit(paymentId, paymentData) {
+  try {
+    console.log('Starting profit distribution for payment:', paymentId);
+    
+    // Calculate total profit from order items
+    let totalProfit = 0;
+    const orderItems = paymentData.orderItems || [];
+    
+    for (const item of orderItems) {
+      // Get product data to find CP and SP
+      if (item.productId) {
+        const productRef = doc(db, 'products', item.productId);
+        const productDoc = await getDoc(productRef);
+        
+        if (productDoc.exists()) {
+          const product = productDoc.data();
+          const variants = product.variants || [];
+          
+          // Find matching variant
+          const variant = variants.find(v => 
+            v.label === item.variant?.label || 
+            v.label === item.variantLabel ||
+            v.price === item.price
+          );
+          
+          if (variant && variant.cp && variant.sp) {
+            const itemProfit = (variant.sp - variant.cp) * (item.quantity || 1);
+            totalProfit += itemProfit;
+            console.log(`Item profit: ${item.name} - Rs ${itemProfit}`);
+          } else {
+            // Fallback: use price as SP, assume 30% profit margin
+            const itemProfit = (item.price * 0.3) * (item.quantity || 1);
+            totalProfit += itemProfit;
+            console.log(`Fallback item profit: ${item.name} - Rs ${itemProfit}`);
+          }
+        }
+      }
+    }
+    
+    console.log('Total profit before voucher deduction:', totalProfit);
+    
+    // Check if voucher was used and deduct voucher amount
+    let voucherAmount = 0;
+    if (paymentData.couponUsage) {
+      // Get coupon usage data
+      const couponUsageQuery = query(
+        collection(db, 'couponUsage'),
+        where('orderId', '==', paymentId)
+      );
+      const couponUsageSnap = await getDocs(couponUsageQuery);
+      
+      if (!couponUsageSnap.empty) {
+        const couponUsage = couponUsageSnap.docs[0].data();
+        voucherAmount = couponUsage.discountAmount || 0;
+        console.log('Voucher amount to deduct:', voucherAmount);
+      }
+    }
+    
+    // Calculate final profit after voucher deduction
+    const finalProfit = Math.max(0, totalProfit - voucherAmount);
+    console.log('Final profit after voucher deduction:', finalProfit);
+    
+    if (finalProfit <= 0) {
+      console.log('No profit to distribute after voucher deduction');
+      return;
+    }
+    
+    // Get all users with their profit percentages
+    const usersQuery = query(collection(db, 'users'));
+    const usersSnap = await getDocs(usersQuery);
+    
+    if (usersSnap.empty) {
+      console.log('No users found for profit distribution');
+      return;
+    }
+    
+    const profitDistributions = [];
+    
+    // Distribute profit to each user
+    for (const userDoc of usersSnap.docs) {
+      const userData = userDoc.data();
+      const userId = userDoc.id;
+      const profitPercentage = userData.profitPercentage || 0;
+      
+      if (profitPercentage > 0) {
+        const userProfit = (finalProfit * profitPercentage) / 100;
+        const currentBalance = userData.balance || 0;
+        const newBalance = currentBalance + userProfit;
+        
+        // Update user balance in main database
+        await updateDoc(doc(db, 'users', userId), {
+          balance: newBalance,
+          updatedAt: serverTimestamp()
+        });
+        
+        // Add wallet transaction for profit
+        await addDoc(collection(db, 'walletTransactions'), {
+          userId: userId,
+          type: 'profit_distribution',
+          amount: userProfit,
+          balance: newBalance,
+          description: `Profit distribution from payment ${paymentId}`,
+          paymentId: paymentId,
+          profitPercentage: profitPercentage,
+          createdAt: serverTimestamp()
+        });
+        
+        profitDistributions.push({
+          userId,
+          userName: userData.name || userData.email || 'Unknown',
+          profitPercentage,
+          profitAmount: userProfit,
+          newBalance
+        });
+        
+        console.log(`Distributed Rs ${userProfit} to ${userData.name || userId} (${profitPercentage}%)`);
+      }
+    }
+    
+    // Log profit distribution
+    await addDoc(collection(db, 'profitDistributions'), {
+      paymentId,
+      orderTotal: paymentData.orderTotal,
+      totalProfit,
+      voucherAmount,
+      finalProfit,
+      distributions: profitDistributions,
+      distributedAt: serverTimestamp(),
+      distributedBy: 'admin'
+    });
+    
+    console.log('Profit distribution completed successfully');
+    showToast(`Profit distributed: Rs ${finalProfit.toFixed(2)}`, 'success');
+    
+  } catch (error) {
+    console.error('Error distributing profit:', error);
+    showToast('Error distributing profit', 'error');
+  }
+}
+
+// Payment status management
+async function updatePaymentStatus(paymentId, newStatus) {
+  try {
+    const ref = doc(db, 'payments', paymentId);
+    await updateDoc(ref, { 
+      status: newStatus, 
+      reviewedAt: new Date() 
+    });
+    
+    // Increment sales count for the products if approved
+    if (newStatus === 'approved') {
+      try {
+        const paymentData = (await getDoc(ref)).data();
+        const productIds = paymentData.productIds || [];
+        
+        for (const productId of productIds) {
+          const productRef = doc(db, 'products', productId);
+          const productDoc = await getDoc(productRef);
+          if (productDoc.exists()) {
+            const currentSales = productDoc.data().salesCount || 0;
+            await updateDoc(productRef, { salesCount: currentSales + 1 });
+          }
+        }
+        
+        // Distribute profit when payment is approved
+        await distributeProfit(paymentId, paymentData);
+        
+      } catch (error) {
+        console.error('Error updating sales count or distributing profit:', error);
+      }
+    }
+    
+    await loadPayments();
+    showToast(`Payment status updated to ${newStatus}`, 'success');
+  } catch (error) {
+    console.error('Error updating payment status:', error);
+    showToast('Error updating payment status', 'error');
+  }
+}
+
+// Profit Deduction Functions
+async function deductProfit(paymentId, paymentData) {
+  try {
+    console.log('Starting profit deduction for cancelled payment:', paymentId);
+    
+    // Check if profit was distributed for this payment
+    const distributionQuery = query(
+      collection(db, 'profitDistributions'),
+      where('paymentId', '==', paymentId)
+    );
+    const distributionSnap = await getDocs(distributionQuery);
+    
+    if (distributionSnap.empty) {
+      console.log('No profit distribution found for this payment');
+      return;
+    }
+    
+    const distributionData = distributionSnap.docs[0].data();
+    const distributions = distributionData.distributions || [];
+    
+    if (distributions.length === 0) {
+      console.log('No distributions to deduct');
+      return;
+    }
+    
+    const profitDeductions = [];
+    
+    // Deduct profit from each user
+    for (const dist of distributions) {
+      const userId = dist.userId;
+      const profitAmount = dist.profitAmount || 0;
+      
+      if (profitAmount > 0) {
+        // Get current user data
+        const userRef = doc(db, 'users', userId);
+        const userDoc = await getDoc(userRef);
+        
+        if (userDoc.exists()) {
+          const userData = userDoc.data();
+          const currentBalance = userData.balance || 0;
+          
+          // Calculate new balance (deduct the profit)
+          const newBalance = Math.max(0, currentBalance - profitAmount);
+          
+          // Update user balance in main database
+          await updateDoc(userRef, {
+            balance: newBalance,
+            updatedAt: serverTimestamp()
+          });
+          
+          // Add wallet transaction for profit deduction
+          await addDoc(collection(db, 'walletTransactions'), {
+            userId: userId,
+            type: 'profit_deduction',
+            amount: -profitAmount, // Negative amount for deduction
+            balance: newBalance,
+            description: `Profit deduction from cancelled payment ${paymentId}`,
+            paymentId: paymentId,
+            profitPercentage: dist.profitPercentage,
+            createdAt: serverTimestamp()
+          });
+          
+          profitDeductions.push({
+            userId,
+            userName: dist.userName,
+            profitPercentage: dist.profitPercentage,
+            profitAmount: profitAmount,
+            previousBalance: currentBalance,
+            newBalance: newBalance
+          });
+          
+          console.log(`Deducted Rs ${profitAmount} from ${dist.userName} (${dist.profitPercentage}%)`);
+        }
+      }
+    }
+    
+    // Log profit deduction
+    await addDoc(collection(db, 'profitDeductions'), {
+      paymentId,
+      originalDistributionId: distributionSnap.docs[0].id,
+      orderTotal: paymentData.orderTotal,
+      totalProfitDeducted: distributionData.finalProfit,
+      deductions: profitDeductions,
+      deductedAt: serverTimestamp(),
+      deductedBy: 'admin',
+      reason: 'Order cancelled'
+    });
+    
+    console.log('Profit deduction completed successfully');
+    showToast(`Profit deducted: Rs ${distributionData.finalProfit.toFixed(2)}`, 'success');
+    
+  } catch (error) {
+    console.error('Error deducting profit:', error);
+    showToast('Error deducting profit', 'error');
+    }
+}
+
+// Order status management
+async function updateOrderStatus(paymentId, newStatus) {
+  try {
+    const ref = doc(db, 'payments', paymentId);
+    const paymentData = (await getDoc(ref)).data();
+    
+    await updateDoc(ref, { 
+      orderStatus: newStatus, 
+      orderStatusUpdatedAt: new Date() 
+    });
+    
+    // If order is cancelled and payment was approved, deduct profit
+    if (newStatus === 'cancelled' && paymentData.status === 'approved') {
+      await deductProfit(paymentId, paymentData);
+    }
+    
+    await loadPayments();
+    showToast(`Order status updated to ${newStatus}`, 'success');
+  } catch (error) {
+    console.error('Error updating order status:', error);
+    showToast('Error updating order status', 'error');
+  }
+}
+
+// Manual profit distribution function
+async function manualProfitDistribution(paymentId) {
+  try {
+    const paymentRef = doc(db, 'payments', paymentId);
+    const paymentDoc = await getDoc(paymentRef);
+    
+    if (!paymentDoc.exists()) {
+      showToast('Payment not found', 'error');
+      return;
+    }
+    
+    const paymentData = paymentDoc.data();
+    
+    if (paymentData.status !== 'approved') {
+      showToast('Payment must be approved before distributing profit', 'error');
+      return;
+    }
+    
+    // Check if profit was already distributed
+    const distributionQuery = query(
+      collection(db, 'profitDistributions'),
+      where('paymentId', '==', paymentId)
+    );
+    const distributionSnap = await getDocs(distributionQuery);
+    
+    if (!distributionSnap.empty) {
+      showToast('Profit already distributed for this payment', 'info');
+      return;
+    }
+    
+    await distributeProfit(paymentId, paymentData);
+    
+  } catch (error) {
+    console.error('Error in manual profit distribution:', error);
+    showToast('Error distributing profit', 'error');
+  }
+}
+
+// View profit distribution history
+async function viewProfitDistributions() {
+  try {
+    console.log('Starting to load profit distributions...');
+    
+    // Check if user is authenticated
+    const currentUser = auth.currentUser;
+    if (!currentUser) {
+      showToast('Please log in to view profit history', 'error');
+      return;
+    }
+    
+    console.log('User authenticated, fetching data...');
+    
+    const distributionsQuery = query(
+      collection(db, 'profitDistributions'),
+      orderBy('distributedAt', 'desc'),
+      limit(50)
+    );
+    const distributionsSnap = await getDocs(distributionsQuery);
+    console.log('Distributions fetched:', distributionsSnap.size);
+    
+    const deductionsQuery = query(
+      collection(db, 'profitDeductions'),
+      orderBy('deductedAt', 'desc'),
+      limit(50)
+    );
+    const deductionsSnap = await getDocs(deductionsQuery);
+    console.log('Deductions fetched:', deductionsSnap.size);
+    
+    // Get wallet transactions for profit
+    const walletQuery = query(
+      collection(db, 'walletTransactions'),
+      where('type', 'in', ['profit_distribution', 'profit_deduction']),
+      orderBy('createdAt', 'desc'),
+      limit(100)
+    );
+    const walletSnap = await getDocs(walletQuery);
+    console.log('Wallet transactions fetched:', walletSnap.size);
+    
+    if (distributionsSnap.empty && deductionsSnap.empty && walletSnap.empty) {
+      showToast('No profit distributions or deductions found', 'info');
+      return;
+    }
+    
+    let historyHTML = '<div class="profit-history-modal">';
+    historyHTML += '<h3><i class="fas fa-chart-line"></i> Profit Distribution & Deduction History</h3>';
+    
+    // Show wallet transactions
+    if (!walletSnap.empty) {
+      historyHTML += '<h4><i class="fas fa-wallet"></i> Wallet Transactions</h4>';
+      walletSnap.forEach(doc => {
+        const data = doc.data();
+        const createdAt = data.createdAt?.toDate?.()?.toLocaleString() || 'N/A';
+        const isDeduction = data.type === 'profit_deduction';
+        const amount = data.amount || 0;
+        const balance = data.balance || 0;
+        
+        historyHTML += `
+          <div class="wallet-transaction ${isDeduction ? 'deduction' : 'distribution'}">
+            <div class="transaction-header">
+              <span class="transaction-type">${isDeduction ? '📉 Profit Deduction' : '📈 Profit Distribution'}</span>
+              <span class="transaction-amount ${isDeduction ? 'negative' : 'positive'}">
+                ${isDeduction ? '-' : '+'}Rs ${Math.abs(amount).toFixed(2)}
+              </span>
+            </div>
+            <div class="transaction-details">
+              <p><strong>User ID:</strong> ${data.userId}</p>
+              <p><strong>Payment ID:</strong> ${data.paymentId || 'N/A'}</p>
+              <p><strong>Description:</strong> ${data.description || 'N/A'}</p>
+              <p><strong>Profit %:</strong> ${data.profitPercentage || 'N/A'}%</p>
+              <p><strong>New Balance:</strong> Rs ${balance.toFixed(2)}</p>
+              <p><strong>Date:</strong> ${createdAt}</p>
+            </div>
+          </div>
+        `;
+      });
+    }
+    
+    // Show distributions
+    if (!distributionsSnap.empty) {
+      historyHTML += '<h4><i class="fas fa-share-alt"></i> Profit Distributions</h4>';
+      distributionsSnap.forEach(doc => {
+        const data = doc.data();
+        const distributedAt = data.distributedAt?.toDate?.()?.toLocaleString() || 'N/A';
+        
+        historyHTML += `
+          <div class="distribution-item">
+            <h5><i class="fas fa-receipt"></i> Payment ID: ${data.paymentId}</h5>
+            <div class="transaction-details">
+              <p><strong>Order Total:</strong> Rs ${data.orderTotal || 'N/A'}</p>
+              <p><strong>Total Profit:</strong> Rs ${data.totalProfit?.toFixed(2) || 'N/A'}</p>
+              <p><strong>Voucher Amount:</strong> Rs ${data.voucherAmount?.toFixed(2) || '0.00'}</p>
+              <p><strong>Final Profit:</strong> Rs ${data.finalProfit?.toFixed(2) || 'N/A'}</p>
+              <p><strong>Distributed At:</strong> ${distributedAt}</p>
+            </div>
+            
+            <div class="distributions-list">
+              <h6><i class="fas fa-users"></i> User Distributions</h6>
+              ${data.distributions?.map(dist => `
+                <div class="user-distribution">
+                  <span><i class="fas fa-user"></i> ${dist.userName}</span>
+                  <span>${dist.profitPercentage}%</span>
+                  <span>Rs ${dist.profitAmount?.toFixed(2)}</span>
+                  <span>Balance: Rs ${dist.newBalance?.toFixed(2)}</span>
+                </div>
+              `).join('') || '<p class="empty-state"><i class="fas fa-info-circle"></i> No distributions found</p>'}
+            </div>
+          </div>
+        `;
+      });
+    }
+    
+    // Show deductions
+    if (!deductionsSnap.empty) {
+      historyHTML += '<h4><i class="fas fa-minus-circle"></i> Profit Deductions</h4>';
+      deductionsSnap.forEach(doc => {
+        const data = doc.data();
+        const deductedAt = data.deductedAt?.toDate?.()?.toLocaleString() || 'N/A';
+        
+        historyHTML += `
+          <div class="deduction-item">
+            <h5><i class="fas fa-receipt"></i> Payment ID: ${data.paymentId}</h5>
+            <div class="transaction-details">
+              <p><strong>Order Total:</strong> Rs ${data.orderTotal || 'N/A'}</p>
+              <p><strong>Total Deducted:</strong> Rs ${data.totalProfitDeducted?.toFixed(2) || 'N/A'}</p>
+              <p><strong>Reason:</strong> ${data.reason || 'N/A'}</p>
+              <p><strong>Deducted At:</strong> ${deductedAt}</p>
+            </div>
+            
+            <div class="deductions-list">
+              <h6><i class="fas fa-users"></i> User Deductions</h6>
+              ${data.deductions?.map(deduct => `
+                <div class="user-deduction">
+                  <span><i class="fas fa-user"></i> ${deduct.userName}</span>
+                  <span>${deduct.profitPercentage}%</span>
+                  <span>Rs ${deduct.profitAmount?.toFixed(2)}</span>
+                  <span>Balance: Rs ${deduct.previousBalance?.toFixed(2)} → Rs ${deduct.newBalance?.toFixed(2)}</span>
+                </div>
+              `).join('') || '<p class="empty-state"><i class="fas fa-info-circle"></i> No deductions found</p>'}
+            </div>
+          </div>
+        `;
+      });
+    }
+    
+    // Add empty state if no data
+    if (distributionsSnap.empty && deductionsSnap.empty && walletSnap.empty) {
+      historyHTML += `
+        <div class="empty-state">
+          <i class="fas fa-chart-line"></i>
+          <h4>No Profit History Found</h4>
+          <p>No profit distributions or deductions have been recorded yet.</p>
+        </div>
+      `;
+    }
+    
+    historyHTML += '</div>';
+    
+    // Show in modal
+    const modal = document.getElementById('orderDetailsModal');
+    const modalContent = document.getElementById('orderDetailsContent');
+    
+    console.log('Modal elements:', { modal, modalContent });
+    
+    if (modal && modalContent) {
+      modalContent.innerHTML = `
+        <div class="modal-header">
+          <h3>Profit History</h3>
+          <button class="close-modal" onclick="closeOrderDetailsModal()">&times;</button>
+        </div>
+        <div class="modal-body">
+          ${historyHTML}
+        </div>
+      `;
+      
+      modal.style.display = 'block';
+      console.log('Modal displayed successfully');
+    } else {
+      console.error('Modal elements not found:', { modal, modalContent });
+      showToast('Error: Modal not found', 'error');
+    }
+    
+  } catch (error) {
+    console.error('Error loading profit history:', error);
+    console.error('Error details:', {
+      message: error.message,
+      code: error.code,
+      stack: error.stack
+    });
+    showToast(`Error loading profit history: ${error.message}`, 'error');
+  }
+}
+
 // Make functions globally available
+// Add User Modal Functions
+function openAddUserModal() {
+    const modal = document.getElementById('addUserModal');
+    if (modal) {
+        modal.style.display = 'block';
+        document.body.style.overflow = 'hidden';
+        
+        // Reset form
+        const form = document.getElementById('addUserForm');
+        if (form) {
+            form.reset();
+        }
+    }
+}
+
+function closeAddUserModal() {
+    const modal = document.getElementById('addUserModal');
+    if (modal) {
+        modal.style.display = 'none';
+        document.body.style.overflow = 'auto';
+    }
+}
+
+// Create new user
+async function createUser(event) {
+    event.preventDefault();
+    
+    const form = event.target;
+    const submitBtn = form.querySelector('button[type="submit"]');
+    const originalText = submitBtn.innerHTML;
+    
+    // Get form data
+    const fullName = document.getElementById('newUserName').value.trim();
+    const email = document.getElementById('newUserEmail').value.trim();
+    const password = document.getElementById('newUserPassword').value;
+    const role = document.getElementById('newUserRole').value;
+    const status = document.getElementById('newUserStatus').value;
+    
+    // Validation
+    if (!fullName || !email || !password || !role || !status) {
+        showToast('Please fill in all required fields', 'error');
+        return;
+    }
+    
+    if (password.length < 6) {
+        showToast('Password must be at least 6 characters long', 'error');
+        return;
+    }
+    
+    // Email validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+        showToast('Please enter a valid email address', 'error');
+        return;
+    }
+    
+    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Creating...';
+    submitBtn.disabled = true;
+    
+    try {
+        // Check if user already exists
+        const usersQuery = query(
+            collection(db, 'users'),
+            where('email', '==', email)
+        );
+        const existingUsers = await getDocs(usersQuery);
+        
+        if (!existingUsers.empty) {
+            showToast('A user with this email already exists', 'error');
+            return;
+        }
+        
+        // Create user in Firebase Auth
+        const { createUserWithEmailAndPassword } = await import('https://www.gstatic.com/firebasejs/12.3.0/firebase-auth.js');
+        const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+        const newUser = userCredential.user;
+        
+        // Create user document in Firestore
+        const userData = {
+            firstName: fullName.split(' ')[0] || '',
+            lastName: fullName.split(' ').slice(1).join(' ') || '',
+            email: email,
+            phone: '',
+            role: role,
+            status: status,
+            balance: 0,
+            profitPercentage: role === 'admin' || role === 'super-admin' ? 0 : 5, // Default profit percentage
+            createdAt: serverTimestamp(),
+            updatedAt: serverTimestamp(),
+            createdBy: auth.currentUser.uid
+        };
+        
+        await addDoc(collection(db, 'users'), {
+            ...userData,
+            uid: newUser.uid
+        });
+        
+        // Add wallet transaction for initial balance
+        if (userData.balance > 0) {
+            await addDoc(collection(db, 'walletTransactions'), {
+                userId: newUser.uid,
+                type: 'admin_credit',
+                amount: userData.balance,
+                balance: userData.balance,
+                description: 'Initial balance from admin creation',
+                createdAt: serverTimestamp()
+            });
+        }
+        
+        showToast(`User "${fullName}" created successfully!`, 'success');
+        
+        // Close modal and refresh users list
+        closeAddUserModal();
+        await loadUsers();
+        
+    } catch (error) {
+        console.error('Error creating user:', error);
+        
+        let errorMessage = 'Failed to create user';
+        if (error.code === 'auth/email-already-in-use') {
+            errorMessage = 'Email is already in use';
+        } else if (error.code === 'auth/weak-password') {
+            errorMessage = 'Password is too weak';
+        } else if (error.code === 'auth/invalid-email') {
+            errorMessage = 'Invalid email address';
+        } else if (error.message) {
+            errorMessage = error.message;
+        }
+        
+        showToast(errorMessage, 'error');
+    } finally {
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = originalText;
+    }
+}
+
 window.showOrderDetails = showOrderDetails;
 window.closeOrderDetailsModal = closeOrderDetailsModal;
 window.viewBase64Image = viewBase64Image;
 window.showToast = showToast;
+window.updatePaymentStatus = updatePaymentStatus;
+window.updateOrderStatus = updateOrderStatus;
 window.openAddCouponModal = openAddCouponModal;
 window.closeAddCouponModal = closeAddCouponModal;
+window.manualProfitDistribution = manualProfitDistribution;
+window.viewProfitDistributions = viewProfitDistributions;
+window.openAddUserModal = openAddUserModal;
+window.closeAddUserModal = closeAddUserModal;
+window.createUser = createUser;
 
 // Payment Management Functions
 function statusBadge(status) {
@@ -466,8 +1148,17 @@ function statusBadge(status) {
   return `<span class="status-badge ${cls}">${text}</span>`;
 }
 
+function orderStatusBadge(status) {
+  const cls = status === 'delivered' ? 'status-delivered'
+            : status === 'cancelled' ? 'status-cancelled'
+            : 'status-pending';
+  const text = status ? status : 'pending';
+  return `<span class="status-badge ${cls}">${text}</span>`;
+}
+
 function rowTemplate(id, data) {
-  const status = data.status || 'pending';
+  const paymentStatus = data.status || 'pending';
+  const orderStatus = data.orderStatus || 'pending';
   
   // Handle screenshot display - support both Cloudflare URLs and base64
   let ss = '-';
@@ -489,11 +1180,23 @@ function rowTemplate(id, data) {
   return `
     <tr data-id="${id}">
       <td>${data.fullName || 'Customer'}</td>
-      <td>${statusBadge(status)}</td>
+      <td>
+        <select class="payment-status-select" onchange="updatePaymentStatus('${id}', this.value)" style="padding: 4px 8px; border-radius: 4px; border: 1px solid #ddd;">
+          <option value="pending" ${paymentStatus === 'pending' ? 'selected' : ''}>Pending</option>
+          <option value="approved" ${paymentStatus === 'approved' ? 'selected' : ''}>Approved</option>
+          <option value="rejected" ${paymentStatus === 'rejected' ? 'selected' : ''}>Rejected</option>
+        </select>
+      </td>
+      <td>
+        <select class="order-status-select" onchange="updateOrderStatus('${id}', this.value)" style="padding: 4px 8px; border-radius: 4px; border: 1px solid #ddd;">
+          <option value="pending" ${orderStatus === 'pending' ? 'selected' : ''}>Pending</option>
+          <option value="delivered" ${orderStatus === 'delivered' ? 'selected' : ''}>Delivered</option>
+          <option value="cancelled" ${orderStatus === 'cancelled' ? 'selected' : ''}>Cancelled</option>
+        </select>
+      </td>
       <td class="actions">
         <button class="btn-order-details" onclick="showOrderDetails('${id}')">Order Details</button>
-        <button class="btn-approve">Approve</button>
-        <button class="btn-reject">Reject</button>
+        <button class="btn-profit-dist" onclick="manualProfitDistribution('${id}')" title="Distribute Profit">💰</button>
       </td>
       <td>${data.orderTotal || 'N/A'}</td>
       <td>${ss}</td>
@@ -510,7 +1213,7 @@ async function loadPayments() {
   }
   
   console.log('Setting loading message');
-  tbody.innerHTML = '<tr><td colspan="5">Loading...</td></tr>';
+    tbody.innerHTML = '<tr><td colspan="6">Loading...</td></tr>';
   
   try {
     console.log('Querying payments collection...');
@@ -530,11 +1233,11 @@ async function loadPayments() {
       tbody.innerHTML = rows.join('');
     } else {
       console.log('No payments found, showing empty message');
-      tbody.innerHTML = '<tr><td colspan="5">No payments yet.</td></tr>';
+      tbody.innerHTML = '<tr><td colspan="6">No payments yet.</td></tr>';
     }
   } catch (err) {
     console.error('Error in loadPayments:', err);
-    tbody.innerHTML = '<tr><td colspan="5">Failed to load.</td></tr>';
+    tbody.innerHTML = '<tr><td colspan="6">Failed to load.</td></tr>';
   }
 }
 
@@ -542,47 +1245,9 @@ function wirePaymentActions() {
   const table = document.getElementById('paymentsTable');
   if (!table) return;
   
-  table.addEventListener('click', async (e) => {
-    const target = e.target;
-    if (!(target instanceof Element)) return;
-    const row = target.closest('tr[data-id]');
-    if (!row) return;
-    const id = row.getAttribute('data-id');
-    const ref = doc(db, 'payments', id);
-    try {
-      if (target.classList.contains('btn-approve')) {
-        await updateDoc(ref, { status: 'approved', reviewedAt: new Date() });
-        
-        // Increment sales count for the products
-        try {
-          const paymentData = (await getDoc(ref)).data();
-          const productIds = paymentData.productIds || [];
-          
-          for (const productId of productIds) {
-            const productRef = doc(db, 'products', productId);
-            const productDoc = await getDoc(productRef);
-            if (productDoc.exists()) {
-              const currentSales = productDoc.data().salesCount || 0;
-              await updateDoc(productRef, { salesCount: currentSales + 1 });
-            }
-          }
-        } catch (error) {
-          console.error('Error updating sales count:', error);
-        }
-        
-        await loadPayments();
-        showToast('Payment approved', 'success');
-      }
-      if (target.classList.contains('btn-reject')) {
-        await updateDoc(ref, { status: 'rejected', reviewedAt: new Date() });
-        await loadPayments();
-        showToast('Payment rejected', 'success');
-      }
-    } catch (err) {
-      console.error(err);
-      showToast('Failed to update status', 'error');
-    }
-  });
+  // Note: Payment and order status updates are now handled directly by the select dropdowns
+  // using the updatePaymentStatus and updateOrderStatus functions
+  // This function is kept for any future table-level event handling needs
 }
 
 // Product Management Functions
@@ -1000,8 +1665,16 @@ function addVariant() {
           <input type="text" class="variant-label" placeholder="1000 V-Bucks" required>
         </div>
         <div class="form-group">
-          <label>Price (Rs)</label>
-          <input type="number" class="variant-price" step="0.01" placeholder="7.99" required>
+          <label>Cost Price (CP) - Rs</label>
+          <input type="number" class="variant-cp" step="0.01" placeholder="5.00" required>
+        </div>
+        <div class="form-group">
+          <label>Selling Price (SP) - Rs</label>
+          <input type="number" class="variant-sp" step="0.01" placeholder="7.99" required>
+        </div>
+        <div class="form-group">
+          <label>Profit Margin</label>
+          <input type="text" class="variant-margin" readonly placeholder="Auto-calculated">
         </div>
       </div>
       <button type="button" class="remove-variant" onclick="removeVariant(this)">×</button>
@@ -1009,6 +1682,26 @@ function addVariant() {
   `;
   
   container.insertAdjacentHTML('beforeend', variantHTML);
+  
+  // Add event listeners for auto-calculation
+  const newVariant = container.lastElementChild;
+  const cpInput = newVariant.querySelector('.variant-cp');
+  const spInput = newVariant.querySelector('.variant-sp');
+  const marginInput = newVariant.querySelector('.variant-margin');
+  
+  function calculateMargin() {
+    const cp = parseFloat(cpInput.value) || 0;
+    const sp = parseFloat(spInput.value) || 0;
+    if (cp > 0 && sp > 0) {
+      const margin = (sp - cp).toFixed(2);
+      marginInput.value = `Rs ${margin}`;
+    } else {
+      marginInput.value = '';
+    }
+  }
+  
+  cpInput.addEventListener('input', calculateMargin);
+  spInput.addEventListener('input', calculateMargin);
 }
 
 function addExtraField() {
@@ -1046,14 +1739,48 @@ function addEditVariant() {
   const variantHTML = `
     <div class="variant-item">
       <div class="variant-grid">
-        <input type="text" class="variant-label" placeholder="Variant name (e.g., 100 Diamonds)" required>
-        <input type="number" class="variant-price" placeholder="Price" step="0.01" required>
+        <div class="form-group">
+          <label>Label (e.g. 1000 V-Bucks)</label>
+          <input type="text" class="variant-label" placeholder="1000 V-Bucks" required>
+        </div>
+        <div class="form-group">
+          <label>Cost Price (CP) - Rs</label>
+          <input type="number" class="variant-cp" step="0.01" placeholder="5.00" required>
+        </div>
+        <div class="form-group">
+          <label>Selling Price (SP) - Rs</label>
+          <input type="number" class="variant-sp" step="0.01" placeholder="7.99" required>
+        </div>
+        <div class="form-group">
+          <label>Profit Margin</label>
+          <input type="text" class="variant-margin" readonly placeholder="Auto-calculated">
+        </div>
         <button type="button" class="remove-variant" onclick="removeVariant(this)">×</button>
       </div>
     </div>
   `;
   
   container.insertAdjacentHTML('beforeend', variantHTML);
+  
+  // Add event listeners for auto-calculation
+  const newVariant = container.lastElementChild;
+  const cpInput = newVariant.querySelector('.variant-cp');
+  const spInput = newVariant.querySelector('.variant-sp');
+  const marginInput = newVariant.querySelector('.variant-margin');
+  
+  function calculateMargin() {
+    const cp = parseFloat(cpInput.value) || 0;
+    const sp = parseFloat(spInput.value) || 0;
+    if (cp > 0 && sp > 0) {
+      const margin = (sp - cp).toFixed(2);
+      marginInput.value = `Rs ${margin}`;
+    } else {
+      marginInput.value = '';
+    }
+  }
+  
+  cpInput.addEventListener('input', calculateMargin);
+  spInput.addEventListener('input', calculateMargin);
 }
 
 function addEditExtraField() {
@@ -1145,13 +1872,41 @@ function cancelAddProduct() {
             <input type="text" class="variant-label" placeholder="1000 V-Bucks" required>
           </div>
           <div class="form-group">
-            <label>Price (Rs)</label>
-            <input type="number" class="variant-price" step="0.01" placeholder="7.99" required>
+            <label>Cost Price (CP) - Rs</label>
+            <input type="number" class="variant-cp" step="0.01" placeholder="5.00" required>
+          </div>
+          <div class="form-group">
+            <label>Selling Price (SP) - Rs</label>
+            <input type="number" class="variant-sp" step="0.01" placeholder="7.99" required>
+          </div>
+          <div class="form-group">
+            <label>Profit Margin</label>
+            <input type="text" class="variant-margin" readonly placeholder="Auto-calculated">
           </div>
         </div>
         <button type="button" class="remove-variant" onclick="removeVariant(this)">×</button>
       </div>
     `;
+    
+    // Add event listeners for auto-calculation
+    const newVariant = variantsContainer.firstElementChild;
+    const cpInput = newVariant.querySelector('.variant-cp');
+    const spInput = newVariant.querySelector('.variant-sp');
+    const marginInput = newVariant.querySelector('.variant-margin');
+    
+    function calculateMargin() {
+      const cp = parseFloat(cpInput.value) || 0;
+      const sp = parseFloat(spInput.value) || 0;
+      if (cp > 0 && sp > 0) {
+        const margin = ((sp - cp) / cp * 100).toFixed(2);
+        marginInput.value = `${margin}%`;
+      } else {
+        marginInput.value = '';
+      }
+    }
+    
+    cpInput.addEventListener('input', calculateMargin);
+    spInput.addEventListener('input', calculateMargin);
   }
   
   // Reset extra fields
@@ -1224,12 +1979,48 @@ async function editProduct(productId) {
         variantDiv.className = 'variant-item';
         variantDiv.innerHTML = `
           <div class="variant-grid">
-            <input type="text" class="variant-label" placeholder="Variant name (e.g., 100 Diamonds)" value="${variant.label || ''}" required>
-            <input type="number" class="variant-price" placeholder="Price" step="0.01" value="${variant.price || ''}" required>
+            <div class="form-group">
+              <label>Label (e.g. 1000 V-Bucks)</label>
+              <input type="text" class="variant-label" placeholder="1000 V-Bucks" value="${variant.label || ''}" required>
+            </div>
+            <div class="form-group">
+              <label>Cost Price (CP) - Rs</label>
+              <input type="number" class="variant-cp" step="0.01" placeholder="5.00" value="${variant.cp || ''}" required>
+            </div>
+            <div class="form-group">
+              <label>Selling Price (SP) - Rs</label>
+              <input type="number" class="variant-sp" step="0.01" placeholder="7.99" value="${variant.sp || variant.price || ''}" required>
+            </div>
+            <div class="form-group">
+              <label>Profit Margin</label>
+              <input type="text" class="variant-margin" readonly placeholder="Auto-calculated">
+            </div>
           <button type="button" class="remove-variant" onclick="removeVariant(this)">×</button>
           </div>
         `;
         variantsContainer.appendChild(variantDiv);
+        
+        // Add event listeners for auto-calculation
+        const cpInput = variantDiv.querySelector('.variant-cp');
+        const spInput = variantDiv.querySelector('.variant-sp');
+        const marginInput = variantDiv.querySelector('.variant-margin');
+        
+        function calculateMargin() {
+          const cp = parseFloat(cpInput.value) || 0;
+          const sp = parseFloat(spInput.value) || 0;
+          if (cp > 0 && sp > 0) {
+            const margin = ((sp - cp) / cp * 100).toFixed(2);
+            marginInput.value = `${margin}%`;
+          } else {
+            marginInput.value = '';
+          }
+        }
+        
+        cpInput.addEventListener('input', calculateMargin);
+        spInput.addEventListener('input', calculateMargin);
+        
+        // Calculate initial margin
+        calculateMargin();
       });
     } else {
       // Add default variant if none exist
@@ -1314,12 +2105,15 @@ async function handleProductSubmit(e) {
     
     variantElements.forEach(variantEl => {
       const label = variantEl.querySelector('.variant-label').value;
-      const price = parseFloat(variantEl.querySelector('.variant-price').value);
+      const cp = parseFloat(variantEl.querySelector('.variant-cp').value);
+      const sp = parseFloat(variantEl.querySelector('.variant-sp').value);
       
-      if (label && price) {
+      if (label && cp && sp) {
         variants.push({
           label,
-          price
+          cp,
+          sp,
+          price: sp // Keep price field for backward compatibility
         });
       }
     });
@@ -1454,12 +2248,15 @@ async function handleEditProductSubmit(e) {
     
     variantElements.forEach(variantEl => {
       const label = variantEl.querySelector('.variant-label').value;
-      const price = parseFloat(variantEl.querySelector('.variant-price').value);
+      const cp = parseFloat(variantEl.querySelector('.variant-cp').value);
+      const sp = parseFloat(variantEl.querySelector('.variant-sp').value);
       
-      if (label && price) {
+      if (label && cp && sp) {
         variants.push({
           label,
-          price
+          cp,
+          sp,
+          price: sp // Keep price field for backward compatibility
         });
       }
     });
@@ -1789,20 +2586,220 @@ async function updateUserRole(userId, newRole) {
 
 async function viewUserDetails(userId) {
   try {
-    const snap = await getDoc(doc(db, 'users', userId));
-    if (!snap.exists()) { showToast('User not found', 'error'); return; }
-    const u = snap.data();
-    const lines = [
-      `Name: ${(u.firstName||'') + ' ' + (u.lastName||'')}`.trim(),
-      `Email: ${u.email || 'N/A'}`,
-      `Phone: ${u.phone || 'N/A'}`,
-      `Role: ${u.role || 'user'}`,
-      `Created: ${u.createdAt?.toDate ? u.createdAt.toDate().toLocaleString() : 'N/A'}`
-    ];
-    showToast(lines.join('\n'), 'info', { timeout: 6000 });
-  } catch (e) {
-    console.error(e);
+    const userDoc = await getDoc(doc(db, 'users', userId));
+    if (!userDoc.exists()) { 
+      showToast('User not found', 'error'); 
+      return; 
+    }
+    
+    const userData = userDoc.data();
+    const createdAt = userData.createdAt?.toDate?.()?.toLocaleString() || 'N/A';
+    const updatedAt = userData.updatedAt?.toDate?.()?.toLocaleString() || 'N/A';
+    
+    // Show modal with user details and edit form
+    const modal = document.getElementById('orderDetailsModal');
+    const modalContent = document.getElementById('orderDetailsContent');
+    
+    if (modal && modalContent) {
+      modalContent.innerHTML = `
+        <div class="modal-header">
+          <h3><i class="fas fa-user"></i> User Details</h3>
+          <button class="close-modal" onclick="closeOrderDetailsModal()">&times;</button>
+        </div>
+        <div class="modal-body">
+          <div class="user-details-container">
+            <div class="user-info-section">
+              <h4><i class="fas fa-info-circle"></i> User Information</h4>
+              <div class="user-details-grid">
+                <div class="detail-item">
+                  <label>User ID:</label>
+                  <span>${userId}</span>
+                </div>
+                <div class="detail-item">
+                  <label>Email:</label>
+                  <span>${userData.email || 'N/A'}</span>
+                </div>
+                <div class="detail-item">
+                  <label>Phone:</label>
+                  <span>${userData.phone || 'N/A'}</span>
+                </div>
+                <div class="detail-item">
+                  <label>Created:</label>
+                  <span>${createdAt}</span>
+                </div>
+                <div class="detail-item">
+                  <label>Last Updated:</label>
+                  <span>${updatedAt}</span>
+                </div>
+                <div class="detail-item">
+                  <label>Status:</label>
+                  <span class="status-badge ${userData.status === 'active' ? 'status-active' : 'status-inactive'}">${userData.status || 'active'}</span>
+                </div>
+              </div>
+            </div>
+            
+            <div class="user-edit-section">
+              <h4><i class="fas fa-edit"></i> Edit User Details</h4>
+              <form id="editUserForm" onsubmit="saveUserDetails(event, '${userId}')">
+                <div class="form-row">
+                  <div class="form-group">
+                    <label for="editFirstName">First Name</label>
+                    <input type="text" id="editFirstName" value="${userData.firstName || ''}" required>
+                  </div>
+                  <div class="form-group">
+                    <label for="editLastName">Last Name</label>
+                    <input type="text" id="editLastName" value="${userData.lastName || ''}" required>
+                  </div>
+                </div>
+                
+                <div class="form-row">
+                  <div class="form-group">
+                    <label for="editEmail">Email</label>
+                    <input type="email" id="editEmail" value="${userData.email || ''}" required>
+                  </div>
+                  <div class="form-group">
+                    <label for="editPhone">Phone</label>
+                    <input type="tel" id="editPhone" value="${userData.phone || ''}">
+                  </div>
+                </div>
+                
+                <div class="form-row">
+                  <div class="form-group">
+                    <label for="editRole">Role</label>
+                    <select id="editRole" required>
+                      <option value="user" ${userData.role === 'user' ? 'selected' : ''}>User</option>
+                      <option value="admin" ${userData.role === 'admin' ? 'selected' : ''}>Admin</option>
+                    </select>
+                  </div>
+                  <div class="form-group">
+                    <label for="editStatus">Status</label>
+                    <select id="editStatus" required>
+                      <option value="active" ${userData.status === 'active' ? 'selected' : ''}>Active</option>
+                      <option value="inactive" ${userData.status === 'inactive' ? 'selected' : ''}>Inactive</option>
+                    </select>
+                  </div>
+                </div>
+                
+                <div class="form-group">
+                  <label for="editBalance">Wallet Balance (Rs)</label>
+                  <input type="number" id="editBalance" value="${userData.balance || 0}" step="0.01" min="0">
+                </div>
+                
+                <div class="form-group">
+                  <label for="editProfitPercentage">Profit Percentage (%)</label>
+                  <input type="number" id="editProfitPercentage" value="${userData.profitPercentage || 0}" step="0.01" min="0" max="100">
+                </div>
+                
+                <div class="form-actions">
+                  <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-save"></i> Save Changes
+                  </button>
+                  <button type="button" class="btn btn-secondary" onclick="closeOrderDetailsModal()">
+                    <i class="fas fa-times"></i> Cancel
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      `;
+      
+      modal.style.display = 'block';
+    } else {
+      console.error('Modal elements not found:', { modal, modalContent });
+      showToast('Error: Modal not found', 'error');
+    }
+  } catch (error) {
+    console.error('Error loading user details:', error);
     showToast('Failed to load user details', 'error');
+  }
+}
+
+// Save user details from edit form
+async function saveUserDetails(event, userId) {
+  event.preventDefault();
+  
+  try {
+    const formData = {
+      firstName: document.getElementById('editFirstName').value.trim(),
+      lastName: document.getElementById('editLastName').value.trim(),
+      email: document.getElementById('editEmail').value.trim(),
+      phone: document.getElementById('editPhone').value.trim(),
+      role: document.getElementById('editRole').value,
+      status: document.getElementById('editStatus').value,
+      balance: parseFloat(document.getElementById('editBalance').value) || 0,
+      profitPercentage: parseFloat(document.getElementById('editProfitPercentage').value) || 0,
+      updatedAt: serverTimestamp()
+    };
+    
+    // Validate required fields
+    if (!formData.firstName || !formData.lastName || !formData.email) {
+      showToast('Please fill in all required fields', 'error');
+      return;
+    }
+    
+    // Validate email format
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(formData.email)) {
+      showToast('Please enter a valid email address', 'error');
+      return;
+    }
+    
+    // Validate profit percentage
+    if (formData.profitPercentage < 0 || formData.profitPercentage > 100) {
+      showToast('Profit percentage must be between 0 and 100', 'error');
+      return;
+    }
+    
+    // Validate balance
+    if (formData.balance < 0) {
+      showToast('Balance cannot be negative', 'error');
+      return;
+    }
+    
+    // Disable submit button
+    const submitBtn = event.target.querySelector('button[type="submit"]');
+    const originalText = submitBtn.innerHTML;
+    submitBtn.disabled = true;
+    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
+    
+    // Update user document
+    await updateDoc(doc(db, 'users', userId), formData);
+    
+    // Add wallet transaction if balance changed
+    const currentUserDoc = await getDoc(doc(db, 'users', userId));
+    const currentBalance = currentUserDoc.data()?.balance || 0;
+    
+    if (formData.balance !== currentBalance) {
+      const balanceChange = formData.balance - currentBalance;
+      
+      await addDoc(collection(db, 'walletTransactions'), {
+        userId: userId,
+        type: balanceChange > 0 ? 'admin_credit' : 'admin_debit',
+        amount: Math.abs(balanceChange),
+        balance: formData.balance,
+        description: `Balance ${balanceChange > 0 ? 'added' : 'deducted'} by admin`,
+        createdAt: serverTimestamp(),
+        adminAction: true
+      });
+    }
+    
+    showToast('User details updated successfully', 'success');
+    
+    // Close modal and refresh users table
+    closeOrderDetailsModal();
+    loadUsers();
+    
+  } catch (error) {
+    console.error('Error saving user details:', error);
+    showToast('Error saving user details: ' + error.message, 'error');
+  } finally {
+    // Re-enable submit button
+    const submitBtn = event.target.querySelector('button[type="submit"]');
+    if (submitBtn) {
+      submitBtn.disabled = false;
+      submitBtn.innerHTML = '<i class="fas fa-save"></i> Save Changes';
+    }
   }
 }
 
@@ -2186,12 +3183,45 @@ window.addEditVariant = function() {
   variantItem.className = 'variant-item';
   variantItem.innerHTML = `
     <div class="variant-grid">
-      <input type="text" class="variant-label" placeholder="Variant name (e.g., 100 Diamonds)" required>
-      <input type="number" class="variant-price" placeholder="Price" step="0.01" required>
+      <div class="form-group">
+        <label>Label (e.g. 1000 V-Bucks)</label>
+        <input type="text" class="variant-label" placeholder="1000 V-Bucks" required>
+      </div>
+      <div class="form-group">
+        <label>Cost Price (CP) - Rs</label>
+        <input type="number" class="variant-cp" step="0.01" placeholder="5.00" required>
+      </div>
+      <div class="form-group">
+        <label>Selling Price (SP) - Rs</label>
+        <input type="number" class="variant-sp" step="0.01" placeholder="7.99" required>
+      </div>
+      <div class="form-group">
+        <label>Profit Margin</label>
+        <input type="text" class="variant-margin" readonly placeholder="Auto-calculated">
+      </div>
       <button type="button" class="remove-variant" onclick="removeVariant(this)">×</button>
     </div>
   `;
   container.appendChild(variantItem);
+  
+  // Add event listeners for auto-calculation
+  const cpInput = variantItem.querySelector('.variant-cp');
+  const spInput = variantItem.querySelector('.variant-sp');
+  const marginInput = variantItem.querySelector('.variant-margin');
+  
+  function calculateMargin() {
+    const cp = parseFloat(cpInput.value) || 0;
+    const sp = parseFloat(spInput.value) || 0;
+    if (cp > 0 && sp > 0) {
+      const margin = (sp - cp).toFixed(2);
+      marginInput.value = `Rs ${margin}`;
+    } else {
+      marginInput.value = '';
+    }
+  }
+  
+  cpInput.addEventListener('input', calculateMargin);
+  spInput.addEventListener('input', calculateMargin);
 };
 
 window.addEditExtraField = function() {
@@ -2288,6 +3318,13 @@ function initializeAdminPanel() {
   loadUsers();
   debugUserAccess(); // Debug user access
   document.getElementById('refreshUsersBtn')?.addEventListener('click', loadUsers);
+  
+  // Setup Add User form
+  const addUserForm = document.getElementById('addUserForm');
+  if (addUserForm) {
+    addUserForm.addEventListener('submit', createUser);
+  }
+  
   const usersSearch = document.getElementById('searchUsersInput');
   if (usersSearch) {
     usersSearch.addEventListener('input', () => {
@@ -2327,6 +3364,10 @@ function initializeAdminPanel() {
   loadPromoters();
   setupPromoterForm();
   document.getElementById('refreshPromotersBtn')?.addEventListener('click', loadPromoters);
+  
+  // Setup code management
+  console.log('Setting up code management...');
+  initializeCodeManagement();
   const promotersSearch = document.getElementById('searchPromotersInput');
   if (promotersSearch) {
       promotersSearch.addEventListener('input', () => {
@@ -2400,6 +3441,7 @@ window.cancelAddProduct = cancelAddProduct;
 window.deleteProduct = deleteProduct;
 window.updateUserRole = updateUserRole;
 window.viewUserDetails = viewUserDetails;
+window.saveUserDetails = saveUserDetails;
 window.viewContactMessage = viewContactMessage;
 window.viewBase64Image = viewBase64Image;
 window.debugUserAccess = debugUserAccess;
@@ -2419,4 +3461,627 @@ window.closeEditPromoterModal = closeEditPromoterModal;
 window.deletePromoterFromEdit = deletePromoterFromEdit;
 window.fetchPromoterInfo = fetchPromoterInfo;
 
+// Code Management Functions
+let generatedCodes = [];
 
+// Generate 16-digit alphanumeric code
+function generateCode() {
+    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+    let code = '';
+    for (let i = 0; i < 16; i++) {
+        code += chars.charAt(Math.floor(Math.random() * chars.length));
+    }
+    return code;
+}
+
+// Show code tab
+function showCodeTab(tab) {
+    // Hide all tab contents
+    document.querySelectorAll('.code-tab-content').forEach(content => {
+        content.classList.remove('active');
+    });
+    
+    // Remove active class from all buttons
+    document.querySelectorAll('.code-tab-btn').forEach(btn => {
+        btn.classList.remove('active');
+    });
+    
+    // Show selected tab content
+    document.getElementById(tab + 'CodeTab').classList.add('active');
+    
+    // Add active class to clicked button
+    event.target.classList.add('active');
+}
+
+// Create scratch card codes
+async function createSpinCodes() {
+    const form = document.getElementById('createSpinCodeForm');
+    if (!form) return;
+
+    form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        
+        const quantity = parseInt(document.getElementById('spinCodeQuantity').value);
+        const expiryDays = parseInt(document.getElementById('spinCodeExpiry').value);
+        const description = document.getElementById('spinCodeDescription').value;
+        
+        if (quantity > 100) {
+            showToast('Maximum 100 codes can be generated at once', 'error');
+            return;
+        }
+
+        const submitBtn = form.querySelector('button[type="submit"]');
+        const originalText = submitBtn.innerHTML;
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Generating...';
+
+        try {
+            const codes = [];
+            const expiresAt = new Date(Date.now() + expiryDays * 24 * 60 * 60 * 1000);
+
+            // Generate codes
+            const existingCodes = new Set();
+            for (let i = 0; i < quantity; i++) {
+                let code;
+                let attempts = 0;
+                
+                // Ensure unique codes
+                do {
+                    code = generateCode();
+                    attempts++;
+                    if (attempts > 100) {
+                        throw new Error('Failed to generate unique code after 100 attempts');
+                    }
+                } while (existingCodes.has(code));
+                
+                existingCodes.add(code);
+                codes.push({
+                    code,
+                    amount: 0, // Placeholder - actual reward is random when scratched
+                    type: 'spin',
+                    expiresAt,
+                    description
+                });
+            }
+
+            // Save to database
+            const currentUser = auth.currentUser;
+            if (!currentUser) {
+                throw new Error('User not authenticated');
+            }
+
+            for (const codeData of codes) {
+                // Check if code already exists in database
+                const existingCodeQuery = query(
+                    collection(db, 'spinCodes'),
+                    where('code', '==', codeData.code)
+                );
+                const existingCodeSnap = await getDocs(existingCodeQuery);
+                
+                if (!existingCodeSnap.empty) {
+                    console.warn(`Code ${codeData.code} already exists, skipping...`);
+                    continue;
+                }
+                
+                await addDoc(collection(db, 'spinCodes'), {
+                    userId: currentUser.uid, // Admin's user ID
+                    code: codeData.code,
+                    amount: codeData.amount, // 0 as placeholder
+                    type: 'spin',
+                    isUsed: false,
+                    createdAt: serverTimestamp(),
+                    expiresAt: codeData.expiresAt,
+                    createdBy: 'admin',
+                    description: codeData.description || ''
+                });
+            }
+
+            // Display generated codes
+            displayGeneratedCodes(codes);
+            showToast(`Successfully generated ${quantity} scratch card codes`, 'success');
+            
+            // Reset form
+            form.reset();
+            document.getElementById('spinCodeQuantity').value = 1;
+            document.getElementById('spinCodeExpiry').value = 30;
+
+        } catch (error) {
+            console.error('Error creating scratch card codes:', error);
+            showToast('Error creating scratch card codes', 'error');
+        } finally {
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = originalText;
+        }
+    });
+}
+
+// Create store balance codes
+async function createBalanceCodes() {
+    const form = document.getElementById('createBalanceCodeForm');
+    if (!form) return;
+
+    form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        
+        const amount = parseFloat(document.getElementById('balanceAmount').value);
+        const quantity = parseInt(document.getElementById('balanceCodeQuantity').value);
+        const expiryDays = parseInt(document.getElementById('balanceCodeExpiry').value);
+        const description = document.getElementById('balanceCodeDescription').value;
+        
+        if (quantity > 100) {
+            showToast('Maximum 100 codes can be generated at once', 'error');
+            return;
+        }
+
+        const submitBtn = form.querySelector('button[type="submit"]');
+        const originalText = submitBtn.innerHTML;
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Generating...';
+
+        try {
+            const codes = [];
+            const expiresAt = new Date(Date.now() + expiryDays * 24 * 60 * 60 * 1000);
+
+            // Generate codes
+            for (let i = 0; i < quantity; i++) {
+                const code = generateCode();
+                codes.push({
+                    code,
+                    amount,
+                    type: 'balance',
+                    expiresAt,
+                    description
+                });
+            }
+
+            // Save to database
+            const currentUser = auth.currentUser;
+            if (!currentUser) {
+                throw new Error('User not authenticated');
+            }
+
+            for (const codeData of codes) {
+                await addDoc(collection(db, 'balanceCodes'), {
+                    userId: currentUser.uid, // Admin's user ID
+                    code: codeData.code,
+                    amount: codeData.amount,
+                    type: 'balance',
+                    isUsed: false,
+                    createdAt: serverTimestamp(),
+                    expiresAt: codeData.expiresAt,
+                    createdBy: 'admin',
+                    description: codeData.description || ''
+                });
+            }
+
+            // Display generated codes
+            displayGeneratedCodes(codes);
+            showToast(`Successfully generated ${quantity} store balance codes`, 'success');
+            
+            // Reset form
+            form.reset();
+            document.getElementById('balanceCodeQuantity').value = 1;
+            document.getElementById('balanceCodeExpiry').value = 30;
+
+        } catch (error) {
+            console.error('Error creating balance codes:', error);
+            showToast('Error creating balance codes', 'error');
+        } finally {
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = originalText;
+        }
+    });
+}
+
+// Display generated codes
+function displayGeneratedCodes(codes) {
+    const section = document.getElementById('generatedCodesSection');
+    const list = document.getElementById('codesList');
+    
+    if (!section || !list) return;
+
+    generatedCodes = codes;
+    
+    list.innerHTML = codes.map(code => `
+        <div class="code-item">
+            <div>
+                <div class="code-value">${code.code}</div>
+                <div class="code-amount">${code.type === 'spin' ? 'Random Reward (Rs 1-1000)' : `Rs ${code.amount}`} - ${code.type === 'spin' ? 'Scratch Card' : 'Store Balance'}</div>
+            </div>
+            <button class="copy-code-btn" onclick="copyCode('${code.code}')">
+                <i class="fas fa-copy"></i> Copy
+            </button>
+        </div>
+    `).join('');
+
+    section.style.display = 'block';
+    section.scrollIntoView({ behavior: 'smooth' });
+}
+
+// Copy single code
+function copyCode(code) {
+    navigator.clipboard.writeText(code).then(() => {
+        showToast('Code copied to clipboard', 'success');
+    }).catch(err => {
+        console.error('Failed to copy code:', err);
+        showToast('Failed to copy code', 'error');
+    });
+}
+
+// Copy all generated codes
+function copyAllCodes() {
+    if (generatedCodes.length === 0) {
+        showToast('No codes to copy', 'info');
+        return;
+    }
+
+    const codesText = generatedCodes.map(code => 
+        `${code.code} - ${code.type === 'spin' ? 'Random Reward (Rs 1-1000)' : `Rs ${code.amount}`} (${code.type === 'spin' ? 'Scratch Card' : 'Store Balance'})`
+    ).join('\n');
+
+    navigator.clipboard.writeText(codesText).then(() => {
+        showToast('All codes copied to clipboard', 'success');
+    }).catch(err => {
+        console.error('Failed to copy codes:', err);
+        showToast('Failed to copy codes', 'error');
+    });
+}
+
+// Load all codes for management
+async function loadAllCodes() {
+    const table = document.getElementById('allCodesTable');
+    if (!table) return;
+
+    const tbody = table.querySelector('tbody');
+    tbody.innerHTML = '<tr><td colspan="8">Loading codes...</td></tr>';
+
+    try {
+        // Load spin codes
+        const spinQuery = query(
+            collection(db, 'spinCodes'),
+            orderBy('createdAt', 'desc'),
+            limit(100)
+        );
+        const spinSnap = await getDocs(spinQuery);
+
+        // Load balance codes
+        const balanceQuery = query(
+            collection(db, 'balanceCodes'),
+            orderBy('createdAt', 'desc'),
+            limit(100)
+        );
+        const balanceSnap = await getDocs(balanceQuery);
+
+        const allCodes = [];
+
+        // Process spin codes
+        spinSnap.forEach(doc => {
+            const data = doc.data();
+            allCodes.push({
+                id: doc.id,
+                ...data,
+                collection: 'spinCodes'
+            });
+        });
+
+        // Process balance codes
+        balanceSnap.forEach(doc => {
+            const data = doc.data();
+            allCodes.push({
+                id: doc.id,
+                ...data,
+                collection: 'balanceCodes'
+            });
+        });
+
+        // Sort by creation date
+        allCodes.sort((a, b) => {
+            const aTime = a.createdAt?.toDate?.() || new Date(0);
+            const bTime = b.createdAt?.toDate?.() || new Date(0);
+            return bTime - aTime;
+        });
+
+        // Filter codes
+        const typeFilter = document.getElementById('codeTypeFilter')?.value || 'all';
+        const statusFilter = document.getElementById('codeStatusFilter')?.value || 'all';
+
+        const filteredCodes = allCodes.filter(code => {
+            // Type filter
+            if (typeFilter !== 'all') {
+                if (typeFilter === 'spin' && code.collection !== 'spinCodes') return false;
+                if (typeFilter === 'balance' && code.collection !== 'balanceCodes') return false;
+            }
+
+            // Status filter
+            if (statusFilter !== 'all') {
+                const now = new Date();
+                const expiresAt = code.expiresAt?.toDate?.() || new Date(0);
+                
+                if (statusFilter === 'unused' && (code.isUsed || now > expiresAt)) return false;
+                if (statusFilter === 'used' && !code.isUsed) return false;
+                if (statusFilter === 'expired' && now <= expiresAt) return false;
+            }
+
+            return true;
+        });
+
+        // Display codes
+        if (filteredCodes.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="8">No codes found</td></tr>';
+            return;
+        }
+
+        tbody.innerHTML = filteredCodes.map(code => {
+            const now = new Date();
+            const expiresAt = code.expiresAt?.toDate?.() || new Date(0);
+            const createdAt = code.createdAt?.toDate?.() || new Date(0);
+
+            let status = 'unused';
+            if (code.isUsed) {
+                status = 'used';
+            } else if (now > expiresAt) {
+                status = 'expired';
+            }
+
+            return `
+                <tr>
+                    <td><code>${code.code}</code></td>
+                    <td><span class="code-type ${code.collection === 'spinCodes' ? 'spin' : 'balance'}">${code.collection === 'spinCodes' ? 'Spin' : 'Balance'}</span></td>
+                    <td>Rs ${code.amount}</td>
+                    <td><span class="code-status ${status}">${status}</span></td>
+                    <td>${createdAt.toLocaleDateString()}</td>
+                    <td>${expiresAt.toLocaleDateString()}</td>
+                    <td>${code.usedBy || 'N/A'}</td>
+                    <td>
+                        <button class="btn btn-sm" onclick="copyCode('${code.code}')" title="Copy Code">
+                            <i class="fas fa-copy"></i>
+                        </button>
+                        ${!code.isUsed && now <= expiresAt ? `
+                            <button class="btn btn-sm btn-danger" onclick="deleteCode('${code.id}', '${code.collection}')" title="Delete Code">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        ` : ''}
+                    </td>
+                </tr>
+            `;
+        }).join('');
+
+    } catch (error) {
+        console.error('Error loading codes:', error);
+        tbody.innerHTML = '<tr><td colspan="8">Error loading codes</td></tr>';
+        showToast('Error loading codes', 'error');
+    }
+}
+
+// Delete code
+async function deleteCode(codeId, collection) {
+    if (!confirm('Are you sure you want to delete this code? This action cannot be undone.')) {
+        return;
+    }
+
+    try {
+        await deleteDoc(doc(db, collection, codeId));
+        showToast('Code deleted successfully', 'success');
+        loadAllCodes();
+    } catch (error) {
+        console.error('Error deleting code:', error);
+        showToast('Error deleting code', 'error');
+    }
+}
+
+// Load wallet top-ups
+async function loadWalletTopups() {
+    const table = document.getElementById('walletTopupsTable');
+    const tbody = document.querySelector('#walletTopupsTable tbody');
+    
+    if (!table || !tbody) return;
+
+    // Show the table
+    table.style.display = 'table';
+    
+    // Hide other tables
+    document.querySelectorAll('table').forEach(t => {
+        if (t.id !== 'walletTopupsTable') {
+            t.style.display = 'none';
+        }
+    });
+
+    try {
+        tbody.innerHTML = '<tr><td colspan="9">Loading wallet top-ups...</td></tr>';
+
+        const topupsSnapshot = await getDocs(collection(db, 'walletTopups'));
+        const topups = topupsSnapshot.docs.map(doc => ({
+            id: doc.id,
+            ...doc.data()
+        }));
+
+        if (topups.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="9">No wallet top-up requests found</td></tr>';
+            return;
+        }
+
+        // Sort by creation date (newest first)
+        topups.sort((a, b) => {
+            const aTime = a.createdAt?.toDate() || new Date(0);
+            const bTime = b.createdAt?.toDate() || new Date(0);
+            return bTime - aTime;
+        });
+
+        tbody.innerHTML = topups.map(topup => {
+            const createdAt = topup.createdAt?.toDate() || new Date();
+            const submittedAt = topup.submittedAt?.toDate() || null;
+            
+            return `
+                <tr>
+                    <td><code>${topup.id}</code></td>
+                    <td>${topup.userName || 'N/A'}</td>
+                    <td>${topup.userEmail || 'N/A'}</td>
+                    <td>Rs ${topup.amount}</td>
+                    <td>${topup.paymentMethod}</td>
+                    <td><span class="status-badge ${topup.status}">${topup.status}</span></td>
+                    <td>${submittedAt ? submittedAt.toLocaleDateString() : 'Not submitted'}</td>
+                    <td>
+                        ${topup.screenshot || (topup.paymentScreenshotUrl && topup.paymentScreenshotUrl !== 'MANUAL_VERIFICATION_REQUIRED') ? 
+                            `<button class="btn btn-sm" onclick="viewWalletTopupScreenshot('${topup.screenshot || topup.paymentScreenshotUrl}')" title="View Screenshot">
+                                <i class="fas fa-image"></i>
+                            </button>` : 
+                            '<span class="text-muted">No screenshot</span>'
+                        }
+                    </td>
+                    <td>
+                        ${topup.status === 'pending' || topup.status === 'pending_verification' ? `
+                            <button class="btn btn-sm btn-success" onclick="approveWalletTopup('${topup.id}', '${topup.userId}', ${topup.amount})" title="Approve">
+                                <i class="fas fa-check"></i>
+                            </button>
+                            <button class="btn btn-sm btn-danger" onclick="rejectWalletTopup('${topup.id}')" title="Reject">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        ` : ''}
+                        ${topup.status === 'approved' ? '<span class="text-success">Approved</span>' : ''}
+                        ${topup.status === 'rejected' ? '<span class="text-danger">Rejected</span>' : ''}
+                    </td>
+                </tr>
+            `;
+        }).join('');
+
+    } catch (error) {
+        console.error('Error loading wallet top-ups:', error);
+        tbody.innerHTML = '<tr><td colspan="9">Error loading wallet top-ups</td></tr>';
+        showToast('Error loading wallet top-ups', 'error');
+    }
+}
+
+// View payment screenshot
+function viewScreenshot(imageUrl) {
+    window.open(imageUrl, '_blank');
+}
+
+// View wallet top-up screenshot (handles both base64 and URLs)
+function viewWalletTopupScreenshot(imageData) {
+    if (!imageData) return;
+    
+    if (imageData.startsWith('data:image')) {
+        // Base64 image - show in modal
+        const modal = document.getElementById('orderDetailsModal');
+        if (!modal) return;
+        
+        modal.innerHTML = `
+            <div class="modal-header">
+                <h3>Payment Screenshot</h3>
+                <button class="close-modal" onclick="closeOrderDetailsModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="screenshot-viewer">
+                    <img src="${imageData}" alt="Payment Screenshot" style="max-width: 100%; height: auto; border-radius: 10px;">
+                </div>
+            </div>
+        `;
+        
+        modal.style.display = 'block';
+    } else {
+        // URL - open in new tab
+        window.open(imageData, '_blank');
+    }
+}
+
+// Approve wallet top-up
+async function approveWalletTopup(topupId, userId, amount) {
+    if (!confirm(`Are you sure you want to approve this wallet top-up of Rs ${amount}?`)) {
+        return;
+    }
+
+    try {
+        // Update top-up status
+        await updateDoc(doc(db, 'walletTopups', topupId), {
+            status: 'approved',
+            approvedAt: serverTimestamp(),
+            approvedBy: auth.currentUser.uid
+        });
+
+        // Add amount to user's wallet
+        const userRef = doc(db, 'users', userId);
+        const userDoc = await getDoc(userRef);
+        
+        if (userDoc.exists()) {
+            const currentBalance = userDoc.data().balance || 0;
+            const newBalance = currentBalance + amount;
+            
+            await updateDoc(userRef, {
+                balance: newBalance
+            });
+
+            // Record wallet transaction
+            await addDoc(collection(db, 'walletTransactions'), {
+                userId: userId,
+                type: 'wallet_topup',
+                amount: amount,
+                balance: newBalance,
+                description: `Wallet top-up approved by admin`,
+                createdAt: serverTimestamp(),
+                topupId: topupId
+            });
+
+            showToast('Wallet top-up approved successfully', 'success');
+            loadWalletTopups();
+        } else {
+            showToast('User not found', 'error');
+        }
+
+    } catch (error) {
+        console.error('Error approving wallet top-up:', error);
+        showToast('Error approving wallet top-up', 'error');
+    }
+}
+
+// Reject wallet top-up
+async function rejectWalletTopup(topupId) {
+    if (!confirm('Are you sure you want to reject this wallet top-up request?')) {
+        return;
+    }
+
+    try {
+        await updateDoc(doc(db, 'walletTopups', topupId), {
+            status: 'rejected',
+            rejectedAt: serverTimestamp(),
+            rejectedBy: auth.currentUser.uid
+        });
+
+        showToast('Wallet top-up rejected', 'success');
+        loadWalletTopups();
+
+    } catch (error) {
+        console.error('Error rejecting wallet top-up:', error);
+        showToast('Error rejecting wallet top-up', 'error');
+    }
+}
+
+// Initialize code management
+function initializeCodeManagement() {
+    createSpinCodes();
+    createBalanceCodes();
+    loadAllCodes();
+
+    // Add filter event listeners
+    const typeFilter = document.getElementById('codeTypeFilter');
+    const statusFilter = document.getElementById('codeStatusFilter');
+
+    if (typeFilter) {
+        typeFilter.addEventListener('change', loadAllCodes);
+    }
+    if (statusFilter) {
+        statusFilter.addEventListener('change', loadAllCodes);
+    }
+}
+
+// Make functions globally available
+window.showCodeTab = showCodeTab;
+window.copyCode = copyCode;
+window.copyAllCodes = copyAllCodes;
+window.loadAllCodes = loadAllCodes;
+window.deleteCode = deleteCode;
+window.initializeCodeManagement = initializeCodeManagement;
+window.loadWalletTopups = loadWalletTopups;
+window.viewScreenshot = viewScreenshot;
+window.viewWalletTopupScreenshot = viewWalletTopupScreenshot;
+window.approveWalletTopup = approveWalletTopup;
+window.rejectWalletTopup = rejectWalletTopup;

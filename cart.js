@@ -1,7 +1,8 @@
 import { showToast } from './toast.js';
 import { auth, db } from './firebase-config.js';
-import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-auth.js";
-import { doc, getDoc } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
+import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-auth.js";
+import { doc, getDoc } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-firestore.js";
+import { getWalletBalance } from './wallet.js';
 
 // Cart functionality
 class Cart {
@@ -371,13 +372,18 @@ class Cart {
         navMenu.appendChild(authLi);
 
         // Listen for auth state changes
-        onAuthStateChanged(auth, (user) => {
+        onAuthStateChanged(auth, async (user) => {
             if (!user) {
                 // User not signed in
                 authLi.innerHTML = `<a href="login.html" class="nav-link">Login</a> / <a href="register.html" class="nav-link">Sign Up</a>`;
             } else {
                 // User signed in
-                authLi.innerHTML = `<a href="profile.html" class="nav-link">My Profile</a>`;
+                let walletStr = '';
+                try {
+                    const bal = await getWalletBalance(user.uid);
+                    walletStr = ` <span class="nav-wallet" style="margin-left:8px;color:#a5b4fc;">Rs ${bal.toFixed(2)}</span>`;
+                } catch {}
+                authLi.innerHTML = `<a href="profile.html" class="nav-link">My Profile</a>${walletStr}`;
             }
         });
 

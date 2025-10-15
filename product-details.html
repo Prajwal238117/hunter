@@ -78,14 +78,61 @@
 
                 </a>
             </div>
+            
+            <!-- Floating Cart Button for Mobile -->
+            <div class="floating-cart">
+                <a href="cart.html">
+                <i class="fas fa-shopping-cart"></i>
+                <span class="cart-count">0</span>
+                </a>
+            </div>
             <div class="nav-auth">
                 <a href="login.html" class="nav-link">Login</a>
                 <a href="register.html" class="nav-link">Register</a>
             </div>
-            <div class="hamburger" aria-label="Menu" role="button" tabindex="0">
-                <span class="bar"></span>
-                <span class="bar"></span>
-                <span class="bar"></span>
+            <div class="user-button" onclick="toggleUserDropdown()">
+                <i class="fas fa-user"></i>
+                <div class="user-dropdown" id="userDropdown">
+                    <div class="user-dropdown-header">
+                        <div class="user-avatar">
+                            <i class="fas fa-user"></i>
+                        </div>
+                        <div class="user-name" id="dropdownUserName">Loading...</div>
+                        <div class="user-email" id="dropdownUserEmail">Loading...</div>
+                    </div>
+                    <div class="user-dropdown-content">
+                        <div class="user-balance">
+                            <div class="balance-info">
+                                <div class="balance-icon">
+                                    <i class="fas fa-wallet"></i>
+                                </div>
+                                <div>
+                                    <div class="balance-text">Wallet Balance</div>
+                                    <div class="balance-amount" id="dropdownBalance">Loading...</div>
+                                </div>
+                            </div>
+                            <button class="topup-btn" onclick="window.location.href='wallet-topup.html'">Topup</button>
+                        </div>
+                        <div class="user-menu-items">
+                            <a href="profile.html" class="menu-item">
+                                <i class="fas fa-user-circle"></i>
+                                <span>Profile</span>
+                            </a>
+                            <a href="index.html#latest-purchases" class="menu-item">
+                                <i class="fas fa-history"></i>
+                                <span>Transaction History</span>
+                            </a>
+                            <a href="contact.html" class="menu-item">
+                                <i class="fas fa-question-circle"></i>
+                                <span>Help Center</span>
+                            </a>
+                            <button class="menu-item logout" onclick="logout()">
+                                <i class="fas fa-sign-out-alt"></i>
+                                <span>Logout</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
             </div>
 
         </nav>

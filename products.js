@@ -1,6 +1,6 @@
 import { db, storage, auth } from './firebase-config.js';
-import { collection, getDocs, doc, getDoc, query, where, orderBy, addDoc, limit, serverTimestamp } from 'https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js';
-import { ref, getDownloadURL } from 'https://www.gstatic.com/firebasejs/12.1.0/firebase-storage.js';
+import { collection, getDocs, doc, getDoc, query, where, orderBy, addDoc, limit, serverTimestamp } from 'https://www.gstatic.com/firebasejs/12.3.0/firebase-firestore.js';
+import { ref, getDownloadURL } from 'https://www.gstatic.com/firebasejs/12.3.0/firebase-storage.js';
 import { showToast } from './toast.js';
 
 class ProductManager {

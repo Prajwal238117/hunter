@@ -1,5 +1,5 @@
 import { db } from './firebase-config.js';
-import { collection, query, orderBy, limit, getDocs } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
+import { collection, query, orderBy, limit, getDocs } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-firestore.js";
 
 class LatestPurchases {
     constructor() {
@@ -52,6 +52,7 @@ class LatestPurchases {
                 orderTotal: 'Rs 500',
                 paymentMethod: 'esewa',
                 status: 'approved',
+                orderStatus: 'delivered',
                 orderItems: [{ name: 'PUBG UC' }],
                 createdAt: new Date()
             },
@@ -61,6 +62,7 @@ class LatestPurchases {
                 orderTotal: 'Rs 800',
                 paymentMethod: 'khalti',
                 status: 'pending',
+                orderStatus: 'pending',
                 orderItems: [{ name: 'Netflix Gift Card' }],
                 createdAt: new Date(Date.now() - 86400000)
             },
@@ -70,6 +72,7 @@ class LatestPurchases {
                 orderTotal: 'Rs 1200',
                 paymentMethod: 'esewa',
                 status: 'approved',
+                orderStatus: 'delivered',
                 orderItems: [{ name: 'Spotify Premium' }],
                 createdAt: new Date(Date.now() - 172800000)
             }
@@ -98,7 +101,8 @@ class LatestPurchases {
                             <th>Product Name</th>
                             <th>Price</th>
                             <th>Payment Method</th>
-                            <th>Status</th>
+                            <th>Payment Status</th>
+                            <th>Order Status</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -119,7 +123,8 @@ class LatestPurchases {
     }
 
     createPurchaseRow(purchase) {
-        const status = purchase.status || 'pending';
+        const paymentStatus = purchase.status || 'pending';
+        const orderStatus = purchase.orderStatus || 'pending';
         const customerName = purchase.fullName || purchase.email || 'Anonymous';
         const amount = purchase.orderTotal || 'N/A';
         const paymentMethod = this.getPaymentMethodIcon(purchase.paymentMethod);
@@ -145,7 +150,10 @@ class LatestPurchases {
                     <span>${paymentMethod.name}</span>
                 </td>
                 <td class="status">
-                    <span class="status-badge ${status}">${status.toUpperCase()}</span>
+                    <span class="status-badge ${paymentStatus}">${paymentStatus.toUpperCase()}</span>
+                </td>
+                <td class="status">
+                    <span class="status-badge ${orderStatus}">${orderStatus.toUpperCase()}</span>
                 </td>
             </tr>
         `;

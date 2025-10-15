@@ -1,9 +1,9 @@
 // Firebase modular v12 shared config and service exports
-import { initializeApp } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-app.js";
-import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-analytics.js";
-import { getAuth } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-auth.js";
-import { getFirestore } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
-import { getStorage } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-storage.js";
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-app.js";
+import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-analytics.js";
+import { getAuth } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-auth.js";
+import { getFirestore } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-firestore.js";
+import { getStorage } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-storage.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyABhXlczK3kcDTDqV1M5CO-u4JNVbtFRcI",

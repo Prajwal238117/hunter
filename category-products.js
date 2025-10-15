@@ -1,11 +1,12 @@
 import { db } from './firebase-config.js';
-import { collection, query, orderBy, limit, getDocs, where } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
+import { collection, query, orderBy, limit, getDocs, where } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-firestore.js";
 
 class CategoryProducts {
     constructor() {
         this.gameTopupList = document.getElementById('gameTopupList');
         this.giftCardList = document.getElementById('giftCardList');
         this.subscriptionList = document.getElementById('subscriptionList');
+        this.pcGamesList = document.getElementById('pcGamesList');
         this.init();
     }
 
@@ -14,7 +15,8 @@ class CategoryProducts {
             await Promise.all([
                 this.loadCategoryProducts('game-topup', this.gameTopupList),
                 this.loadCategoryProducts('gift-card', this.giftCardList),
-                this.loadCategoryProducts('subscription', this.subscriptionList)
+                this.loadCategoryProducts('subscription', this.subscriptionList),
+                this.loadCategoryProducts('pc-games', this.pcGamesList)
             ]);
         } catch (error) {
             this.showError();
@@ -148,6 +150,19 @@ class CategoryProducts {
                        productDesc.includes('monthly') ||
                        productTags.some(tag => tag.includes('subscription') || tag.includes('monthly') || tag.includes('premium'));
             
+            case 'pc-games':
+                return productName.includes('pc') || 
+                       productName.includes('computer') ||
+                       productName.includes('steam') ||
+                       productName.includes('epic') ||
+                       productName.includes('origin') ||
+                       productName.includes('battle.net') ||
+                       productName.includes('uplay') ||
+                       productDesc.includes('pc') ||
+                       productDesc.includes('computer') ||
+                       productDesc.includes('steam') ||
+                       productTags.some(tag => tag.includes('pc') || tag.includes('computer') || tag.includes('steam') || tag.includes('epic'));
+            
             default:
                 return false;
         }
@@ -226,6 +241,7 @@ class CategoryProducts {
         if (this.gameTopupList) this.gameTopupList.innerHTML = errorMessage;
         if (this.giftCardList) this.giftCardList.innerHTML = errorMessage;
         if (this.subscriptionList) this.subscriptionList.innerHTML = errorMessage;
+        if (this.pcGamesList) this.pcGamesList.innerHTML = errorMessage;
     }
 
 

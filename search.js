@@ -1,5 +1,5 @@
 import { db } from './firebase-config.js';
-import { collection, query, where, getDocs, orderBy, limit } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
+import { collection, query, where, getDocs, orderBy, limit } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-firestore.js";
 import { showToast } from './toast.js';
 
 class ProductSearch {

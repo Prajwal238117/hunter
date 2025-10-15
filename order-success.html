@@ -354,6 +354,356 @@
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
         }
+
+        /* Spin Code Section Styles */
+        .spin-code-section {
+            margin-bottom: 2rem;
+            animation: detailsSlideIn 0.8s ease-out 1.5s both;
+        }
+
+        .spin-code-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 20px;
+            padding: 2rem;
+            color: white;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .spin-code-card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+            animation: shimmer 3s ease-in-out infinite;
+        }
+
+        @keyframes shimmer {
+            0%, 100% { transform: rotate(0deg); }
+            50% { transform: rotate(180deg); }
+        }
+
+        .spin-code-header {
+            margin-bottom: 1.5rem;
+            position: relative;
+            z-index: 2;
+        }
+
+        .spin-code-header i {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+            display: block;
+        }
+
+        .spin-code-header h3 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin: 0;
+        }
+
+        .spin-code-content {
+            position: relative;
+            z-index: 2;
+        }
+
+        .reward-amount {
+            font-size: 3rem;
+            font-weight: 900;
+            color: #fbbf24;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+            margin-bottom: 1rem;
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        .reward-message {
+            font-size: 1.1rem;
+            margin-bottom: 1.5rem;
+            opacity: 0.9;
+        }
+
+        .code-display {
+            background: rgba(255,255,255,0.1);
+            border: 2px dashed rgba(255,255,255,0.3);
+            border-radius: 15px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            backdrop-filter: blur(10px);
+        }
+
+        .code-label {
+            font-size: 0.9rem;
+            opacity: 0.8;
+            margin-bottom: 0.5rem;
+        }
+
+        .code-value {
+            font-family: 'Courier New', monospace;
+            font-size: 1.8rem;
+            font-weight: bold;
+            letter-spacing: 2px;
+            margin-bottom: 1rem;
+            word-break: break-all;
+            background: rgba(255,255,255,0.1);
+            padding: 0.5rem;
+            border-radius: 8px;
+        }
+
+        .copy-code-btn {
+            background: rgba(255,255,255,0.2);
+            color: white;
+            border: 2px solid rgba(255,255,255,0.3);
+            padding: 0.5rem 1rem;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+
+        .copy-code-btn:hover {
+            background: rgba(255,255,255,0.3);
+            border-color: rgba(255,255,255,0.5);
+            transform: translateY(-2px);
+        }
+
+        .code-instructions {
+            background: rgba(255,255,255,0.1);
+            border-radius: 15px;
+            padding: 1.5rem;
+            text-align: left;
+            backdrop-filter: blur(10px);
+        }
+
+        .code-instructions h4 {
+            margin-bottom: 1rem;
+            font-size: 1.1rem;
+        }
+
+        .code-instructions ol {
+            margin-bottom: 1rem;
+            padding-left: 1.5rem;
+        }
+
+        .code-instructions li {
+            margin-bottom: 0.5rem;
+            line-height: 1.4;
+        }
+
+        .code-instructions a {
+            color: #fbbf24;
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .code-instructions a:hover {
+            text-decoration: underline;
+        }
+
+        .expiry-note {
+            background: rgba(251, 191, 36, 0.2);
+            border: 1px solid rgba(251, 191, 36, 0.3);
+            border-radius: 8px;
+            padding: 0.75rem;
+            font-size: 0.9rem;
+            margin-top: 1rem;
+        }
+
+        .expiry-note i {
+            color: #fbbf24;
+            margin-right: 0.5rem;
+        }
+
+        @media (max-width: 768px) {
+            .spin-code-card {
+                padding: 1.5rem;
+            }
+
+            .reward-amount {
+                font-size: 2.5rem;
+            }
+
+            .code-value {
+                font-size: 1.4rem;
+                letter-spacing: 1px;
+            }
+
+            .spin-code-header h3 {
+                font-size: 1.3rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .spin-code-card {
+                padding: 1rem;
+            }
+
+            .reward-amount {
+                font-size: 2rem;
+            }
+
+            .code-value {
+                font-size: 1.2rem;
+            }
+
+            .code-instructions {
+                padding: 1rem;
+            }
+        }
+
+        /* Wallet Top-up Section Styles */
+        .wallet-topup-section {
+            margin-top: 2rem;
+        }
+
+        .success-card {
+            background: linear-gradient(135deg, #1A1A2E 0%, #16213e 100%);
+            border-radius: 20px;
+            padding: 2rem;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .success-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .success-header i {
+            font-size: 3rem;
+            color: #fbbf24;
+            margin-bottom: 1rem;
+        }
+
+        .success-header h2 {
+            color: #f1f5f9;
+            font-size: 1.8rem;
+            margin: 0;
+        }
+
+        .success-message {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .success-message p {
+            color: #94a3b8;
+            font-size: 1.1rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .topup-details {
+            background: rgba(255,255,255,0.05);
+            border-radius: 15px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .verification-info {
+            background: rgba(59, 130, 246, 0.1);
+            border: 1px solid rgba(59, 130, 246, 0.3);
+            border-radius: 15px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .verification-info h4 {
+            color: #60a5fa;
+            margin-bottom: 1rem;
+            font-size: 1.1rem;
+        }
+
+        .verification-info ol {
+            color: #94a3b8;
+            margin-bottom: 1rem;
+            padding-left: 1.5rem;
+        }
+
+        .verification-info li {
+            margin-bottom: 0.5rem;
+        }
+
+        .processing-note {
+            background: rgba(251, 191, 36, 0.2);
+            border: 1px solid rgba(251, 191, 36, 0.3);
+            border-radius: 8px;
+            padding: 1rem;
+            color: #fbbf24;
+            font-size: 0.9rem;
+        }
+
+        .processing-note i {
+            margin-right: 0.5rem;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .btn-primary, .btn-secondary {
+            padding: 12px 24px;
+            border-radius: 10px;
+            font-weight: 600;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: all 0.3s ease;
+            border: none;
+            cursor: pointer;
+        }
+
+        .btn-primary {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn-secondary {
+            background: rgba(255,255,255,0.1);
+            color: #f1f5f9;
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255,255,255,0.2);
+            transform: translateY(-2px);
+        }
+
+        @media (max-width: 768px) {
+            .success-card {
+                padding: 1.5rem;
+            }
+
+            .success-header h2 {
+                font-size: 1.5rem;
+            }
+
+            .action-buttons {
+                flex-direction: column;
+            }
+
+            .btn-primary, .btn-secondary {
+                width: 100%;
+                justify-content: center;
+            }
+        }
     </style>
 </head>
 <body>
@@ -409,6 +759,94 @@
                 </div>
             </div>
 
+            <!-- Spin Code Section (only for wallet purchases) -->
+            <div class="spin-code-section" id="spinCodeSection" style="display: none;">
+                <div class="spin-code-card">
+                    <div class="spin-code-header">
+                        <i class="fas fa-gift"></i>
+                        <h3>🎉 Congratulations! You Won a Reward!</h3>
+                    </div>
+                    <div class="spin-code-content">
+                        <p class="reward-message">Use your 16-digit code below to redeem your reward!</p>
+                        <div class="code-display">
+                            <div class="code-label">Your Redemption Code:</div>
+                            <div class="code-value" id="spinCode">XXXXXXXX-XXXXXXXX</div>
+                            <button class="copy-code-btn" onclick="copySpinCode()">
+                                <i class="fas fa-copy"></i> Copy Code
+                            </button>
+                        </div>
+                        <div class="code-instructions">
+                            <h4><i class="fas fa-info-circle"></i> How to Redeem:</h4>
+                            <ol>
+                                <li>Go to <a href="redeem.html" target="_blank">redeem.html</a></li>
+                                <li>Enter your 16-digit code</li>
+                                <li>Click "Redeem Code"</li>
+                                <li>You'll be redirected to spin the wheel to win your reward!</li>
+                            </ol>
+                            <p class="expiry-note">
+                                <i class="fas fa-clock"></i> 
+                                <strong>Note:</strong> This code expires in 30 days and can only be used once.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Wallet Top-up Section -->
+            <div class="wallet-topup-section" id="walletTopupSection" style="display: none;">
+                <div class="success-card">
+                    <div class="success-header">
+                        <i class="fas fa-wallet"></i>
+                        <h2>💰 Wallet Top-up Request Submitted!</h2>
+                    </div>
+                    <div class="success-content">
+                        <div class="success-message">
+                            <p>Your wallet top-up request has been submitted successfully!</p>
+                            <p>Our admin will verify your payment and add the amount to your wallet balance.</p>
+                        </div>
+                        <div class="topup-details">
+                            <div class="detail-row">
+                                <span class="detail-label">Request ID:</span>
+                                <span class="detail-value" id="topupId">Loading...</span>
+                            </div>
+                            <div class="detail-row">
+                                <span class="detail-label">Amount:</span>
+                                <span class="detail-value" id="topupAmount">Loading...</span>
+                            </div>
+                            <div class="detail-row">
+                                <span class="detail-label">Payment Method:</span>
+                                <span class="detail-value" id="topupMethod">Loading...</span>
+                            </div>
+                            <div class="detail-row">
+                                <span class="detail-label">Status:</span>
+                                <span class="detail-value" style="color: #f59e0b;">Pending Verification</span>
+                            </div>
+                        </div>
+                        <div class="verification-info">
+                            <h4><i class="fas fa-info-circle"></i> What happens next?</h4>
+                            <ol>
+                                <li>Our admin will review your payment screenshot</li>
+                                <li>Once verified, the amount will be added to your wallet</li>
+                                <li>You'll receive a notification when the process is complete</li>
+                                <li>You can check your wallet balance anytime</li>
+                            </ol>
+                            <p class="processing-note">
+                                <i class="fas fa-clock"></i> 
+                                <strong>Processing Time:</strong> Usually within 24 hours during business days.
+                            </p>
+                        </div>
+                        <div class="action-buttons">
+                            <button class="btn-primary" onclick="window.location.href='index.html'">
+                                <i class="fas fa-home"></i> Go to Home
+                            </button>
+                            <button class="btn-secondary" onclick="window.location.href='profile.html'">
+                                <i class="fas fa-wallet"></i> Check Wallet
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <!-- Action Buttons -->
             <div class="success-actions">
                 <a href="index.html" class="btn-primary">
@@ -430,6 +868,30 @@
             const orderId = urlParams.get('orderId');
             const orderTotal = urlParams.get('total');
             const paymentMethod = urlParams.get('method');
+            const spinCode = urlParams.get('spinCode');
+            const reward = urlParams.get('reward');
+            const type = urlParams.get('type');
+            const topupId = urlParams.get('topupId');
+            const topupAmount = urlParams.get('amount');
+            const topupMethod = urlParams.get('method');
+
+            // Handle wallet top-up success
+            if (type === 'wallet_topup') {
+                const walletTopupSection = document.getElementById('walletTopupSection');
+                const orderDetailsSection = document.querySelector('.order-details');
+                
+                if (walletTopupSection) {
+                    if (topupId) document.getElementById('topupId').textContent = topupId;
+                    if (topupAmount) document.getElementById('topupAmount').textContent = `Rs ${topupAmount}`;
+                    if (topupMethod) document.getElementById('topupMethod').textContent = topupMethod.charAt(0).toUpperCase() + topupMethod.slice(1);
+                    
+                    walletTopupSection.style.display = 'block';
+                    if (orderDetailsSection) {
+                        orderDetailsSection.style.display = 'none';
+                    }
+                }
+                return;
+            }
 
             // Update order details
             if (orderId) {
@@ -440,6 +902,42 @@
             }
             if (paymentMethod) {
                 document.getElementById('paymentMethod').textContent = paymentMethod.charAt(0).toUpperCase() + paymentMethod.slice(1);
+            }
+
+            // Show spin code section for wallet purchases
+            if (spinCode && reward && paymentMethod === 'wallet') {
+                const spinCodeSection = document.getElementById('spinCodeSection');
+                const spinCodeValue = document.getElementById('spinCode');
+
+                if (spinCodeSection && spinCodeValue) {
+                    spinCodeValue.textContent = spinCode;
+                    spinCodeSection.style.display = 'block';
+                }
+            }
+        }
+
+        // Copy spin code to clipboard
+        function copySpinCode() {
+            const spinCodeValue = document.getElementById('spinCode');
+            if (spinCodeValue) {
+                const code = spinCodeValue.textContent;
+                navigator.clipboard.writeText(code).then(() => {
+                    // Show success feedback
+                    const copyBtn = document.querySelector('.copy-code-btn');
+                    const originalText = copyBtn.innerHTML;
+                    copyBtn.innerHTML = '<i class="fas fa-check"></i> Copied!';
+                    copyBtn.style.background = 'rgba(34, 197, 94, 0.3)';
+                    copyBtn.style.borderColor = 'rgba(34, 197, 94, 0.5)';
+                    
+                    setTimeout(() => {
+                        copyBtn.innerHTML = originalText;
+                        copyBtn.style.background = 'rgba(255,255,255,0.2)';
+                        copyBtn.style.borderColor = 'rgba(255,255,255,0.3)';
+                    }, 2000);
+                }).catch(err => {
+                    console.error('Failed to copy code:', err);
+                    alert('Failed to copy code. Please copy manually: ' + code);
+                });
             }
         }
 
