@@ -13,6 +13,7 @@ service cloud.firestore {
     }
     function isRoleAdmin() {
       return isSignedIn() &&
+        exists(/databases/$(database)/documents/users/$(request.auth.uid)) &&
         get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin';
     }
     function isAdmin() { return isAdminsDocAdmin() || isRoleAdmin(); }
@@ -22,7 +23,7 @@ service cloud.firestore {
       allow read, create, update: if isSignedIn() && request.auth.uid == uid;
       // Allow admins to list and read all users
       allow read: if isAdmin();
-      // Allow admins to update user roles
+      // Allow admins to update any user data, users can update their own
       allow update: if isAdmin() || (isSignedIn() && request.auth.uid == uid);
       allow delete: if false;
     }
@@ -85,7 +86,7 @@ service cloud.firestore {
 
     // Wallet transactions - users can read their own, create entries for their own userId; admins full access
     match /walletTransactions/{txId} {
-      allow create: if isSignedIn() && request.resource.data.userId == request.auth.uid;
+      allow create: if isAdmin() || (isSignedIn() && request.resource.data.userId == request.auth.uid);
       allow read: if isAdmin() || (isSignedIn() && resource.data.userId == request.auth.uid);
       allow update, delete: if isAdmin();
     }

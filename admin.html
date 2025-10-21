@@ -6,6 +6,10 @@
     <title>CGAPH Admin Panel</title>
     <link rel="stylesheet" href="styles.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
+    <!-- Google AdSense -->
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4664229395164784" crossorigin="anonymous"></script>
+    
     <style>
         :root {
             --primary: #667eea;
@@ -3276,6 +3280,36 @@
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
         }
+        
+        /* Ad Container Styling for Admin */
+        .ad-container {
+            max-width: 100%;
+            margin: 20px 0;
+            padding: 15px;
+            text-align: center;
+            background: #f8f9fa;
+            border-radius: 8px;
+            border: 1px solid #e2e8f0;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        
+        .ad-container ins {
+            display: block !important;
+            margin: 0 auto;
+        }
+        
+        .ad-container.sidebar-ad {
+            position: sticky;
+            top: 20px;
+            margin: 0;
+        }
+        
+        @media (max-width: 768px) {
+            .ad-container {
+                margin: 15px 0;
+                padding: 10px;
+            }
+        }
     </style>
 </head>
 <body>
@@ -3349,6 +3383,17 @@
                             <i class="fas fa-credit-card"></i> Payments
                         </button>
                 </div>
+                
+                <!-- Ad Placement 1 - Admin Dashboard -->
+                <div class="ad-container">
+                    <ins class="adsbygoogle"
+                         style="display:block"
+                         data-ad-client="ca-pub-4664229395164784"
+                         data-ad-slot="4120566264"
+                         data-ad-format="auto"
+                         data-full-width-responsive="true"></ins>
+                </div>
+                
                 <table id="paymentsTable">
                     <thead>
                         <tr>
@@ -3406,6 +3451,15 @@
                         <i class="fas fa-edit"></i> Edit Product
                     </button>
                 </div>
+            </div>
+
+            <!-- Ad Placement 2 - Products Section -->
+            <div class="ad-container">
+                <ins class="adsbygoogle"
+                     style="display:block"
+                     data-ad-format="autorelaxed"
+                     data-ad-client="ca-pub-4664229395164784"
+                     data-ad-slot="4141010890"></ins>
             </div>
 
             <div class="table-wrapper">
@@ -4810,6 +4864,9 @@
 
             // Desktop tabs are removed, only mobile navigation is used
         });
+        
+        // Initialize Google AdSense
+        (adsbygoogle = window.adsbygoogle || []).push({});
     </script>
 </body>
 </html>
