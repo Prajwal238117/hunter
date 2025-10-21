@@ -10,6 +10,92 @@ const usersCol = collection(db, 'users');
 const promotersCol = collection(db, 'promoters');
 
 // Check admin via either admins/{uid}.active or users/{uid}.role == 'admin'
+// Setup admin account in new database
+async function setupAdminAccount() {
+  try {
+    const currentUser = auth.currentUser;
+    if (!currentUser) {
+      showToast('Please log in first', 'error');
+      return;
+    }
+
+    console.log('Setting up admin account for:', currentUser.email);
+    
+    // Create user document with admin role
+    const userData = {
+      firstName: 'Admin',
+      lastName: 'User',
+      email: currentUser.email,
+      phone: '',
+      role: 'admin',
+      status: 'active',
+      balance: 0,
+      profitPercentage: 0,
+      createdAt: serverTimestamp(),
+      updatedAt: serverTimestamp(),
+      createdBy: 'system'
+    };
+
+    // Check if user document already exists
+    const userRef = doc(db, 'users', currentUser.uid);
+    const userDoc = await getDoc(userRef);
+    
+    if (userDoc.exists()) {
+      // Update existing user to admin
+      await updateDoc(userRef, {
+        role: 'admin',
+        updatedAt: serverTimestamp()
+      });
+      console.log('Updated existing user to admin role');
+    } else {
+      // Create new user document
+      await addDoc(collection(db, 'users'), {
+        ...userData,
+        uid: currentUser.uid
+      });
+      console.log('Created new admin user document');
+    }
+
+    // Also create admin document in admins collection
+    const adminData = {
+      active: true,
+      email: currentUser.email,
+      createdAt: serverTimestamp(),
+      createdBy: 'system'
+    };
+
+    const adminRef = doc(db, 'admins', currentUser.uid);
+    const adminDoc = await getDoc(adminRef);
+    
+    if (adminDoc.exists()) {
+      // Update existing admin document
+      await updateDoc(adminRef, {
+        active: true,
+        updatedAt: serverTimestamp()
+      });
+      console.log('Updated existing admin document');
+    } else {
+      // Create new admin document
+      await addDoc(collection(db, 'admins'), {
+        ...adminData,
+        uid: currentUser.uid
+      });
+      console.log('Created new admin document');
+    }
+
+    showToast('Admin account setup complete! Please refresh the page.', 'success');
+    
+    // Refresh the page after 2 seconds
+    setTimeout(() => {
+      window.location.reload();
+    }, 2000);
+
+  } catch (error) {
+    console.error('Error setting up admin account:', error);
+    showToast(`Error setting up admin account: ${error.message}`, 'error');
+  }
+}
+
 async function isAdmin(uid) {
   if (!uid) return false;
   try {
@@ -459,6 +545,19 @@ async function distributeProfit(paymentId, paymentData) {
   try {
     console.log('Starting profit distribution for payment:', paymentId);
     
+    // Check admin status first
+    const currentUser = auth.currentUser;
+    if (!currentUser) {
+      throw new Error('User not authenticated');
+    }
+    
+    const adminStatus = await isAdmin(currentUser.uid);
+    console.log('Admin status check:', { uid: currentUser.uid, isAdmin: adminStatus });
+    
+    if (!adminStatus) {
+      throw new Error('User is not an admin');
+    }
+    
     // Calculate total profit from order items
     let totalProfit = 0;
     const orderItems = paymentData.orderItems || [];
@@ -466,6 +565,7 @@ async function distributeProfit(paymentId, paymentData) {
     for (const item of orderItems) {
       // Get product data to find CP and SP
       if (item.productId) {
+        console.log('Reading product:', item.productId);
         const productRef = doc(db, 'products', item.productId);
         const productDoc = await getDoc(productRef);
         
@@ -500,6 +600,7 @@ async function distributeProfit(paymentId, paymentData) {
     let voucherAmount = 0;
     if (paymentData.couponUsage) {
       // Get coupon usage data
+      console.log('Reading coupon usage for order:', paymentId);
       const couponUsageQuery = query(
         collection(db, 'couponUsage'),
         where('orderId', '==', paymentId)
@@ -523,6 +624,7 @@ async function distributeProfit(paymentId, paymentData) {
     }
     
     // Get all users with their profit percentages
+    console.log('Reading users collection...');
     const usersQuery = query(collection(db, 'users'));
     const usersSnap = await getDocs(usersQuery);
     
@@ -530,6 +632,8 @@ async function distributeProfit(paymentId, paymentData) {
       console.log('No users found for profit distribution');
       return;
     }
+    
+    console.log(`Found ${usersSnap.size} users for profit distribution`);
     
     const profitDistributions = [];
     
@@ -544,23 +648,37 @@ async function distributeProfit(paymentId, paymentData) {
         const currentBalance = userData.balance || 0;
         const newBalance = currentBalance + userProfit;
         
+        console.log(`Updating user ${userId} balance: ${currentBalance} -> ${newBalance}`);
+        
         // Update user balance in main database
-        await updateDoc(doc(db, 'users', userId), {
-          balance: newBalance,
-          updatedAt: serverTimestamp()
-        });
+        try {
+          await updateDoc(doc(db, 'users', userId), {
+            balance: newBalance,
+            updatedAt: serverTimestamp()
+          });
+          console.log(`Successfully updated user ${userId}`);
+        } catch (updateError) {
+          console.error(`Failed to update user ${userId}:`, updateError);
+          throw updateError; // Re-throw to be caught by outer try-catch
+        }
         
         // Add wallet transaction for profit
-        await addDoc(collection(db, 'walletTransactions'), {
-          userId: userId,
-          type: 'profit_distribution',
-          amount: userProfit,
-          balance: newBalance,
-          description: `Profit distribution from payment ${paymentId}`,
-          paymentId: paymentId,
-          profitPercentage: profitPercentage,
-          createdAt: serverTimestamp()
-        });
+        try {
+          await addDoc(collection(db, 'walletTransactions'), {
+            userId: userId,
+            type: 'profit_distribution',
+            amount: userProfit,
+            balance: newBalance,
+            description: `Profit distribution from payment ${paymentId}`,
+            paymentId: paymentId,
+            profitPercentage: profitPercentage,
+            createdAt: serverTimestamp()
+          });
+          console.log(`Successfully added wallet transaction for user ${userId}`);
+        } catch (transactionError) {
+          console.error(`Failed to add wallet transaction for user ${userId}:`, transactionError);
+          throw transactionError; // Re-throw to be caught by outer try-catch
+        }
         
         profitDistributions.push({
           userId,
