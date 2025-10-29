@@ -20,7 +20,7 @@ class LoadingScreen {
         // Create loading screen HTML
         const loadingHTML = `
             <div class="loading-screen" id="loadingScreen">
-                <img src="favicon-16x16.png" alt="CGAPH Logo" class="loading-logo">
+                <img src="" alt="CGAPH Logo" class="loading-logo">
                 <div class="loading-spinner"></div>
                 <div class="loading-text" id="loadingText">Loading CGAPH...</div>
                 <div class="loading-subtext" id="loadingSubtext">Please wait while we prepare your experience</div>
@@ -142,4 +142,5 @@ window.loadingScreen = loadingScreen;
 
 // Export for module usage
 export { LoadingScreen };
+
 
