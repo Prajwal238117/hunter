@@ -558,12 +558,12 @@ async function distributeProfit(paymentId, paymentData) {
       throw new Error('User is not an admin');
     }
     
-    // Calculate total profit from order items
-    let totalProfit = 0;
+    // Calculate total profit as orderTotal - sum of CPs
+    let totalCost = 0;
     const orderItems = paymentData.orderItems || [];
     
     for (const item of orderItems) {
-      // Get product data to find CP and SP
+      // Get product data to find CP
       if (item.productId) {
         console.log('Reading product:', item.productId);
         const productRef = doc(db, 'products', item.productId);
@@ -580,43 +580,29 @@ async function distributeProfit(paymentId, paymentData) {
             v.price === item.price
           );
           
-          if (variant && variant.cp && variant.sp) {
-            const itemProfit = (variant.sp - variant.cp) * (item.quantity || 1);
-            totalProfit += itemProfit;
-            console.log(`Item profit: ${item.name} - Rs ${itemProfit}`);
+          if (variant && typeof variant.cp === 'number') {
+            const itemCost = (variant.cp) * (item.quantity || 1);
+            totalCost += itemCost;
+            console.log(`Item cost: ${item.name} - Rs ${itemCost} (CP: ${variant.cp})`);
           } else {
-            // Fallback: use price as SP, assume 30% profit margin
-            const itemProfit = (item.price * 0.3) * (item.quantity || 1);
-            totalProfit += itemProfit;
-            console.log(`Fallback item profit: ${item.name} - Rs ${itemProfit}`);
+            console.log(`No CP found for item ${item.name}, skipping cost accumulation.`);
           }
         }
       }
     }
     
-    console.log('Total profit before voucher deduction:', totalProfit);
-    
-    // Check if voucher was used and deduct voucher amount
-    let voucherAmount = 0;
-    if (paymentData.couponUsage) {
-      // Get coupon usage data
-      console.log('Reading coupon usage for order:', paymentId);
-      const couponUsageQuery = query(
-        collection(db, 'couponUsage'),
-        where('orderId', '==', paymentId)
-      );
-      const couponUsageSnap = await getDocs(couponUsageQuery);
-      
-      if (!couponUsageSnap.empty) {
-        const couponUsage = couponUsageSnap.docs[0].data();
-        voucherAmount = couponUsage.discountAmount || 0;
-        console.log('Voucher amount to deduct:', voucherAmount);
-      }
-    }
-    
-    // Calculate final profit after voucher deduction
-    const finalProfit = Math.max(0, totalProfit - voucherAmount);
-    console.log('Final profit after voucher deduction:', finalProfit);
+    // Sanitize orderTotal to handle strings like "Rs 123.45" or formatted numbers
+    const parsedOrderTotal = (typeof paymentData.orderTotal === 'number')
+      ? paymentData.orderTotal
+      : parseFloat(String(paymentData.orderTotal || '0').replace(/[^0-9.]/g, '')) || 0;
+
+    if (!isFinite(totalCost)) totalCost = 0;
+    const orderTotal = isFinite(parsedOrderTotal) ? parsedOrderTotal : 0;
+    const totalProfit = Math.max(0, orderTotal - totalCost);
+    const finalProfit = totalProfit; // orderTotal is already net of discounts/vouchers
+    console.log('Order total:', orderTotal);
+    console.log('Total cost (sum of CPs):', totalCost);
+    console.log('Final profit (orderTotal - totalCost):', finalProfit);
     
     if (finalProfit <= 0) {
       console.log('No profit to distribute after voucher deduction');
@@ -641,12 +627,13 @@ async function distributeProfit(paymentId, paymentData) {
     for (const userDoc of usersSnap.docs) {
       const userData = userDoc.data();
       const userId = userDoc.id;
-      const profitPercentage = userData.profitPercentage || 0;
+      const profitPercentage = parseFloat(userData.profitPercentage) || 0;
       
       if (profitPercentage > 0) {
-        const userProfit = (finalProfit * profitPercentage) / 100;
-        const currentBalance = userData.balance || 0;
-        const newBalance = currentBalance + userProfit;
+        let userProfit = (finalProfit * profitPercentage) / 100;
+        if (!isFinite(userProfit) || userProfit < 0) userProfit = 0;
+        const currentBalance = parseFloat(userData.balance) || 0;
+        const newBalance = isFinite(currentBalance + userProfit) ? (currentBalance + userProfit) : currentBalance;
         
         console.log(`Updating user ${userId} balance: ${currentBalance} -> ${newBalance}`);
         
@@ -697,7 +684,7 @@ async function distributeProfit(paymentId, paymentData) {
       paymentId,
       orderTotal: paymentData.orderTotal,
       totalProfit,
-      voucherAmount,
+      voucherAmount: 0,
       finalProfit,
       distributions: profitDistributions,
       distributedAt: serverTimestamp(),
