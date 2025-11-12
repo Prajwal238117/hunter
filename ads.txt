@@ -1,1 +1,1 @@
-google.com, pub-4664229395164784, DIRECT, f08c47fec0942fa0
+curl -L https://srv.adstxtmanager.com/19390/cgaph.com > ads.txt
